@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card } from '@/components/ui';
+import { Card, Badge } from '@/components/ui';
 import { useApp } from '@/context';
 import {
   ArrowLeft,
@@ -21,11 +21,14 @@ import {
   Briefcase,
   Layers,
   FileText,
-  MessageSquare,
   Activity,
   Award,
-  MoreHorizontal,
   Edit,
+  ShieldCheck,
+  ShieldX,
+  Download,
+  Check,
+  RotateCcw,
 } from 'lucide-react';
 
 interface EditorDetailProps {
@@ -65,7 +68,6 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
     { name: 'Projects & Tasks', icon: <FileText className="w-4 h-4" /> },
     { name: 'Submissions', icon: <Activity className="w-4 h-4" /> },
     { name: 'Activity Log', icon: <Clock className="w-4 h-4" /> },
-    { name: 'Messages', icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   const stats = [
@@ -128,6 +130,20 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       thumbnail:
         'https://images.pexels.com/photos/3062545/pexels-photo-3062545.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
+    {
+      title: 'Fitness Tech Commercial',
+      category: 'Commercial Ad',
+      duration: '00:50',
+      thumbnail:
+        'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400',
+    },
+    {
+      title: 'Podcast Highlights Reel',
+      category: 'Reels Editing',
+      duration: '00:40',
+      thumbnail:
+        'https://images.pexels.com/photos/4050245/pexels-photo-4050245.jpeg?auto=compress&cs=tinysrgb&w=400',
+    },
   ];
 
   const currentAssignments = [
@@ -151,6 +167,69 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       status: 'Ready for Review',
       due: 'Due May 23, 2025',
       statusColor: 'bg-amber-50 text-amber-700',
+    },
+  ];
+
+  const editorSubmissions = [
+    {
+      id: 'sub-1',
+      title: 'Instagram Reel Series (5x)',
+      campaign: 'Aurora Skincare — Q4 Launch',
+      submitted: '1h ago',
+      due: 'May 20, 2025',
+      status: 'Ready for review',
+      driveLink: 'https://drive.google.com/aurora-reels',
+    },
+    {
+      id: 'sub-2',
+      title: 'Thumbnail Design Package',
+      campaign: 'Aurora Skincare — Q4 Launch',
+      submitted: '1d ago',
+      due: 'May 20, 2025',
+      status: 'Approved',
+      driveLink: 'https://drive.google.com/aurora-thumbs',
+    },
+    {
+      id: 'sub-3',
+      title: 'Social Teasers (4x)',
+      campaign: 'TechFlow SaaS — Product Demo Series',
+      submitted: '3d ago',
+      due: 'May 21, 2025',
+      status: 'In Progress',
+      driveLink: 'https://drive.google.com/techflow-teasers',
+    },
+  ];
+
+  const fullActivityLog = [
+    {
+      event: 'Submitted "Instagram Reel Series (5x)" for review',
+      timestamp: '2 hours ago',
+      color: 'bg-violet-600',
+    },
+    {
+      event: 'Task "Thumbnail Design Package" approved by Admin User',
+      timestamp: '1 day ago',
+      color: 'bg-emerald-600',
+    },
+    {
+      event: 'Started working on "Feature Walkthrough Video"',
+      timestamp: '2 days ago',
+      color: 'bg-amber-500',
+    },
+    {
+      event: 'Updated portfolio item "Luxury Product Promo"',
+      timestamp: '3 days ago',
+      color: 'bg-emerald-500',
+    },
+    {
+      event: 'Profile verification approved by Admin User',
+      timestamp: 'May 16, 2025',
+      color: 'bg-violet-600',
+    },
+    {
+      event: 'Joined Gogangs Platform',
+      timestamp: 'May 12, 2025',
+      color: 'bg-gray-400',
     },
   ];
 
@@ -178,10 +257,10 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
         </div>
       </div>
 
-      {/* Main 3-Column Layout */}
+      {/* Main Layout: Sticky Left Sidebar + Center/Right Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Column 1: Left Sidebar (Navigation & Quick Actions) - 3 cols */}
-        <div className="lg:col-span-3 space-y-4">
+        {/* Column 1: Sticky Left Sidebar (Navigation & Quick Actions) - 3 cols */}
+        <div className="lg:col-span-3 lg:sticky lg:top-6 self-start space-y-4">
           {/* Navigation Card */}
           <Card className="p-2 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-0.5">
             {navItems.map((item) => (
@@ -235,376 +314,599 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
           </Card>
         </div>
 
-        {/* Column 2: Main Center Content - 6 cols */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Main Profile Header Card */}
-          <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs">
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="relative shrink-0">
-                  <img
-                    src={editor.avatarUrl}
-                    alt={editor.fullName}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm"
-                  />
-                  <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white absolute bottom-0.5 right-0.5" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    <h2 className="text-xl font-extrabold text-gray-900">{editor.fullName}</h2>
-                    <CheckCircle2 className="w-4 h-4 text-violet-600 fill-violet-600/10" />
-                  </div>
-                  <p className="text-xs font-semibold text-gray-500">Video Editor</p>
-                  <div className="space-y-1 pt-1 text-[11.5px] text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-gray-400" />
-                      <span>{editor.email}</span>
-                      <Phone className="w-3.5 h-3.5 text-gray-400 ml-2" />
-                      <span>{editor.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                      <span>{editor.city}</span>
-                      <Calendar className="w-3.5 h-3.5 text-gray-400 ml-2" />
-                      <span>Joined May 12, 2025</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 pt-2">
-                    <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
-                      <Linkedin className="w-3.5 h-3.5 text-sky-600" />
-                    </button>
-                    <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
-                      <Instagram className="w-3.5 h-3.5 text-pink-600" />
-                    </button>
-                    <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
-                      <LinkIcon className="w-3.5 h-3.5 text-gray-500" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+        {/* Dynamic Center / Right Views based on Active Tab */}
 
-              {/* Verification Status Box */}
-              <div className="bg-gray-50/70 border border-gray-100 p-3.5 rounded-xl text-left space-y-1.5 shrink-0 min-w-[140px]">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                  VERIFICATION STATUS
-                </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">
-                  ● Verified
-                </span>
-                <div className="text-[10.5px] text-gray-400 pt-1 space-y-0.5">
-                  <p>Verified on</p>
-                  <p className="font-semibold text-gray-700">May 16, 2025</p>
-                  <p className="pt-0.5">Verified by</p>
-                  <p className="font-semibold text-gray-700">Admin User</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* 5 Stat Cards Row (Compact & Sleek) */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {stats.map((s, idx) => (
-              <Card key={idx} className="p-3 bg-white border border-gray-100 rounded-xl shadow-2xs">
-                <div className={`w-7 h-7 rounded-lg ${s.bg} flex items-center justify-center mb-2`}>
-                  {s.icon}
-                </div>
-                <p className="text-[10px] font-semibold text-gray-500">{s.label}</p>
-                <h3 className="text-base font-extrabold text-gray-900 tracking-tight my-0.5">
-                  {s.value}
-                </h3>
-                <p className="text-[10px] text-gray-400">{s.subtext}</p>
-              </Card>
-            ))}
-          </div>
-
-          {/* About, Skills & Software Card */}
-          <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  About Elena
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">{editor.bio}</p>
-                <div className="space-y-1.5 text-xs pt-1">
-                  <div className="flex justify-between py-0.5 border-b border-gray-50">
-                    <span className="text-gray-400">Experience</span>
-                    <span className="font-semibold text-gray-900">{editor.experience}</span>
-                  </div>
-                  <div className="flex justify-between py-0.5 border-b border-gray-50">
-                    <span className="text-gray-400">Availability</span>
-                    <span className="font-semibold text-gray-900">{editor.availability}</span>
-                  </div>
-                  <div className="flex justify-between py-0.5 border-b border-gray-50">
-                    <span className="text-gray-400">Languages</span>
-                    <span className="font-semibold text-gray-900">{editor.languages}</span>
-                  </div>
-                  <div className="flex justify-between py-0.5">
-                    <span className="text-gray-400">Time Zone</span>
-                    <span className="font-semibold text-gray-900">{editor.timeZone}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
-                    Skills
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      'Reels Editing',
-                      'YouTube Editing',
-                      'Commercial Ads',
-                      'Motion Graphics',
-                      'Color Grading',
-                      'Corporate Videos',
-                      'Thumbnail Design',
-                    ].map((skill, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 bg-violet-50 text-violet-700 border border-violet-100 text-[11px] font-semibold rounded-lg"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-medium rounded-lg">
-                      +2 more
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
-                    Software
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-indigo-950 text-sky-400 font-bold text-xs flex items-center justify-center shadow-2xs">
-                      Pr
-                    </span>
-                    <span className="w-8 h-8 rounded-lg bg-purple-950 text-purple-300 font-bold text-xs flex items-center justify-center shadow-2xs">
-                      Ae
-                    </span>
-                    <span className="w-8 h-8 rounded-lg bg-gray-900 text-pink-500 font-bold text-xs flex items-center justify-center shadow-2xs">
-                      🎬
-                    </span>
-                    <span className="w-8 h-8 rounded-lg bg-sky-950 text-sky-300 font-bold text-xs flex items-center justify-center shadow-2xs">
-                      Ps
-                    </span>
-                    <span className="w-8 h-8 rounded-lg bg-amber-950 text-amber-500 font-bold text-xs flex items-center justify-center shadow-2xs">
-                      Ai
-                    </span>
-                    <span className="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">
-                      +2
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Featured Portfolio (3/3) & Current Assignments */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Featured Portfolio Card */}
-            <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-gray-900">Featured Portfolio (3/3)</h3>
-                <button className="text-[11px] font-semibold text-violet-600 hover:underline">
-                  View all portfolio ↗
-                </button>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                {portfolioItems.map((item, idx) => (
-                  <div key={idx} className="group cursor-pointer space-y-1">
-                    <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+        {/* TAB 1: OVERVIEW (DEFAULT COMPREHENSIVE DASHBOARD) */}
+        {activeTab === 'Overview' && (
+          <>
+            {/* Column 2: Main Center Content - 6 cols */}
+            <div className="lg:col-span-6 space-y-6">
+              {/* Main Profile Header Card */}
+              <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="relative shrink-0">
                       <img
-                        src={item.thumbnail}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        src={editor.avatarUrl}
+                        alt={editor.fullName}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm"
                       />
-                      <span className="absolute bottom-1 right-1 px-1 py-0.2 bg-black/75 text-white text-[8px] font-medium rounded">
+                      <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white absolute bottom-0.5 right-0.5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <h2 className="text-xl font-extrabold text-gray-900">{editor.fullName}</h2>
+                        <CheckCircle2 className="w-4 h-4 text-violet-600 fill-violet-600/10" />
+                      </div>
+                      <p className="text-xs font-semibold text-gray-500">Video Editor</p>
+                      <div className="space-y-1 pt-1 text-[11.5px] text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{editor.email}</span>
+                          <Phone className="w-3.5 h-3.5 text-gray-400 ml-2" />
+                          <span>{editor.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{editor.city}</span>
+                          <Calendar className="w-3.5 h-3.5 text-gray-400 ml-2" />
+                          <span>Joined May 12, 2025</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 pt-2">
+                        <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
+                          <Linkedin className="w-3.5 h-3.5 text-sky-600" />
+                        </button>
+                        <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
+                          <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                        </button>
+                        <button className="w-7 h-7 rounded-lg border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
+                          <LinkIcon className="w-3.5 h-3.5 text-gray-500" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Verification Status Box */}
+                  <div className="bg-gray-50/70 border border-gray-100 p-3.5 rounded-xl text-left space-y-1.5 shrink-0 min-w-[140px]">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                      VERIFICATION STATUS
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">
+                      ● Verified
+                    </span>
+                    <div className="text-[10.5px] text-gray-400 pt-1 space-y-0.5">
+                      <p>Verified on</p>
+                      <p className="font-semibold text-gray-700">May 16, 2025</p>
+                      <p className="pt-0.5">Verified by</p>
+                      <p className="font-semibold text-gray-700">Admin User</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* 5 Stat Cards Row */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {stats.map((s, idx) => (
+                  <Card key={idx} className="p-3 bg-white border border-gray-100 rounded-xl shadow-2xs">
+                    <div className={`w-7 h-7 rounded-lg ${s.bg} flex items-center justify-center mb-2`}>
+                      {s.icon}
+                    </div>
+                    <p className="text-[10px] font-semibold text-gray-500">{s.label}</p>
+                    <h3 className="text-base font-extrabold text-gray-900 tracking-tight my-0.5">
+                      {s.value}
+                    </h3>
+                    <p className="text-[10px] text-gray-400">{s.subtext}</p>
+                  </Card>
+                ))}
+              </div>
+
+              {/* About, Skills & Software Card */}
+              <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                      About Elena
+                    </h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">{editor.bio}</p>
+                    <div className="space-y-1.5 text-xs pt-1">
+                      <div className="flex justify-between py-0.5 border-b border-gray-50">
+                        <span className="text-gray-400">Experience</span>
+                        <span className="font-semibold text-gray-900">{editor.experience}</span>
+                      </div>
+                      <div className="flex justify-between py-0.5 border-b border-gray-50">
+                        <span className="text-gray-400">Availability</span>
+                        <span className="font-semibold text-gray-900">{editor.availability}</span>
+                      </div>
+                      <div className="flex justify-between py-0.5 border-b border-gray-50">
+                        <span className="text-gray-400">Languages</span>
+                        <span className="font-semibold text-gray-900">{editor.languages}</span>
+                      </div>
+                      <div className="flex justify-between py-0.5">
+                        <span className="text-gray-400">Time Zone</span>
+                        <span className="font-semibold text-gray-900">{editor.timeZone}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
+                        Skills
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          'Reels Editing',
+                          'YouTube Editing',
+                          'Commercial Ads',
+                          'Motion Graphics',
+                          'Color Grading',
+                          'Corporate Videos',
+                          'Thumbnail Design',
+                        ].map((skill, i) => (
+                          <span
+                            key={i}
+                            className="px-2.5 py-1 bg-violet-50 text-violet-700 border border-violet-100 text-[11px] font-semibold rounded-lg"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                        <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-medium rounded-lg">
+                          +2 more
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
+                        Software
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="w-8 h-8 rounded-lg bg-indigo-950 text-sky-400 font-bold text-xs flex items-center justify-center shadow-2xs">
+                          Pr
+                        </span>
+                        <span className="w-8 h-8 rounded-lg bg-purple-950 text-purple-300 font-bold text-xs flex items-center justify-center shadow-2xs">
+                          Ae
+                        </span>
+                        <span className="w-8 h-8 rounded-lg bg-gray-900 text-pink-500 font-bold text-xs flex items-center justify-center shadow-2xs">
+                          🎬
+                        </span>
+                        <span className="w-8 h-8 rounded-lg bg-sky-950 text-sky-300 font-bold text-xs flex items-center justify-center shadow-2xs">
+                          Ps
+                        </span>
+                        <span className="w-8 h-8 rounded-lg bg-amber-950 text-amber-500 font-bold text-xs flex items-center justify-center shadow-2xs">
+                          Ai
+                        </span>
+                        <span className="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">
+                          +2
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Featured Portfolio (3/3) & Current Assignments */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-gray-900">Featured Portfolio (3/3)</h3>
+                    <button
+                      onClick={() => setActiveTab('Portfolio')}
+                      className="text-[11px] font-semibold text-violet-600 hover:underline"
+                    >
+                      View all portfolio ↗
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {portfolioItems.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="group cursor-pointer space-y-1">
+                        <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                          <img
+                            src={item.thumbnail}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <span className="absolute bottom-1 right-1 px-1 py-0.2 bg-black/75 text-white text-[8px] font-medium rounded">
+                            {item.duration}
+                          </span>
+                        </div>
+                        <p className="text-[10px] font-bold text-gray-900 truncate">{item.title}</p>
+                        <p className="text-[9px] text-gray-400">{item.category}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-gray-900">Current Assignments</h3>
+                    <button
+                      onClick={() => setActiveTab('Projects & Tasks')}
+                      className="text-[11px] font-semibold text-violet-600 hover:underline"
+                    >
+                      View all projects ↗
+                    </button>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs">
+                    {currentAssignments.map((row, idx) => (
+                      <div key={idx} className="space-y-0.5 pb-2 border-b border-gray-50 last:border-0 last:pb-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-gray-900 text-[11px] truncate">{row.project}</span>
+                          <span className={`px-2 py-0.2 text-[9.5px] font-semibold rounded-full ${row.statusColor}`}>
+                            ● {row.status}
+                          </span>
+                        </div>
+                        <p className="text-[10.5px] text-gray-500">{row.subtask} • <span className="text-gray-400">{row.due}</span></p>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              {/* Recent Reviews Card */}
+              <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-gray-900">Recent Reviews</h3>
+                  <button className="text-[11px] font-semibold text-violet-600 hover:underline">
+                    View all reviews
+                  </button>
+                </div>
+
+                <div className="flex items-start gap-4 text-xs">
+                  <div className="shrink-0 space-y-0.5">
+                    <span className="text-xl font-extrabold text-gray-900">5.0</span>
+                    <div className="flex text-amber-400 text-xs">★★★★★</div>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <p className="italic text-gray-600 text-xs">
+                      "Elena delivered exceptional work! The edits were clean, on-brand, and perfectly captured the vibe we wanted."
+                    </p>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="https://i.pravatar.cc/150?u=marcus"
+                          alt="Marcus"
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                        <div>
+                          <span className="font-bold text-gray-900 block text-[11px]">Marcus Chen</span>
+                          <span className="text-[10px] text-gray-400">Aurora Skincare</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-gray-400">May 10, 2026</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Column 3: Right Sidebar (Activity Summary & Timeline) - 3 cols */}
+            <div className="lg:col-span-3 space-y-4">
+              {/* Activity Summary Card */}
+              <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-gray-900">Activity Summary</h4>
+                  <button className="text-[11px] font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1">
+                    <span>{timeRange}</span>
+                    <ChevronDown className="w-3 h-3 text-gray-400" />
+                  </button>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between py-1 border-b border-gray-50">
+                    <span className="flex items-center gap-2 text-gray-600">
+                      <span className="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
+                        ✓
+                      </span>
+                      Tasks Completed
+                    </span>
+                    <span className="font-bold text-gray-900">12</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-gray-50">
+                    <span className="flex items-center gap-2 text-gray-600">
+                      <span className="w-5 h-5 rounded bg-amber-100 text-amber-600 flex items-center justify-center text-[10px]">
+                        ⏱
+                      </span>
+                      Tasks In Progress
+                    </span>
+                    <span className="font-bold text-gray-900">3</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-gray-50">
+                    <span className="flex items-center gap-2 text-gray-600">
+                      <span className="w-5 h-5 rounded bg-violet-100 text-violet-600 flex items-center justify-center text-[10px]">
+                        📤
+                      </span>
+                      Submitted for Review
+                    </span>
+                    <span className="font-bold text-gray-900">4</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-gray-50">
+                    <span className="flex items-center gap-2 text-gray-600">
+                      <span className="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
+                        ✓
+                      </span>
+                      Approved
+                    </span>
+                    <span className="font-bold text-gray-900">11</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="flex items-center gap-2 text-gray-600">
+                      <span className="w-5 h-5 rounded bg-red-100 text-red-600 flex items-center justify-center text-[10px]">
+                        ↰
+                      </span>
+                      Returned
+                    </span>
+                    <span className="font-bold text-gray-900">1</span>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Recent Activity Card */}
+              <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
+                <h4 className="text-xs font-bold text-gray-900">Recent Activity</h4>
+                <div className="space-y-3 text-xs">
+                  {fullActivityLog.slice(0, 4).map((log, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className={`w-2 h-2 rounded-full ${log.color} mt-1.5 shrink-0`} />
+                      <div>
+                        <p className="text-gray-900 font-medium">{log.event}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">{log.timestamp}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Last Active Card */}
+              <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-gray-900">Last Active</h4>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                    ● Online
+                  </span>
+                </div>
+                <p className="text-xs text-gray-700 font-semibold">May 18, 2026 at 10:24 AM (EST)</p>
+                <p className="text-[10.5px] text-gray-400">IP: 192.168.1.24 • New York, USA</p>
+              </Card>
+            </div>
+          </>
+        )}
+
+        {/* TAB 2: PROFILE & DETAILS VIEW */}
+        {activeTab === 'Profile & Details' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-6">
+              <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3">
+                Profile & Detailed Background
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
+                <div className="space-y-3">
+                  <h4 className="font-bold text-gray-900 uppercase tracking-wider text-[11px]">
+                    Personal Information
+                  </h4>
+                  <div className="space-y-2 text-gray-700">
+                    <p><span className="text-gray-400 block">Full Name:</span> <span className="font-semibold text-gray-900">{editor.fullName}</span></p>
+                    <p><span className="text-gray-400 block">Email Address:</span> <span className="font-semibold text-gray-900">{editor.email}</span></p>
+                    <p><span className="text-gray-400 block">Phone:</span> <span className="font-semibold text-gray-900">{editor.phone}</span></p>
+                    <p><span className="text-gray-400 block">Location:</span> <span className="font-semibold text-gray-900">{editor.city}</span></p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-bold text-gray-900 uppercase tracking-wider text-[11px]">
+                    Work Preferences & Bio
+                  </h4>
+                  <div className="space-y-2 text-gray-700">
+                    <p><span className="text-gray-400 block">Experience:</span> <span className="font-semibold text-gray-900">{editor.experience}</span></p>
+                    <p><span className="text-gray-400 block">Availability:</span> <span className="font-semibold text-gray-900">{editor.availability}</span></p>
+                    <p><span className="text-gray-400 block">Languages Spoken:</span> <span className="font-semibold text-gray-900">{editor.languages}</span></p>
+                    <p><span className="text-gray-400 block">Timezone:</span> <span className="font-semibold text-gray-900">{editor.timeZone}</span></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 space-y-2 text-xs">
+                <h4 className="font-bold text-gray-900 uppercase tracking-wider text-[11px]">
+                  Professional Bio
+                </h4>
+                <p className="text-gray-600 leading-relaxed bg-gray-50/70 p-4 rounded-xl border border-gray-100">
+                  {editor.bio}
+                </p>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* TAB 3: PORTFOLIO GALLERY VIEW */}
+        {activeTab === 'Portfolio' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h3 className="text-base font-extrabold text-gray-900">
+                  Portfolio Gallery ({portfolioItems.length})
+                </h3>
+                <span className="text-xs text-violet-600 font-semibold cursor-pointer hover:underline">
+                  + Add Portfolio Item
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {portfolioItems.map((item, idx) => (
+                  <div key={idx} className="group border border-gray-100 rounded-xl overflow-hidden shadow-2xs hover:shadow-md transition-all p-2 space-y-2">
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                      <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center">
+                          <Play className="w-4 h-4 fill-gray-900 ml-0.5" />
+                        </div>
+                      </div>
+                      <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-black/75 text-white text-[10px] rounded font-medium">
                         {item.duration}
                       </span>
                     </div>
-                    <p className="text-[10px] font-bold text-gray-900 truncate">{item.title}</p>
-                    <p className="text-[9px] text-gray-400">{item.category}</p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Current Assignments Card */}
-            <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-gray-900">Current Assignments</h3>
-                <button className="text-[11px] font-semibold text-violet-600 hover:underline">
-                  View all projects ↗
-                </button>
-              </div>
-
-              <div className="space-y-2.5 text-xs">
-                {currentAssignments.map((row, idx) => (
-                  <div key={idx} className="space-y-0.5 pb-2 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-gray-900 text-[11px] truncate">{row.project}</span>
-                      <span className={`px-2 py-0.2 text-[9.5px] font-semibold rounded-full ${row.statusColor}`}>
-                        ● {row.status}
-                      </span>
+                    <div className="px-1">
+                      <p className="text-xs font-bold text-gray-900 truncate">{item.title}</p>
+                      <p className="text-[10px] text-gray-400">{item.category}</p>
                     </div>
-                    <p className="text-[10.5px] text-gray-500">{row.subtask} • <span className="text-gray-400">{row.due}</span></p>
                   </div>
                 ))}
               </div>
             </Card>
           </div>
+        )}
 
-          {/* Recent Reviews Card */}
-          <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-gray-900">Recent Reviews</h3>
-              <button className="text-[11px] font-semibold text-violet-600 hover:underline">
-                View all reviews
-              </button>
-            </div>
-
-            <div className="flex items-start gap-4 text-xs">
-              <div className="shrink-0 space-y-0.5">
-                <span className="text-xl font-extrabold text-gray-900">5.0</span>
-                <div className="flex text-amber-400 text-xs">★★★★★</div>
+        {/* TAB 4: VERIFICATION VIEW */}
+        {activeTab === 'Verification' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div>
+                  <h3 className="text-base font-extrabold text-gray-900">Verification Inspection</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">Review credentials and documentations submitted by editor</p>
+                </div>
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">
+                  ● {editor.verificationStatus}
+                </span>
               </div>
-              <div className="flex-1 space-y-2">
-                <p className="italic text-gray-600 text-xs">
-                  "Elena delivered exceptional work! The edits were clean, on-brand, and perfectly captured the vibe we wanted."
-                </p>
-                <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src="https://i.pravatar.cc/150?u=marcus"
-                      alt="Marcus"
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                    <div>
-                      <span className="font-bold text-gray-900 block text-[11px]">Marcus Chen</span>
-                      <span className="text-[10px] text-gray-400">Aurora Skincare</span>
+
+              <div className="space-y-4 text-xs">
+                <div className="p-4 bg-gray-50/70 rounded-xl border border-gray-100 space-y-2">
+                  <p className="font-bold text-gray-900 text-xs">Submitted Verification Details</p>
+                  <p className="text-gray-600">Verified date: <span className="font-semibold text-gray-900">{editor.verifiedDate}</span></p>
+                  <p className="text-gray-600">Verified by: <span className="font-semibold text-gray-900">{editor.verifiedBy}</span></p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-bold text-gray-900 text-xs uppercase tracking-wider">Verification Documents & Sample Links</h4>
+                  <div className="space-y-2">
+                    <a href="https://drive.google.com/editor-resume" target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-violet-600 font-semibold text-xs transition-colors">
+                      <span className="flex items-center gap-2">📄 Resume & ID Verification Document.pdf</span>
+                      <Download className="w-3.5 h-3.5 text-gray-400" />
+                    </a>
+                    <a href="https://vimeo.com/showreel" target="_blank" rel="noreferrer" className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 text-violet-600 font-semibold text-xs transition-colors">
+                      <span className="flex items-center gap-2">🔗 Official Video Editing Showreel 2025</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-gray-400" />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() => {
+                      setVerificationStatus(editor.id, 'Verified');
+                      addToast(`${editor.fullName} verified`, 'success');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Approve Verification</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setVerificationStatus(editor.id, 'Rejected', 'Please update sample reels.');
+                      addToast(`${editor.fullName} verification rejected`, 'error');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+                  >
+                    <ShieldX className="w-4 h-4" />
+                    <span>Reject Verification</span>
+                  </button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* TAB 5: PROJECTS & TASKS VIEW */}
+        {activeTab === 'Projects & Tasks' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+              <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3">
+                Assigned Projects & Subtasks ({currentAssignments.length})
+              </h3>
+
+              <div className="space-y-3">
+                {currentAssignments.map((row, idx) => (
+                  <div key={idx} className="p-4 border border-gray-100 rounded-xl bg-white space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-gray-900 text-xs">{row.project}</span>
+                      <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full ${row.statusColor}`}>
+                        ● {row.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600">{row.subtask}</p>
+                    <p className="text-[11px] text-gray-400">{row.due}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* TAB 6: SUBMISSIONS VIEW */}
+        {activeTab === 'Submissions' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+              <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3">
+                Editor Deliverable Submissions ({editorSubmissions.length})
+              </h3>
+
+              <div className="space-y-3">
+                {editorSubmissions.map((row) => (
+                  <div key={row.id} className="p-4 border border-gray-100 rounded-xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-gray-900">{row.title}</h4>
+                      <p className="text-gray-500 text-[11px]">{row.campaign}</p>
+                      <a href={row.driveLink} target="_blank" rel="noreferrer" className="text-violet-600 font-semibold hover:underline inline-flex items-center gap-1 mt-1">
+                        <span>{row.driveLink}</span>
+                        <ExternalLink className="w-3 h-3 text-violet-500" />
+                      </a>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full ${
+                        row.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                      }`}>
+                        ● {row.status}
+                      </span>
+                      <span className="text-gray-400 text-[11px]">{row.submitted}</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-gray-400">May 10, 2026</span>
-                </div>
+                ))}
               </div>
-            </div>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        )}
 
-        {/* Column 3: Right Sidebar (Activity Summary & Timeline) - 3 cols */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* Activity Summary Card */}
-          <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-gray-900">Activity Summary</h4>
-              <button className="text-[11px] font-semibold text-gray-500 hover:text-gray-900 flex items-center gap-1">
-                <span>{timeRange}</span>
-                <ChevronDown className="w-3 h-3 text-gray-400" />
-              </button>
-            </div>
+        {/* TAB 7: ACTIVITY LOG VIEW */}
+        {activeTab === 'Activity Log' && (
+          <div className="lg:col-span-9 space-y-6">
+            <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+              <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3">
+                Complete Chronological Audit Log
+              </h3>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between py-1 border-b border-gray-50">
-                <span className="flex items-center gap-2 text-gray-600">
-                  <span className="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
-                    ✓
-                  </span>
-                  Tasks Completed
-                </span>
-                <span className="font-bold text-gray-900">12</span>
+              <div className="space-y-4 text-xs">
+                {fullActivityLog.map((log, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50/60 rounded-xl border border-gray-100">
+                    <span className={`w-2.5 h-2.5 rounded-full ${log.color} mt-1 shrink-0`} />
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{log.event}</p>
+                      <p className="text-[10.5px] text-gray-400 mt-0.5">{log.timestamp}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50">
-                <span className="flex items-center gap-2 text-gray-600">
-                  <span className="w-5 h-5 rounded bg-amber-100 text-amber-600 flex items-center justify-center text-[10px]">
-                    ⏱
-                  </span>
-                  Tasks In Progress
-                </span>
-                <span className="font-bold text-gray-900">3</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50">
-                <span className="flex items-center gap-2 text-gray-600">
-                  <span className="w-5 h-5 rounded bg-violet-100 text-violet-600 flex items-center justify-center text-[10px]">
-                    📤
-                  </span>
-                  Submitted for Review
-                </span>
-                <span className="font-bold text-gray-900">4</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50">
-                <span className="flex items-center gap-2 text-gray-600">
-                  <span className="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
-                    ✓
-                  </span>
-                  Approved
-                </span>
-                <span className="font-bold text-gray-900">11</span>
-              </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="flex items-center gap-2 text-gray-600">
-                  <span className="w-5 h-5 rounded bg-red-100 text-red-600 flex items-center justify-center text-[10px]">
-                    ↰
-                  </span>
-                  Returned
-                </span>
-                <span className="font-bold text-gray-900">1</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Recent Activity Card */}
-          <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3">
-            <h4 className="text-xs font-bold text-gray-900">Recent Activity</h4>
-            <div className="space-y-3 text-xs">
-              <div className="flex items-start gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-violet-600 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-gray-900 font-medium">Submitted "Instagram Reel Series (5x)" for review</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-violet-600 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-gray-900 font-medium">Task "Thumbnail Design Package" approved</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">1 day ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-gray-900 font-medium">Started working on "Feature Walkthrough Video"</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">2 days ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-gray-900 font-medium">Updated portfolio item "Luxury Product Promo"</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">3 days ago</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Last Active Card */}
-          <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-gray-900">Last Active</h4>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-                ● Online
-              </span>
-            </div>
-            <p className="text-xs text-gray-700 font-semibold">May 18, 2026 at 10:24 AM (EST)</p>
-            <p className="text-[10.5px] text-gray-400">IP: 192.168.1.24 • New York, USA</p>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
 
