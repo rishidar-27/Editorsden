@@ -279,24 +279,24 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
         ))}
       </div>
 
-      {/* Projects Cards List */}
-      <div className="space-y-4">
+      {/* Projects Cards List (Compact & Sleek) */}
+      <div className="space-y-3">
         {projectList.map((item) => (
           <Card
             key={item.id}
             onClick={() => onNavigate(`/admin/projects/${item.id}`)}
-            className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs hover:shadow-md transition-all cursor-pointer"
+            className="p-3.5 sm:p-4 bg-white border border-gray-100 rounded-xl shadow-2xs hover:shadow-md transition-all cursor-pointer"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
               {/* Left Column: Project Info & Meta */}
-              <div className="lg:col-span-4 flex items-start gap-3.5">
-                <div className={`w-11 h-11 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+              <div className="lg:col-span-4 flex items-start gap-3">
+                <div className={`w-9 h-9 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
                   {item.icon}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-gray-900 truncate">{item.title}</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.client}</p>
-                  <div className="flex flex-wrap items-center gap-2 mt-3">
+                  <h3 className="text-xs font-bold text-gray-900 truncate">{item.title}</h3>
+                  <p className="text-[11px] text-gray-400 mt-0.5">{item.client}</p>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500">
                       <List className="w-3 h-3 text-gray-400" />
                       {item.subtasksCount} subtasks
