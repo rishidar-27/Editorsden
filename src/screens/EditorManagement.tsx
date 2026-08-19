@@ -240,25 +240,26 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
         </div>
       </div>
 
-      {/* 5 Top Stat Metric Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* 5 Top Stat Metric Cards Grid (Compact & Sleek) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {metrics.map((m, idx) => (
-          <Card key={idx} className="p-4 relative bg-white border border-gray-100 rounded-xl shadow-2xs">
-            <button className="absolute top-3.5 right-3 text-gray-300 hover:text-gray-500 transition-colors">
-              <MoreVertical className="w-4 h-4" />
-            </button>
-            <div className={`w-10 h-10 rounded-lg ${m.bg} flex items-center justify-center mb-3`}>
-              {m.icon}
+          <Card key={idx} className="p-3.5 relative bg-white border border-gray-100 rounded-xl shadow-2xs">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-gray-500 truncate pr-4">{m.label}</span>
+              <div className={`w-7 h-7 rounded-lg ${m.bg} flex items-center justify-center shrink-0`}>
+                {m.icon}
+              </div>
             </div>
-            <p className="text-xs font-medium text-gray-600 mb-1">{m.label}</p>
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
-              {m.value}
-            </h2>
-            <div className="flex items-center gap-1 text-xs">
-              <span className={`font-semibold ${m.trendUp ? 'text-emerald-600' : 'text-red-500'}`}>
-                {m.trend}
-              </span>
-              <span className="text-gray-400">{m.subtext}</span>
+            <div className="flex items-baseline justify-between gap-1">
+              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                {m.value}
+              </h2>
+              <div className="flex items-center gap-1 text-[10.5px]">
+                <span className={`font-bold ${m.trendUp ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {m.trend}
+                </span>
+                <span className="text-gray-400 font-medium hidden xl:inline">{m.subtext}</span>
+              </div>
             </div>
           </Card>
         ))}

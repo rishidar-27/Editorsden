@@ -254,22 +254,26 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
         </div>
       </div>
 
-      {/* 4 Stat Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 4 Stat Cards Grid (Compact & Sleek) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {stats.map((s, idx) => (
-          <Card key={idx} className="p-4 bg-white border border-gray-100 rounded-xl shadow-2xs">
-            <div className={`w-10 h-10 rounded-lg ${s.bg} flex items-center justify-center mb-3`}>
-              {s.icon}
+          <Card key={idx} className="p-3.5 bg-white border border-gray-100 rounded-xl shadow-2xs">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-gray-500">{s.label}</span>
+              <div className={`w-7 h-7 rounded-lg ${s.bg} flex items-center justify-center shrink-0`}>
+                {s.icon}
+              </div>
             </div>
-            <p className="text-xs font-medium text-gray-600 mb-1">{s.label}</p>
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
-              {s.value}
-            </h2>
-            <div className="flex items-center gap-1 text-xs">
-              <span className={`font-semibold ${s.trendUp ? 'text-emerald-600' : 'text-red-500'}`}>
-                {s.trend}
-              </span>
-              <span className="text-gray-400">{s.subtext}</span>
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                {s.value}
+              </h2>
+              <div className="flex items-center gap-1 text-[11px]">
+                <span className={`font-bold ${s.trendUp ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {s.trend}
+                </span>
+                <span className="text-gray-400 font-medium">{s.subtext}</span>
+              </div>
             </div>
           </Card>
         ))}
