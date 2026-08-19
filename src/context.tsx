@@ -44,6 +44,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activity, setActivity] = useState<ActivityEvent[]>(initialActivity);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  // Fetch initial data from Node.js & Express backend server using native fetch
+  useEffect(() => {
+    async function fetchBackendData() {
+      try {
+        const [editorsRes, projectsRes] = await Promise.all([
+          fetch('http://localhost:5000/api/editors').catch(() => null),
+          fetch('http://localhost:5000/api/projects').catch(() => null),
+        ]);
+
+        if (editorsRes && editorsRes.ok) {
+          const editorsData = await editorsRes.json();
+          if (Array.isArray(editorsData) && editorsData.length > 0) {
+            setEditors(editorsData);
+          }
+        }
+
+        if (projectsRes && projectsRes.ok) {
+          const projectsData = await projectsRes.json();
+          if (Array.isArray(projectsData) && projectsData.length > 0) {
+            setProjects(projectsData);
+          }
+        }
+      } catch (err) {
+        console.warn('Express backend server fallback to local state:', err);
+      }
+    }
+    fetchBackendData();
+  }, []);
+
   const addToast = useCallback((message: string, variant: Toast['variant'] = 'success') => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setToasts((prev) => [...prev, { id, message, variant }]);
