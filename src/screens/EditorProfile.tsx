@@ -67,31 +67,31 @@ export function EditorProfile() {
   );
 
   return (
-    <div className="bg-[#FAF9FF] min-h-screen py-8 px-4 lg:px-8 font-sans text-gray-900">
-      <div className="max-w-[1140px] mx-auto">
+    <div className="bg-[#FAF9FF] min-h-screen py-5 px-3 lg:px-6 font-sans text-gray-900">
+      <div className="max-w-[1060px] mx-auto">
         
-        {/* Header Bar */}
-        <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)] mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
+        {/* Compact Header Bar */}
+        <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)] mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="relative shrink-0">
               <img 
                 src={editor.avatarUrl || 'https://i.pravatar.cc/150?u=editor'} 
                 alt={editor.fullName} 
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-xs" 
+                className="w-12 h-12 rounded-xl object-cover border border-white shadow-2xs" 
               />
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center text-white">
-                <Check className="w-3 h-3 stroke-[3]" />
+              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center text-white">
+                <Check className="w-2.5 h-2.5 stroke-[3]" />
               </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Editor Profile'}</h1>
-                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-[#E6F8F0] text-[#10B981] flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Editor Profile'}</h1>
+                <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-[#E6F8F0] text-[#10B981] flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
                   Verified
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-[11px] text-gray-500 mt-0.5">
                 Manage your personal info, portfolio links, skills, and work availability.
               </p>
             </div>
@@ -99,90 +99,90 @@ export function EditorProfile() {
 
           <Button 
             onClick={handleSave} 
-            className="bg-[#6D28D9] hover:bg-purple-800 text-white font-semibold px-6 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2 shrink-0"
+            className="bg-[#6D28D9] hover:bg-purple-800 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-2xs transition-all flex items-center gap-1.5 shrink-0"
           >
             {saved ? (
-              <><Check className="w-4 h-4" /> Saved!</>
+              <><Check className="w-3.5 h-3.5" /> Saved!</>
             ) : (
-              <><Sparkles className="w-4 h-4" /> Save changes</>
+              <><Sparkles className="w-3.5 h-3.5" /> Save changes</>
             )}
           </Button>
         </div>
 
         {/* 2-Column Grid Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           
           {/* Left Column (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4">
             
             {/* Personal Information Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
-                  <User className="w-4 h-4" />
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+                  <User className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-base font-bold text-gray-900">Personal Information</h2>
+                <h2 className="text-sm font-bold text-gray-900">Personal Information</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input 
                   label="Full Name" 
                   value={form.fullName} 
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })} 
-                  icon={<User className="w-4 h-4 text-gray-400" />}
+                  icon={<User className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Phone Number" 
                   value={form.phone} 
                   onChange={(e) => setForm({ ...form, phone: e.target.value })} 
-                  icon={<Phone className="w-4 h-4 text-gray-400" />}
+                  icon={<Phone className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Email Address" 
                   type="email" 
                   value={form.email} 
                   onChange={(e) => setForm({ ...form, email: e.target.value })} 
-                  icon={<Mail className="w-4 h-4 text-gray-400" />}
+                  icon={<Mail className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="City / Location" 
                   value={form.city} 
                   onChange={(e) => setForm({ ...form, city: e.target.value })} 
-                  icon={<MapPin className="w-4 h-4 text-gray-400" />}
+                  icon={<MapPin className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>
             </div>
 
             {/* Links & Social Media Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
-                  <Globe className="w-4 h-4" />
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+                  <Globe className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-base font-bold text-gray-900">Links & Social Presence</h2>
+                <h2 className="text-sm font-bold text-gray-900">Links & Social Presence</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input 
                   label="LinkedIn Profile" 
                   placeholder="linkedin.com/in/..." 
                   value={form.linkedin} 
                   onChange={(e) => setForm({ ...form, linkedin: e.target.value })} 
-                  icon={<Linkedin className="w-4 h-4 text-gray-400" />}
+                  icon={<Linkedin className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Instagram Handle" 
                   placeholder="@username" 
                   value={form.instagram} 
                   onChange={(e) => setForm({ ...form, instagram: e.target.value })} 
-                  icon={<Instagram className="w-4 h-4 text-gray-400" />}
+                  icon={<Instagram className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Portfolio Website" 
                   placeholder="yourname.studio" 
                   value={form.portfolioLink} 
                   onChange={(e) => setForm({ ...form, portfolioLink: e.target.value })} 
-                  icon={<Globe className="w-4 h-4 text-gray-400" />}
+                  icon={<Globe className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Experience (Years)" 
@@ -190,16 +190,16 @@ export function EditorProfile() {
                   min="0" 
                   value={form.experience} 
                   onChange={(e) => setForm({ ...form, experience: parseInt(e.target.value) || 0 })} 
-                  icon={<Briefcase className="w-4 h-4 text-gray-400" />}
+                  icon={<Briefcase className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>
             </div>
 
             {/* Bio Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <h2 className="text-base font-bold text-gray-900 mb-3">About / Bio</h2>
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <h2 className="text-sm font-bold text-gray-900 mb-2">About / Bio</h2>
               <Textarea
-                rows={4}
+                rows={3}
                 placeholder="Tell clients and admins about your editing style, niche, and achievements..."
                 value={form.bio}
                 onChange={(e) => setForm({ ...form, bio: e.target.value })}
@@ -209,19 +209,19 @@ export function EditorProfile() {
           </div>
 
           {/* Right Column (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-4">
             
             {/* Skills & Specialties */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <h2 className="text-base font-bold text-gray-900 mb-3">Skills & Specialties</h2>
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <h2 className="text-sm font-bold text-gray-900 mb-2.5">Skills & Specialties</h2>
               
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {skills.map((skill) => (
-                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-[#F0EBFE] text-[#7C3AED] font-semibold px-3 py-1 rounded-full text-xs">
+                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-[#F0EBFE] text-[#7C3AED] font-semibold px-2.5 py-0.5 rounded-full text-[11px]">
                     {skill}
                   </SkillTag>
                 ))}
-                {skills.length === 0 && <p className="text-xs text-gray-500">No skills added yet.</p>}
+                {skills.length === 0 && <p className="text-[11px] text-gray-500">No skills added yet.</p>}
               </div>
 
               <div className="relative">
@@ -229,15 +229,15 @@ export function EditorProfile() {
                   placeholder="Type to search and add skills..."
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
-                  icon={<Plus className="w-4 h-4 text-gray-400" />}
+                  icon={<Plus className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 {skillInput && filteredSkills.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20 max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20 max-h-40 overflow-y-auto">
                     {filteredSkills.map((skill) => (
                       <button
                         key={skill}
                         onClick={() => addSkill(skill)}
-                        className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-[#F0EBFE] hover:text-[#7C3AED] transition-colors font-medium"
+                        className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-[#F0EBFE] hover:text-[#7C3AED] transition-colors font-medium"
                       >
                         + {skill}
                       </button>
@@ -248,23 +248,23 @@ export function EditorProfile() {
             </div>
 
             {/* Editing Software */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <h2 className="text-base font-bold text-gray-900 mb-3">Editing Software</h2>
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <h2 className="text-sm font-bold text-gray-900 mb-2.5">Editing Software</h2>
               
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {allSoftware.map((sw) => {
                   const selected = software.includes(sw as Software);
                   return (
                     <button
                       key={sw}
                       onClick={() => toggleSoftware(sw)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
                         selected
                           ? 'bg-[#F0EBFE] border-[#7C3AED]/40 text-[#7C3AED]'
                           : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                       }`}
                     >
-                      {selected && <Check className="w-3.5 h-3.5 text-[#7C3AED]" />}
+                      {selected && <Check className="w-3 h-3 text-[#7C3AED]" />}
                       {sw}
                     </button>
                   );
@@ -273,15 +273,15 @@ export function EditorProfile() {
             </div>
 
             {/* Work Availability */}
-            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF4E5] text-[#F97316] flex items-center justify-center">
-                  <Clock className="w-4 h-4" />
+            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-[#FFF4E5] text-[#F97316] flex items-center justify-center">
+                  <Clock className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-base font-bold text-gray-900">Work Availability</h2>
+                <h2 className="text-sm font-bold text-gray-900">Work Availability</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Select
                   label="Status"
                   value={form.availability}
@@ -299,7 +299,7 @@ export function EditorProfile() {
                   max="60"
                   value={form.hoursPerWeek}
                   onChange={(e) => setForm({ ...form, hoursPerWeek: parseInt(e.target.value) || 0 })}
-                  icon={<Clock className="w-4 h-4 text-gray-400" />}
+                  icon={<Clock className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>
             </div>
