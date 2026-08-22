@@ -14,7 +14,7 @@ interface AppState {
   projects: Project[];
   activity: ActivityEvent[];
   toasts: Toast[];
-  login: (email: string, password: string) => { success: boolean; error?: string };
+  login: (email: string, password: string) => { success: boolean; userType?: 'admin' | 'editor'; error?: string };
   register: (email: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
   getEditor: (id: string) => Editor | undefined;
@@ -85,28 +85,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const login = useCallback((email: string, password: string): { success: boolean; error?: string } => {
-    if (email === adminCredentials.email && password === adminCredentials.password) {
+  const login = useCallback((emailInput: string, passwordInput: string): { success: boolean; userType?: 'admin' | 'editor'; error?: string } => {
+    const email = emailInput.trim().toLowerCase();
+    const password = passwordInput.trim();
+
+    if (email === adminCredentials.email.toLowerCase() && password === adminCredentials.password) {
       setUser({ type: 'admin' });
-      return { success: true };
+      return { success: true, userType: 'admin' };
     }
-    const editor = editors.find((e) => e.email === email && e.password === password);
+    const editor = editors.find((e) => e.email.trim().toLowerCase() === email && e.password === password);
     if (editor) {
       setUser({ type: 'editor', editorId: editor.id });
       setEditors((prev) => prev.map((e) => e.id === editor.id ? { ...e, lastLogin: new Date().toISOString() } : e));
-      return { success: true };
+      return { success: true, userType: 'editor' };
     }
     return { success: false, error: 'Invalid email or password' };
   }, [editors]);
 
-  const register = useCallback((email: string, password: string): { success: boolean; error?: string } => {
-    const exists = editors.some((e) => e.email === email);
+  const register = useCallback((emailInput: string, passwordInput: string): { success: boolean; error?: string } => {
+    const email = emailInput.trim().toLowerCase();
+    const password = passwordInput.trim();
+    const exists = editors.some((e) => e.email.trim().toLowerCase() === email);
     if (exists) return { success: false, error: 'An account with this email already exists' };
     const newEditor: Editor = {
       id: `e${Date.now()}`,
       email,
       password,
-      fullName: '',
+      fullName: email.split('@')[0] || 'New Editor',
       phone: '',
       city: '',
       experience: 0,

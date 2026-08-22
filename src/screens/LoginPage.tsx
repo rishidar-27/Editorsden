@@ -25,7 +25,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
       if (mode === 'login') {
         const result = login(email, password);
         if (result.success) {
-          if (email === 'admin@gogangs.com') {
+          if (result.userType === 'admin') {
             onNavigate('/admin/dashboard');
           } else {
             onNavigate('/editor/dashboard');
