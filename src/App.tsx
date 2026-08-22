@@ -77,7 +77,7 @@ function Router() {
 
   // Public portfolio
   const editorMatch = route.match(/^\/editor\/([^/]+)$/);
-  if (editorMatch) {
+  if (editorMatch && !['dashboard', 'profile', 'portfolio', 'verification', 'projects'].includes(editorMatch[1])) {
     return (
       <>
         <PublicPortfolioPage editorId={editorMatch[1]} onNavigate={navigate} />
