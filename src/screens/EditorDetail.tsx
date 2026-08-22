@@ -114,35 +114,35 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       category: 'Commercial Ad',
       duration: '00:45',
       thumbnail:
-        'https://images.pexels.com/photos/3756879/pexels-photo-3756879.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       title: 'Travel Vlog – Highlights',
       category: 'YouTube Video',
       duration: '01:02',
       thumbnail:
-        'https://images.pexels.com/photos/325153/pexels-photo-325153.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       title: 'Luxury Product Promo',
       category: 'Commercial Ad',
       duration: '00:30',
       thumbnail:
-        'https://images.pexels.com/photos/3062545/pexels-photo-3062545.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       title: 'Fitness Tech Commercial',
       category: 'Commercial Ad',
       duration: '00:50',
       thumbnail:
-        'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       title: 'Podcast Highlights Reel',
       category: 'Reels Editing',
       duration: '00:40',
       thumbnail:
-        'https://images.pexels.com/photos/4050245/pexels-photo-4050245.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
   ];
 

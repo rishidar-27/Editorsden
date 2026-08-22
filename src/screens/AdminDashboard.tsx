@@ -81,7 +81,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       dueDate: 'Due May 22',
       status: 'warning',
       thumbnail:
-        'https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg?auto=compress&cs=tinysrgb&w=300',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       id: 'd2',
@@ -92,7 +92,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       dueDate: 'Due May 20',
       status: 'warning',
       thumbnail:
-        'https://images.pexels.com/photos/3756879/pexels-photo-3756879.jpeg?auto=compress&cs=tinysrgb&w=300',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       id: 'd3',
@@ -103,7 +103,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       dueDate: 'Due May 19',
       status: 'danger',
       thumbnail:
-        'https://images.pexels.com/photos/325153/pexels-photo-325153.jpeg?auto=compress&cs=tinysrgb&w=300',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       id: 'd4',
@@ -114,7 +114,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       dueDate: 'Due May 21',
       status: 'warning',
       thumbnail:
-        'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=300',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
     {
       id: 'd5',
@@ -125,7 +125,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       dueDate: 'Due May 23',
       status: 'warning',
       thumbnail:
-        'https://images.pexels.com/photos/4050245/pexels-photo-4050245.jpeg?auto=compress&cs=tinysrgb&w=300',
+        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
     },
   ];
 

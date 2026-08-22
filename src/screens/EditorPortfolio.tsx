@@ -43,7 +43,7 @@ export function EditorPortfolio() {
       id: `p${Date.now()}`,
       title: newTitle,
       type: 'link',
-      thumbnailUrl: newThumbnail || `https://images.pexels.com/photos/325153/pexels-photo-325153.jpeg?auto=compress&cs=tinysrgb&w=800`,
+      thumbnailUrl: newThumbnail || `https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800`,
       link: newLink,
       featured: false,
     };
