@@ -46,16 +46,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
     }, 500);
   };
 
-  const fillDemo = (type: 'admin' | 'editor') => {
-    if (type === 'admin') {
-      setEmail('admin@gogangs.com');
-      setPassword('admin1234');
-    } else {
-      setEmail('marcus@gogangs.com');
-      setPassword('demo1234');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-surface-50 flex flex-col">
       {/* Simple top bar */}
@@ -123,27 +113,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               </button>
             </div>
           </div>
-
-          {/* Demo credentials */}
-          {mode === 'login' && (
-            <div className="mt-4 p-4 bg-gray-050 border border-gray-100 rounded-card">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Demo credentials</p>
-              <div className="flex flex-col gap-1.5">
-                <button
-                  onClick={() => fillDemo('admin')}
-                  className="text-left text-xs text-gray-600 hover:text-violet-700 transition-colors"
-                >
-                  <span className="font-medium">Admin:</span> admin@gogangs.com / admin1234
-                </button>
-                <button
-                  onClick={() => fillDemo('editor')}
-                  className="text-left text-xs text-gray-600 hover:text-violet-700 transition-colors"
-                >
-                  <span className="font-medium">Editor:</span> marcus@gogangs.com / demo1234
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

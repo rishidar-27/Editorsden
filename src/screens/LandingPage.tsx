@@ -25,11 +25,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         <div className="max-w-[1200px] mx-auto h-full px-4 lg:px-6 flex items-center justify-between">
           <Logo />
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => onNavigate('/login')}>
-              Admin login
-            </Button>
             <Button size="sm" onClick={() => onNavigate('/login')}>
-              Apply as an editor
+              Login / Sign Up
             </Button>
           </div>
         </div>
@@ -61,11 +58,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             style={{ animationDelay: '350ms', animationFillMode: 'forwards' }}
           >
             <Button size="lg" onClick={() => onNavigate('/login')} className="w-full sm:w-auto">
-              Apply as an editor
+              Login / Sign Up
               <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => onNavigate('/login')} className="w-full sm:w-auto">
-              Admin login
             </Button>
           </div>
         </div>
@@ -110,8 +104,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                 <div className="bg-surface-0 border border-gray-200 rounded-card overflow-hidden transition-all duration-150 ease-out-soft hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] hover:-translate-y-0.5">
                   <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                     <img
-                      src={editor.portfolio[0]?.thumbnailUrl}
-                      alt={editor.portfolio[0]?.title}
+                      src={editor.portfolio?.[0]?.thumbnailUrl || 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800'}
+                      alt={editor.portfolio?.[0]?.title || editor.fullName}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                     <div className="absolute inset-0 bg-ink-950/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -138,14 +132,14 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                     </div>
                     <p className="text-sm text-gray-600 line-clamp-2 mb-3">{editor.bio}</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {editor.skills.slice(0, 3).map((skill) => (
+                      {(editor.skills || []).slice(0, 3).map((skill) => (
                         <span key={skill} className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">
                           {skill}
                         </span>
                       ))}
-                      {editor.skills.length > 3 && (
+                      {(editor.skills?.length || 0) > 3 && (
                         <span className="px-2 py-0.5 text-xs font-medium text-gray-500">
-                          +{editor.skills.length - 3}
+                          +{(editor.skills?.length || 0) - 3}
                         </span>
                       )}
                     </div>

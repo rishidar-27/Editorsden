@@ -74,6 +74,10 @@ export interface Editor {
   lastProfileUpdate: string;
   lastPortfolioUpdate: string;
   isFeatured?: boolean;
+  languages?: string[];
+  timeZone?: string;
+  verifiedDate?: string;
+  verifiedBy?: string;
 }
 
 export interface Subtask {
