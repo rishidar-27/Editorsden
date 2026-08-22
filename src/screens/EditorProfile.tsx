@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Input, Textarea, Select, Button, SkillTag } from '@/components/ui';
 import { useApp } from '@/context';
 import { allSkills, allSoftware } from '@/data';
-import { Check, X, Plus } from 'lucide-react';
+import { Check, Plus, User, Mail, Phone, MapPin, Globe, Linkedin, Instagram, Briefcase, Clock, ShieldCheck, Sparkles } from 'lucide-react';
 import type { AvailabilityStatus, Skill, Software } from '@/types';
 
 const availabilityOptions: AvailabilityStatus[] = ['Full-Time', 'Part-Time', 'Weekends', 'Not Available'];
@@ -67,144 +67,246 @@ export function EditorProfile() {
   );
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 lg:px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-h2 mb-1">My profile</h1>
-          <p className="text-sm text-gray-600">Keep your information up to date</p>
-        </div>
-        <Button onClick={handleSave} size="sm">
-          {saved ? <><Check className="w-4 h-4" /> Saved</> : 'Save changes'}
-        </Button>
-      </div>
-
-      {/* Personal info */}
-      <section className="mb-8">
-        <h2 className="text-h3 mb-4" style={{ fontSize: '16px' }}>Personal information</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="Full name" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
-          <Input label="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <Input label="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-        </div>
-      </section>
-
-      <div className="h-px bg-gray-100 mb-8" />
-
-      {/* Social & links */}
-      <section className="mb-8">
-        <h2 className="text-h3 mb-4" style={{ fontSize: '16px' }}>Links & social</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="LinkedIn" placeholder="linkedin.com/in/..." value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} />
-          <Input label="Instagram" placeholder="@username" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} />
-          <Input label="Portfolio link" placeholder="yourname.studio" value={form.portfolioLink} onChange={(e) => setForm({ ...form, portfolioLink: e.target.value })} />
-          <Input label="Experience (years)" type="number" min="0" value={form.experience} onChange={(e) => setForm({ ...form, experience: parseInt(e.target.value) || 0 })} />
-        </div>
-      </section>
-
-      <div className="h-px bg-gray-100 mb-8" />
-
-      {/* Bio */}
-      <section className="mb-8">
-        <Textarea
-          label="Bio"
-          rows={4}
-          placeholder="Tell clients about your editing style and experience..."
-          value={form.bio}
-          onChange={(e) => setForm({ ...form, bio: e.target.value })}
-        />
-      </section>
-
-      <div className="h-px bg-gray-100 mb-8" />
-
-      {/* Skills */}
-      <section className="mb-8">
-        <h2 className="text-h3 mb-4" style={{ fontSize: '16px' }}>Skills</h2>
-        <div className="flex flex-wrap gap-2 mb-3">
-          {skills.map((skill) => (
-            <SkillTag key={skill} onRemove={() => removeSkill(skill)}>{skill}</SkillTag>
-          ))}
-          {skills.length === 0 && <p className="text-sm text-gray-500">No skills added yet.</p>}
-        </div>
-        <div className="relative">
-          <Input
-            placeholder="Type to search and add skills..."
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            icon={<Plus className="w-4 h-4" />}
-          />
-          {skillInput && filteredSkills.length > 0 && (
-            <div className="absolute top-full mt-1 w-full bg-surface-0 border border-gray-200 rounded-lg shadow-lg py-1 z-10 max-h-48 overflow-y-auto scrollbar-thin">
-              {filteredSkills.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => addSkill(skill)}
-                  className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  {skill}
-                </button>
-              ))}
+    <div className="bg-[#FAF9FF] min-h-screen py-8 px-4 lg:px-8 font-sans text-gray-900">
+      <div className="max-w-[1140px] mx-auto">
+        
+        {/* Header Bar */}
+        <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)] mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <img 
+                src={editor.avatarUrl || 'https://i.pravatar.cc/150?u=editor'} 
+                alt={editor.fullName} 
+                className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-xs" 
+              />
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center text-white">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </span>
             </div>
-          )}
-        </div>
-      </section>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Editor Profile'}</h1>
+                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-[#E6F8F0] text-[#10B981] flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Verified
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Manage your personal info, portfolio links, skills, and work availability.
+              </p>
+            </div>
+          </div>
 
-      <div className="h-px bg-gray-100 mb-8" />
-
-      {/* Software */}
-      <section className="mb-8">
-        <h2 className="text-h3 mb-4" style={{ fontSize: '16px' }}>Editing software</h2>
-        <div className="flex flex-wrap gap-2">
-          {allSoftware.map((sw) => {
-            const selected = software.includes(sw as Software);
-            return (
-              <button
-                key={sw}
-                onClick={() => toggleSoftware(sw)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
-                  selected
-                    ? 'bg-violet-050 border-violet-200 text-violet-700'
-                    : 'bg-surface-0 border-gray-200 text-gray-700 hover:bg-gray-050'
-                }`}
-              >
-                {selected && <Check className="w-3.5 h-3.5" />}
-                {sw}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <div className="h-px bg-gray-100 mb-8" />
-
-      {/* Availability */}
-      <section className="mb-8">
-        <h2 className="text-h3 mb-4" style={{ fontSize: '16px' }}>Availability</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Select
-            label="Availability"
-            value={form.availability}
-            onChange={(e) => setForm({ ...form, availability: e.target.value as AvailabilityStatus })}
+          <Button 
+            onClick={handleSave} 
+            className="bg-[#6D28D9] hover:bg-purple-800 text-white font-semibold px-6 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2 shrink-0"
           >
-            {availabilityOptions.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </Select>
-          <Input
-            label="Hours per week"
-            type="number"
-            min="0"
-            max="60"
-            value={form.hoursPerWeek}
-            onChange={(e) => setForm({ ...form, hoursPerWeek: parseInt(e.target.value) || 0 })}
-          />
+            {saved ? (
+              <><Check className="w-4 h-4" /> Saved!</>
+            ) : (
+              <><Sparkles className="w-4 h-4" /> Save changes</>
+            )}
+          </Button>
         </div>
-      </section>
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave}>
-          {saved ? <><Check className="w-4 h-4" /> Saved</> : 'Save changes'}
-        </Button>
+        {/* 2-Column Grid Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left Column (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Personal Information Card */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+                  <User className="w-4 h-4" />
+                </div>
+                <h2 className="text-base font-bold text-gray-900">Personal Information</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input 
+                  label="Full Name" 
+                  value={form.fullName} 
+                  onChange={(e) => setForm({ ...form, fullName: e.target.value })} 
+                  icon={<User className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="Phone Number" 
+                  value={form.phone} 
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })} 
+                  icon={<Phone className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="Email Address" 
+                  type="email" 
+                  value={form.email} 
+                  onChange={(e) => setForm({ ...form, email: e.target.value })} 
+                  icon={<Mail className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="City / Location" 
+                  value={form.city} 
+                  onChange={(e) => setForm({ ...form, city: e.target.value })} 
+                  icon={<MapPin className="w-4 h-4 text-gray-400" />}
+                />
+              </div>
+            </div>
+
+            {/* Links & Social Media Card */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <h2 className="text-base font-bold text-gray-900">Links & Social Presence</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input 
+                  label="LinkedIn Profile" 
+                  placeholder="linkedin.com/in/..." 
+                  value={form.linkedin} 
+                  onChange={(e) => setForm({ ...form, linkedin: e.target.value })} 
+                  icon={<Linkedin className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="Instagram Handle" 
+                  placeholder="@username" 
+                  value={form.instagram} 
+                  onChange={(e) => setForm({ ...form, instagram: e.target.value })} 
+                  icon={<Instagram className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="Portfolio Website" 
+                  placeholder="yourname.studio" 
+                  value={form.portfolioLink} 
+                  onChange={(e) => setForm({ ...form, portfolioLink: e.target.value })} 
+                  icon={<Globe className="w-4 h-4 text-gray-400" />}
+                />
+                <Input 
+                  label="Experience (Years)" 
+                  type="number" 
+                  min="0" 
+                  value={form.experience} 
+                  onChange={(e) => setForm({ ...form, experience: parseInt(e.target.value) || 0 })} 
+                  icon={<Briefcase className="w-4 h-4 text-gray-400" />}
+                />
+              </div>
+            </div>
+
+            {/* Bio Card */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <h2 className="text-base font-bold text-gray-900 mb-3">About / Bio</h2>
+              <Textarea
+                rows={4}
+                placeholder="Tell clients and admins about your editing style, niche, and achievements..."
+                value={form.bio}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              />
+            </div>
+
+          </div>
+
+          {/* Right Column (5 cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Skills & Specialties */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <h2 className="text-base font-bold text-gray-900 mb-3">Skills & Specialties</h2>
+              
+              <div className="flex flex-wrap gap-2 mb-4">
+                {skills.map((skill) => (
+                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-[#F0EBFE] text-[#7C3AED] font-semibold px-3 py-1 rounded-full text-xs">
+                    {skill}
+                  </SkillTag>
+                ))}
+                {skills.length === 0 && <p className="text-xs text-gray-500">No skills added yet.</p>}
+              </div>
+
+              <div className="relative">
+                <Input
+                  placeholder="Type to search and add skills..."
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  icon={<Plus className="w-4 h-4 text-gray-400" />}
+                />
+                {skillInput && filteredSkills.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20 max-h-48 overflow-y-auto">
+                    {filteredSkills.map((skill) => (
+                      <button
+                        key={skill}
+                        onClick={() => addSkill(skill)}
+                        className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-[#F0EBFE] hover:text-[#7C3AED] transition-colors font-medium"
+                      >
+                        + {skill}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Editing Software */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <h2 className="text-base font-bold text-gray-900 mb-3">Editing Software</h2>
+              
+              <div className="flex flex-wrap gap-2">
+                {allSoftware.map((sw) => {
+                  const selected = software.includes(sw as Software);
+                  return (
+                    <button
+                      key={sw}
+                      onClick={() => toggleSoftware(sw)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
+                        selected
+                          ? 'bg-[#F0EBFE] border-[#7C3AED]/40 text-[#7C3AED]'
+                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {selected && <Check className="w-3.5 h-3.5 text-[#7C3AED]" />}
+                      {sw}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Work Availability */}
+            <div className="bg-white rounded-2xl border border-gray-200/70 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.03)]">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-[#FFF4E5] text-[#F97316] flex items-center justify-center">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <h2 className="text-base font-bold text-gray-900">Work Availability</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label="Status"
+                  value={form.availability}
+                  onChange={(e) => setForm({ ...form, availability: e.target.value as AvailabilityStatus })}
+                >
+                  {availabilityOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </Select>
+
+                <Input
+                  label="Hours per week"
+                  type="number"
+                  min="0"
+                  max="60"
+                  value={form.hoursPerWeek}
+                  onChange={(e) => setForm({ ...form, hoursPerWeek: parseInt(e.target.value) || 0 })}
+                  icon={<Clock className="w-4 h-4 text-gray-400" />}
+                />
+              </div>
+            </div>
+
+          </div>
+
+        </div>
       </div>
     </div>
   );
