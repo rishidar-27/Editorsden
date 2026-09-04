@@ -30,7 +30,17 @@ import {
   Volume2,
   FileCheck2,
   Activity,
-  DollarSign
+  DollarSign,
+  Palette,
+  Scissors,
+  CheckCheck,
+  Radio,
+  Share2,
+  RefreshCw,
+  HelpCircle,
+  BarChart3,
+  Flame,
+  Filter
 } from 'lucide-react';
 import { useApp } from '@/context';
 
@@ -93,8 +103,18 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedShowreel, setSelectedShowreel] = useState<any | null>(null);
   
+  // Interactive Studio Workstation Playground State
+  const [activeLut, setActiveLut] = useState<'raw' | 'cine' | 'commercial' | 'moody'>('cine');
+  const [activeTimelinePin, setActiveTimelinePin] = useState<number | null>(0);
+  const [isPlayingMock, setIsPlayingMock] = useState(true);
+
+  // Interactive Project Matcher / Quote Wizard State
+  const [wizardFormat, setWizardFormat] = useState<'commercial' | 'shorts' | 'youtube' | '3d' | 'doc'>('commercial');
+  const [wizardResolution, setWizardResolution] = useState<'1080p' | '4k' | '8k'>('4k');
+  const [wizardSpeed, setWizardSpeed] = useState<'rush' | 'standard' | 'relaxed'>('standard');
+
   // Interactive ROI Calculator State
-  const [monthlyVideos, setMonthlyVideos] = useState<number>(8);
+  const [monthlyVideos, setMonthlyVideos] = useState<number>(10);
   const [currentTurnaroundDays, setCurrentTurnaroundDays] = useState<number>(6);
   
   // FAQ Accordion State
@@ -107,12 +127,11 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
 
   // Calculated ROI Metrics
   const estimatedHoursSaved = useMemo(() => {
-    // Average 11 hours saved per video with Gogangs R2 cloud and review workflows
-    return monthlyVideos * 11;
+    return monthlyVideos * 12;
   }, [monthlyVideos]);
 
   const estimatedTurnaroundVelocity = useMemo(() => {
-    const newTurnaround = Math.max(1, Math.round(currentTurnaroundDays * 0.35));
+    const newTurnaround = Math.max(1, Math.round(currentTurnaroundDays * 0.3));
     return {
       days: newTurnaround,
       percentFaster: Math.round(((currentTurnaroundDays - newTurnaround) / currentTurnaroundDays) * 100),
@@ -120,10 +139,71 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   }, [currentTurnaroundDays]);
 
   const estimatedCostSavings = useMemo(() => {
-    return monthlyVideos * 180;
+    return monthlyVideos * 220;
   }, [monthlyVideos]);
 
-  // Featured Editors with rich metadata
+  // Project Matcher Live Calculation
+  const wizardEstimate = useMemo(() => {
+    let basePrice = 450;
+    let turnHours = 24;
+    let recommendedSpecialist = 'Marcus Chen';
+    let specialistRole = 'Lead Commercial Reel Specialist';
+    let specialistAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80';
+    let editorId = 'e1';
+
+    if (wizardFormat === 'shorts') {
+      basePrice = 180;
+      turnHours = 14;
+      recommendedSpecialist = 'James Wilson';
+      specialistRole = 'Viral Shorts & Pacing Strategist';
+      specialistAvatar = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80';
+      editorId = 'e5';
+    } else if (wizardFormat === 'youtube') {
+      basePrice = 320;
+      turnHours = 28;
+      recommendedSpecialist = 'Elena Rodriguez';
+      specialistRole = 'Commercial & Content Director';
+      specialistAvatar = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80';
+      editorId = 'e2';
+    } else if (wizardFormat === '3d') {
+      basePrice = 650;
+      turnHours = 48;
+      recommendedSpecialist = 'Priya Sharma';
+      specialistRole = '3D Motion Graphics & VFX Lead';
+      specialistAvatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80';
+      editorId = 'e4';
+    } else if (wizardFormat === 'doc') {
+      basePrice = 580;
+      turnHours = 40;
+      recommendedSpecialist = 'David Park';
+      specialistRole = 'Senior DaVinci Colorist & Finisher';
+      specialistAvatar = 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80';
+      editorId = 'e3';
+    }
+
+    if (wizardResolution === '4k') basePrice *= 1.2;
+    if (wizardResolution === '8k') basePrice *= 1.45;
+
+    if (wizardSpeed === 'rush') {
+      basePrice *= 1.35;
+      turnHours = Math.round(turnHours * 0.5);
+    } else if (wizardSpeed === 'relaxed') {
+      basePrice *= 0.9;
+      turnHours = Math.round(turnHours * 1.8);
+    }
+
+    return {
+      price: Math.round(basePrice),
+      turnHours: Math.max(12, turnHours),
+      recommendedSpecialist,
+      specialistRole,
+      specialistAvatar,
+      editorId,
+      storageQuota: wizardResolution === '8k' ? '1 GB Cloudflare R2' : '1 GB Cloudflare R2'
+    };
+  }, [wizardFormat, wizardResolution, wizardSpeed]);
+
+  // Roster of Vetted Editors
   const rosterEditors = useMemo(() => {
     return [
       {
@@ -141,7 +221,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: true,
         badge: 'TOP 1%',
         badgeBg: 'bg-amber-50 text-amber-700 border border-amber-200',
-        sampleTitle: 'Nike Athletic Master Commercial 4K'
+        sampleTitle: 'Nike Athletic Master Commercial 4K',
+        clientBadge: 'Nike & RedBull'
       },
       {
         id: editors[1]?.id || 'e2',
@@ -158,7 +239,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: true,
         badge: 'PRO',
         badgeBg: 'bg-gray-100 text-gray-700 border border-gray-200',
-        sampleTitle: 'Vogue Haute Couture Autumn Cut'
+        sampleTitle: 'Vogue Haute Couture Autumn Cut',
+        clientBadge: 'Vogue & Zara'
       },
       {
         id: editors[2]?.id || 'e3',
@@ -175,7 +257,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: true,
         badge: 'MASTER',
         badgeBg: 'bg-amber-50 text-amber-700 border border-amber-200',
-        sampleTitle: 'Cinematic Feature Film 8K Color Grade'
+        sampleTitle: 'Cinematic Feature Film 8K Color Grade',
+        clientBadge: 'Netflix & HBO'
       },
       {
         id: editors[3]?.id || 'e4',
@@ -192,7 +275,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: false,
         badge: 'PRO',
         badgeBg: 'bg-gray-100 text-gray-700 border border-gray-200',
-        sampleTitle: 'Fintech 3D Mobile App Product Launch'
+        sampleTitle: 'Fintech 3D Mobile App Product Launch',
+        clientBadge: 'Revolut & Stripe'
       },
       {
         id: editors[4]?.id || 'e5',
@@ -209,7 +293,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: true,
         badge: 'VIRAL LEAD',
         badgeBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        sampleTitle: '10M+ Views TikTok Series Retention Cut'
+        sampleTitle: '10M+ Views TikTok Series Retention Cut',
+        clientBadge: 'Top 10 YouTubers'
       },
       {
         id: 'e6',
@@ -226,12 +311,13 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         available: true,
         badge: 'FEATURE',
         badgeBg: 'bg-gray-100 text-gray-700 border border-gray-200',
-        sampleTitle: 'Wild Earth Expedition Series Episode 4'
+        sampleTitle: 'Wild Earth Expedition Series Episode 4',
+        clientBadge: 'BBC & Discovery'
       }
     ];
   }, [editors]);
 
-  // Filtered roster based on category and search query
+  // Filtered roster
   const filteredEditors = useMemo(() => {
     return rosterEditors.filter(editor => {
       const matchesCategory = selectedCategory === 'all' || editor.category === selectedCategory;
@@ -243,7 +329,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
     });
   }, [rosterEditors, selectedCategory, searchQuery]);
 
-  // Showreels with rich metadata & modal preview data
+  // Showreels with rich metadata
   const showreels = [
     {
       id: 'sr-1',
@@ -257,7 +343,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       aspect: '16:9',
       icon: Play,
       bgImage: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&auto=format&fit=crop&q=80',
-      description: 'High-octane automotive and lifestyle reel graded in ACES color space with custom sound design.'
+      description: 'High-octane automotive and lifestyle reel graded in ACES color space with custom sound design and dynamic speed ramps.'
     },
     {
       id: 'sr-2',
@@ -271,7 +357,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       aspect: '16:9',
       icon: Maximize2,
       bgImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&auto=format&fit=crop&q=80',
-      description: 'Television broadcast master deliverable with multi-format cutdowns for web and social distribution.'
+      description: 'Television broadcast master deliverable with multi-format cutdowns for web, digital billboards, and social channels.'
     },
     {
       id: 'sr-3',
@@ -285,7 +371,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       aspect: '16:9',
       icon: UploadCloud,
       bgImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
-      description: 'Deep emotional narrative with natural skin tone protection and textured 35mm film grain emulation.'
+      description: 'Deep emotional narrative with natural skin tone protection, textured 35mm film halation, and organic grain curves.'
     },
     {
       id: 'sr-4',
@@ -299,7 +385,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       aspect: '16:9',
       icon: Layers,
       bgImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-      description: 'Seamless kinetic typography, 3D product renders, and UI mockups animated with fluid dynamics.'
+      description: 'Seamless kinetic typography, 3D product renders, and UI mockups animated with particle simulations and physics engines.'
     },
     {
       id: 'sr-5',
@@ -313,7 +399,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
       aspect: '9:16',
       icon: Wand2,
       bgImage: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80',
-      description: 'Pattern interrupts, animated subtitles, dynamic zooms, and sound SFX optimized for 85%+ retention.'
+      description: 'Pattern interrupts, animated subtitles, dynamic zooms, and sound SFX engineered for 85%+ audience retention curves.'
     },
     {
       id: 'sr-6',
@@ -345,32 +431,30 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
     }
   ];
 
-  // Testimonials from Studio Heads and Creators
-  const testimonials = [
-    {
-      quote: "Gogangs eliminated our 4-day revision bottlenecks. Direct R2 uploads and timestamped versioning reduced our turnaround from a week to under 24 hours.",
-      author: "Sarah Jenkins",
-      role: "Head of Creative Production",
-      company: "Apex Media Agency",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      stats: "75+ Delivered Projects"
-    },
-    {
-      quote: "The review queue and file inspector make client feedback effortless. No more broken Google Drive links or lost WhatsApp revisions.",
-      author: "Alex Rivera",
-      role: "YouTube Creator (2.4M Subs)",
-      company: "Rivera Digital",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-      stats: "99.2% Retention Rate"
-    },
-    {
-      quote: "As a senior DaVinci colorist, having a dedicated 1GB cloud workspace with frame-accurate approvals lets me focus on the craft rather than managing storage.",
-      author: "David Park",
-      role: "Master Colorist",
-      company: "Park Grading Studio",
-      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
-      stats: "Top 1% Rated Editor"
-    }
+  // Timeline Markers for the Hero Studio Preview
+  const timelineMarkers = [
+    { time: '00:14', title: 'Macro B-Roll Cut', note: 'Swapped raw shot with 60fps high-speed macro angle.' },
+    { time: '00:32', title: 'ACES Color Correction', note: 'Matched skin tone exposure and highlight rolloff.' },
+    { time: '00:54', title: 'Audio Ducking & SFX', note: 'Ducked background score by -4.5dB under voiceover.' },
+  ];
+
+  // Competitive Comparison Matrix Data
+  const comparisonRows = [
+    { feature: 'Dedicated 1GB Cloudflare R2 Workspace', gogangs: true, freelance: false, agency: false, drive: 'Manual (Chaotic)' },
+    { feature: 'Frame-Accurate Versioning (v1, v2) & Diffing', gogangs: true, freelance: false, agency: 'Slow', drive: false },
+    { feature: 'Vetted Top 1% Editing Specialists', gogangs: true, freelance: 'Hit or Miss', agency: true, drive: false },
+    { feature: 'Zero-Egress Direct S3 Browser Uploads', gogangs: true, freelance: false, agency: false, drive: false },
+    { feature: 'Granular Multi-Task Milestones', gogangs: true, freelance: 'Manual', agency: true, drive: false },
+    { feature: 'Average Turnaround Time', gogangs: '18 - 24 Hours', freelance: '3 - 7 Days', agency: '1 - 2 Weeks', drive: 'Unpredictable' },
+  ];
+
+  // 5-Stage Vetting Pipeline
+  const vettingStages = [
+    { step: '01', title: 'Identity & Reel Audit', desc: 'Detailed inspection of raw project files, verified client credits, and editing credits.' },
+    { step: '02', title: 'Pacing & Rhythm Test', desc: 'Blind assessment on retention curve mechanics, cut point timing, and sound accents.' },
+    { step: '03', title: 'Color Science & ACES', desc: 'Proficiency evaluation in DaVinci Studio, log curve balancing, and gamut mapping.' },
+    { step: '04', title: 'Audio Mastering Standards', desc: 'LUFS loudness compliance (-14 LUFS web / -24 LUFS broadcast) and dialog de-noising.' },
+    { step: '05', title: 'Live Client Simulation', desc: 'Real-time turnaround drill testing deadline discipline and revision communication.' },
   ];
 
   // Supported Professional Software & Codecs
@@ -395,11 +479,15 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
     },
     {
       q: 'How are video editors vetted and verified?',
-      a: 'Every editor undergoes a rigorous multi-step assessment including portfolio verification, pacing and typography evaluation, color science proficiency tests, and client communication standards before receiving their verified badge.'
+      a: 'Every editor undergoes a rigorous 5-stage assessment including portfolio verification, pacing and typography evaluation, color science proficiency tests, and client communication standards before receiving their verified badge.'
     },
     {
       q: 'Can agencies create multi-task project milestones?',
       a: 'Yes! Agency admins can break down complex campaigns into granular subtasks (e.g. Rough Cut, Sound Design, 3D Intro, Master Color Grade), assigning distinct specialists to each milestone with separate deadlines and tracking.'
+    },
+    {
+      q: 'What video codecs and file resolutions are supported?',
+      a: 'Gogangs natively handles Apple ProRes 422/4444, Avid DNxHR, H.264/H.265 (HEVC 10-bit), BRAW, REDCODE, and standard web formats from 1080p up to 8K DCI.'
     }
   ];
 
@@ -433,12 +521,13 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               </span>
             </button>
 
-            <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-gray-600">
-              <a href="#roster" className="hover:text-gray-900 transition-colors">Find Editors</a>
+            <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-gray-600">
+              <a href="#studio" className="hover:text-gray-900 transition-colors">Interactive Studio</a>
+              <a href="#estimator" className="hover:text-gray-900 transition-colors">Instant Match</a>
+              <a href="#roster" className="hover:text-gray-900 transition-colors">Talent Directory</a>
               <a href="#showreels" className="hover:text-gray-900 transition-colors">Showreels</a>
-              <a href="#workflow" className="hover:text-gray-900 transition-colors">How It Works</a>
-              <a href="#calculator" className="hover:text-gray-900 transition-colors">ROI Calculator</a>
-              <a href="#software" className="hover:text-gray-900 transition-colors">Tech Stack</a>
+              <a href="#comparison" className="hover:text-gray-900 transition-colors">Comparison</a>
+              <a href="#vetting" className="hover:text-gray-900 transition-colors">Vetting Standards</a>
               <a href="#faq" className="hover:text-gray-900 transition-colors">FAQ</a>
             </nav>
           </div>
@@ -481,8 +570,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </div>
       </header>
 
-      {/* 3. HERO SECTION WITH 3D WORKSPACE PREVIEW & LIVE METRIC CHIPS */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
+      {/* 3. HEAVY HERO SECTION WITH DUAL COLUMN VALUE PROPOSITION */}
+      <section className="relative pt-12 pb-16 px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-gray-200/30 rounded-full blur-[140px] pointer-events-none" />
 
@@ -554,23 +643,23 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button 
                 onClick={() => {
-                  const el = document.getElementById('roster');
+                  const el = document.getElementById('estimator');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-6 py-3.5 rounded-xl shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group"
               >
-                <span>Explore Vetted Roster</span>
+                <span>Instant Project Matcher</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <button 
                 onClick={() => {
-                  const el = document.getElementById('showreels');
+                  const el = document.getElementById('studio');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 text-xs font-bold px-6 py-3.5 rounded-xl hover:border-gray-300 shadow-2xs transition-all flex items-center gap-2"
               >
-                <span>Watch 4K Showreels</span>
+                <span>Interactive Studio Demo</span>
                 <Play className="w-3.5 h-3.5 fill-gray-900 text-gray-900" />
               </button>
             </div>
@@ -673,44 +762,539 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
           </div>
         </div>
 
-        {/* 4. THREE LIVE METRIC KPI SUMMARY PILLS */}
+        {/* 4. REAL-TIME PLATFORM COUNTERS */}
         <Reveal delay={200}>
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left border-t border-gray-200/80 pt-8 max-w-4xl">
-            <div className="flex items-center gap-3.5 bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-800 flex items-center justify-center font-bold shrink-0">
-                <Award className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <div className="text-xl font-black text-gray-900">250+</div>
-                <div className="text-[11px] text-gray-500 font-medium">Vetted Video Specialists</div>
-              </div>
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-left border-t border-gray-200/80 pt-8 max-w-5xl">
+            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
+              <div className="text-[10px] font-bold text-gray-400 uppercase">Vetted Specialists</div>
+              <div className="text-2xl font-black text-gray-900 mt-1">250+</div>
+              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">Top 1% Acceptance Rate</div>
             </div>
 
-            <div className="flex items-center gap-3.5 bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-800 flex items-center justify-center font-bold shrink-0">
-                <Briefcase className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <div className="text-xl font-black text-gray-900">1,400+</div>
-                <div className="text-[11px] text-gray-500 font-medium">Delivered Master Projects</div>
-              </div>
+            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
+              <div className="text-[10px] font-bold text-gray-400 uppercase">Master Deliverables</div>
+              <div className="text-2xl font-black text-gray-900 mt-1">1,420+</div>
+              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">100% On-Time Delivery</div>
             </div>
 
-            <div className="flex items-center gap-3.5 bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-800 flex items-center justify-center font-bold shrink-0">
-                <Clock className="w-5 h-5 stroke-[2.2]" />
-              </div>
-              <div>
-                <div className="text-xl font-black text-gray-900">99.4%</div>
-                <div className="text-[11px] text-gray-500 font-medium">On-Time Client Approval</div>
-              </div>
+            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
+              <div className="text-[10px] font-bold text-gray-400 uppercase">Agency Hours Saved</div>
+              <div className="text-2xl font-black text-gray-900 mt-1">15,000+</div>
+              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">Zero Transfer Latency</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-2xs">
+              <div className="text-[10px] font-bold text-gray-400 uppercase">Client Approval Rate</div>
+              <div className="text-2xl font-black text-gray-900 mt-1">99.4%</div>
+              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">Across 40+ Top Agencies</div>
             </div>
           </div>
         </Reveal>
       </section>
 
-      {/* 5. INTERACTIVE FEATURED EDITOR ROSTER WITH DYNAMIC FILTER TABS */}
-      <section id="roster" className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
+      {/* 4. HEAVY INTERACTIVE STUDIO WORKSPACE PLAYGROUND (HERO SUITE PREVIEW) */}
+      <section id="studio" className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
+        <Reveal threshold={0.1}>
+          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                  <MonitorPlay className="w-3.5 h-3.5" />
+                  <span>Interactive Studio Preview</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                  Frame-Accurate Video Operations Suite
+                </h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  Test the real-time timeline scrubber, switch between ACES color grade LUTs, and inspect pinned revision feedback.
+                </p>
+              </div>
+
+              {/* Color LUT Switcher Controls */}
+              <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-2xl border border-gray-200">
+                <span className="text-[10px] font-bold text-gray-500 px-2 flex items-center gap-1">
+                  <Palette className="w-3.5 h-3.5" /> LUT Grade:
+                </span>
+                {[
+                  { id: 'raw', label: 'Raw S-Log3' },
+                  { id: 'cine', label: 'Teal & Orange Cine' },
+                  { id: 'commercial', label: 'Commercial Neutral' },
+                  { id: 'moody', label: 'Moody 35mm' },
+                ].map(lut => (
+                  <button
+                    key={lut.id}
+                    onClick={() => setActiveLut(lut.id as any)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      activeLut === lut.id
+                        ? 'bg-gray-900 text-white shadow-xs'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {lut.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mock NLE Studio Workstation */}
+            <div className="rounded-2xl border border-gray-200 bg-gray-950 text-white overflow-hidden shadow-2xl">
+              
+              {/* Top Studio Bar */}
+              <div className="px-4 py-2.5 bg-gray-900 border-b border-gray-800 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                  </div>
+                  <span className="font-mono text-gray-400 text-[11px]">PROJECT_MASTER_COMMERCIAL_V2.PRPROJ</span>
+                </div>
+
+                <div className="flex items-center gap-4 text-[11px] font-mono text-gray-400">
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    R2 Cloudflare Sync: 100%
+                  </span>
+                  <span>3840x2160 • 60.00 fps</span>
+                </div>
+              </div>
+
+              {/* Main Viewport & Video Player Mockup */}
+              <div className="grid grid-cols-1 lg:grid-cols-12">
+                
+                {/* Video Monitor */}
+                <div className="lg:col-span-8 relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&auto=format&fit=crop&q=80"
+                    alt="Monitor"
+                    className={`w-full h-full object-cover transition-all duration-500 ${
+                      activeLut === 'raw' ? 'contrast-75 brightness-125 saturate-50' :
+                      activeLut === 'cine' ? 'contrast-125 saturate-125 hue-rotate-15' :
+                      activeLut === 'commercial' ? 'contrast-105 brightness-105 saturate-110' :
+                      'contrast-140 brightness-90 saturate-85 sepia-[0.2]'
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
+
+                  {/* Top Monitor Overlay */}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                    <span className="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-sm text-[10px] font-mono border border-white/10 text-white">
+                      REC 709 • {activeLut.toUpperCase()}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-red-600 text-[10px] font-black tracking-wider text-white">
+                      PLAYING MASTER
+                    </span>
+                  </div>
+
+                  {/* Center Playback Indicator */}
+                  <button
+                    onClick={() => setIsPlayingMock(!isPlayingMock)}
+                    className="relative z-10 w-16 h-16 rounded-full bg-white/90 text-gray-900 flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer"
+                  >
+                    <Play className="w-6 h-6 fill-gray-900 ml-1" />
+                  </button>
+
+                  {/* Pinned Feedback Indicators on the Video */}
+                  <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-xs z-10">
+                    <div className="bg-black/80 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/20 text-white flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="text-[11px] font-medium">
+                        {activeTimelinePin !== null ? timelineMarkers[activeTimelinePin].note : 'Click timeline markers below to inspect feedback.'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side: Inspector & Feedback Feed */}
+                <div className="lg:col-span-4 p-5 bg-gray-900 border-l border-gray-800 space-y-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">Timestamped Revisions</span>
+                      <span className="text-[10px] font-bold text-gray-400">3 Markers</span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {timelineMarkers.map((marker, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setActiveTimelinePin(idx)}
+                          className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                            activeTimelinePin === idx
+                              ? 'bg-gray-800 border-white text-white shadow-md'
+                              : 'bg-gray-950/60 border-gray-800 hover:border-gray-700 text-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between text-xs font-bold mb-1">
+                            <span>{marker.title}</span>
+                            <span className="text-[10px] font-mono text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">
+                              {marker.time}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-400">{marker.note}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>Assigned Editor</span>
+                      <span className="font-bold text-white">David Park (DaVinci Specialist)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>Deliverable State</span>
+                      <span className="text-emerald-400 font-bold">Ready for Approval (v2)</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Multi-Track NLE Timeline Visualizer */}
+              <div className="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
+                
+                {/* Track 1: Video A-Roll */}
+                <div className="flex items-center gap-3">
+                  <span className="w-12 text-[10px] font-mono text-gray-500 uppercase">V2 B-ROLL</span>
+                  <div className="flex-1 h-7 bg-gray-900 rounded-lg flex items-center p-1 gap-1 border border-gray-800">
+                    <div className="h-full bg-blue-900/60 border border-blue-600/40 rounded px-2 flex items-center text-[9px] font-bold text-blue-200 w-1/4">
+                      Macro_Cut_01.mov
+                    </div>
+                    <div className="h-full bg-blue-900/60 border border-blue-600/40 rounded px-2 flex items-center text-[9px] font-bold text-blue-200 w-1/3">
+                      Kinetic_3D_Type.mov
+                    </div>
+                  </div>
+                </div>
+
+                {/* Track 2: Video Base A-Roll */}
+                <div className="flex items-center gap-3">
+                  <span className="w-12 text-[10px] font-mono text-gray-500 uppercase">V1 A-ROLL</span>
+                  <div className="flex-1 h-7 bg-gray-900 rounded-lg flex items-center p-1 gap-1 border border-gray-800">
+                    <div className="h-full bg-emerald-900/60 border border-emerald-600/40 rounded px-2 flex items-center text-[9px] font-bold text-emerald-200 w-full">
+                      Interview_Master_4K_ProRes422HQ.mov [ACES CINE LUT]
+                    </div>
+                  </div>
+                </div>
+
+                {/* Track 3: Audio Dialogue & SFX */}
+                <div className="flex items-center gap-3">
+                  <span className="w-12 text-[10px] font-mono text-gray-500 uppercase">A1 AUDIO</span>
+                  <div className="flex-1 h-6 bg-gray-900 rounded-lg flex items-center p-1 gap-1 border border-gray-800">
+                    <div className="h-full bg-amber-900/60 border border-amber-600/40 rounded px-2 flex items-center text-[9px] font-bold text-amber-200 w-2/3">
+                      Dialog_Master_iZotope_Denoised.wav
+                    </div>
+                    <div className="h-full bg-amber-900/60 border border-amber-600/40 rounded px-2 flex items-center text-[9px] font-bold text-amber-200 w-1/3">
+                      Whoosh_Riser_SFX.wav
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </Reveal>
+      </section>
+
+      {/* 5. INSTANT PROJECT MATCHER & ESTIMATOR (HEAVY INTERACTIVE COMPONENT) */}
+      <section id="estimator" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
+        <Reveal threshold={0.15}>
+          <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            
+            <div className="max-w-3xl mx-auto text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                <Zap className="w-3.5 h-3.5" />
+                <span>Instant Pipeline Configurator</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                Configure Your Production & Match in Seconds
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Select your deliverable style, resolution, and speed. Our algorithm routes your brief to the perfect verified specialist.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Interactive Wizard Controls */}
+              <div className="lg:col-span-7 space-y-6">
+                
+                {/* Step 1: Format Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
+                    1. Deliverable Genre & Format
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    {[
+                      { id: 'commercial', label: 'Commercial & Brand', icon: Film },
+                      { id: 'shorts', label: 'Viral Shorts / TikTok', icon: Wand2 },
+                      { id: 'youtube', label: 'YouTube / Podcast', icon: MonitorPlay },
+                      { id: '3d', label: '3D Motion & VFX', icon: Layers },
+                      { id: 'doc', label: 'Documentary Film', icon: Camera },
+                    ].map(item => {
+                      const Icon = item.icon;
+                      const active = wizardFormat === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setWizardFormat(item.id as any)}
+                          className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                            active
+                              ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                              : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 mb-2 ${active ? 'text-white' : 'text-gray-600'}`} />
+                          <span className="text-xs font-bold leading-tight">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Step 2: Resolution & Codec */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
+                    2. Resolution & Master Codec
+                  </label>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { id: '1080p', label: '1080p Full HD', desc: 'Standard Web H.264' },
+                      { id: '4k', label: '4K ProRes Master', desc: 'Broadcast ProRes 422' },
+                      { id: '8k', label: '8K RAW Cinema', desc: 'ACES / RED / BRAW' },
+                    ].map(res => (
+                      <button
+                        key={res.id}
+                        onClick={() => setWizardResolution(res.id as any)}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          wizardResolution === res.id
+                            ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{res.label}</div>
+                        <div className={`text-[10px] mt-0.5 ${wizardResolution === res.id ? 'text-gray-300' : 'text-gray-400'}`}>
+                          {res.desc}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 3: Turnaround Speed */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-2.5">
+                    3. Turnaround Velocity
+                  </label>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { id: 'rush', label: '⚡ Rush Priority', desc: 'Under 18h Delivery' },
+                      { id: 'standard', label: '⏱️ Standard', desc: '24 - 48h Delivery' },
+                      { id: 'relaxed', label: '🌱 Extended', desc: '3 - 5 Days' },
+                    ].map(speed => (
+                      <button
+                        key={speed.id}
+                        onClick={() => setWizardSpeed(speed.id as any)}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          wizardSpeed === speed.id
+                            ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{speed.label}</div>
+                        <div className={`text-[10px] mt-0.5 ${wizardSpeed === speed.id ? 'text-gray-300' : 'text-gray-400'}`}>
+                          {speed.desc}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Live Matched Specialist Card */}
+              <div className="lg:col-span-5 bg-gray-50 rounded-3xl p-6 border border-gray-200 space-y-6">
+                
+                <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Estimated Project Match</span>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                    MATCH CONFIDENCE: 99.2%
+                  </span>
+                </div>
+
+                {/* Matched Editor Preview */}
+                <div className="flex items-center gap-3.5 bg-white p-4 rounded-2xl border border-gray-200">
+                  <img
+                    src={wizardEstimate.specialistAvatar}
+                    alt={wizardEstimate.recommendedSpecialist}
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-900 shrink-0"
+                  />
+                  <div>
+                    <div className="text-sm font-black text-gray-900 uppercase">{wizardEstimate.recommendedSpecialist}</div>
+                    <div className="text-[11px] text-gray-500 font-medium">{wizardEstimate.specialistRole}</div>
+                    <div className="flex items-center gap-1 text-amber-500 text-xs font-bold mt-1">
+                      <Star className="w-3 h-3 fill-amber-400" /> 4.9 (Verified Pro)
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price & Turnaround Summary */}
+                <div className="grid grid-cols-2 gap-3 text-left">
+                  <div className="bg-white p-3.5 rounded-2xl border border-gray-200">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase">Estimated Budget</div>
+                    <div className="text-2xl font-black text-gray-900 mt-0.5">${wizardEstimate.price}</div>
+                    <div className="text-[9px] text-gray-500">Fixed Milestone Escrow</div>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-2xl border border-gray-200">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase">Turnaround Time</div>
+                    <div className="text-2xl font-black text-emerald-600 mt-0.5">{wizardEstimate.turnHours} Hours</div>
+                    <div className="text-[9px] text-gray-500">First-cut delivery</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-[11px] text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Includes <strong>1GB Cloudflare R2 Workspace</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Frame-accurate review queue with 2 revision rounds</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => onNavigate(`/editor/${wizardEstimate.editorId}`)}
+                  className="w-full bg-gray-900 hover:bg-black text-white text-xs font-bold py-3.5 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Book {wizardEstimate.recommendedSpecialist}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </Reveal>
+      </section>
+
+      {/* 6. COMPETITIVE COMPARISON MATRIX (HEAVY TABLE) */}
+      <section id="comparison" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
+        <Reveal threshold={0.15}>
+          <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-wider mb-2">
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>The Direct Comparison</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                Why Modern Creators Choose Gogangs
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                See how Gogangs eliminates file management chaos and provides structured creative velocity.
+              </p>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 text-xs font-bold text-gray-500">
+                    <th className="py-3.5 px-4">Feature & Workflow Capability</th>
+                    <th className="py-3.5 px-4 bg-gray-900 text-white rounded-t-xl text-center">Gogangs Platform</th>
+                    <th className="py-3.5 px-4 text-center">Freelance Marketplaces</th>
+                    <th className="py-3.5 px-4 text-center">Traditional Post-Houses</th>
+                    <th className="py-3.5 px-4 text-center">Raw Google Drive / Slack</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-xs font-medium text-gray-700">
+                  {comparisonRows.map((row, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50/60 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-gray-900">{row.feature}</td>
+                      
+                      <td className="py-3.5 px-4 bg-gray-900/5 text-center font-black text-gray-900">
+                        {typeof row.gogangs === 'boolean' ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
+                        ) : (
+                          <span className="text-emerald-700 font-bold">{row.gogangs}</span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-center text-gray-500">
+                        {typeof row.freelance === 'boolean' ? (
+                          row.freelance ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" /> : <X className="w-4 h-4 text-gray-300 mx-auto" />
+                        ) : (
+                          row.freelance
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-center text-gray-500">
+                        {typeof row.agency === 'boolean' ? (
+                          row.agency ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" /> : <X className="w-4 h-4 text-gray-300 mx-auto" />
+                        ) : (
+                          row.agency
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-center text-gray-500">
+                        {typeof row.drive === 'boolean' ? (
+                          row.drive ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" /> : <X className="w-4 h-4 text-gray-300 mx-auto" />
+                        ) : (
+                          row.drive
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </Reveal>
+      </section>
+
+      {/* 7. 5-STAGE VETTING STANDARDS & QUALITY ASSURANCE */}
+      <section id="vetting" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
+        <Reveal threshold={0.15}>
+          <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-wider mb-2">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Rigorous Quality Controls</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                The 5-Stage Editor Vetting Pipeline
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Only the top 1% of video editors pass our technical, aesthetic, and communication assessments.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {vettingStages.map((stage, idx) => (
+                <div key={idx} className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-3 relative group hover:bg-white hover:shadow-md transition-all">
+                  <div className="text-2xl font-black text-gray-300 group-hover:text-gray-900 transition-colors">
+                    {stage.step}
+                  </div>
+                  <h3 className="font-bold text-xs text-gray-900">{stage.title}</h3>
+                  <p className="text-[11px] text-gray-500 leading-relaxed">{stage.desc}</p>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </Reveal>
+      </section>
+
+      {/* 8. TALENT DIRECTORY WITH CATEGORY FILTERS */}
+      <section id="roster" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
         <Reveal threshold={0.1}>
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
             
@@ -725,7 +1309,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                   Featured Video Specialists
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  Discover top creators vetted across pacing, color grading, motion graphics, and audio mastering.
+                  Browse verified creators across pacing, color grading, motion graphics, and audio mastering.
                 </p>
               </div>
 
@@ -823,16 +1407,11 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               ))}
             </div>
 
-            {filteredEditors.length === 0 && (
-              <div className="text-center py-12 text-gray-500 text-xs font-medium">
-                No video editors found matching your search. Try resetting filters.
-              </div>
-            )}
           </div>
         </Reveal>
       </section>
 
-      {/* 6. VERIFIED SHOWREELS GALLERY & INTERACTIVE PREVIEW MODAL */}
+      {/* 9. 4K SHOWREELS GALLERY & INTERACTIVE PREVIEW MODAL */}
       <section id="showreels" className="py-8 px-4 sm:px-8 max-w-7xl mx-auto">
         <Reveal threshold={0.1}>
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
@@ -909,7 +1488,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </Reveal>
       </section>
 
-      {/* 7. INTERACTIVE ROI & VELOCITY CALCULATOR */}
+      {/* 10. INTERACTIVE ROI & VELOCITY CALCULATOR */}
       <section id="calculator" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
         <Reveal threshold={0.15}>
           <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
@@ -1008,79 +1587,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </Reveal>
       </section>
 
-      {/* 8. 4-PILLAR BENTO GRID: HOW GOGANGS WORKS */}
-      <section id="workflow" className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
-        <Reveal threshold={0.15}>
-          <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            
-            {/* Section Header */}
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-wider mb-2">
-                <Target className="w-4 h-4" />
-                <span>The Gogangs Operating System</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                Built for Speed, Quality, & Absolute Trust
-              </h2>
-              <p className="text-xs text-gray-500 mt-1">
-                From brief to master export — a seamless workflow replacing messy Drive links and email chaos.
-              </p>
-            </div>
-
-            {/* 4 Bento Architecture Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              
-              {/* Bento 1: Cloudflare R2 Workspace */}
-              <div className="bg-gray-50/80 hover:bg-white rounded-2xl p-6 border border-gray-200/90 hover:border-gray-300 hover:shadow-lg transition-all duration-300 space-y-4 group">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center font-black group-hover:bg-gray-900 group-hover:text-white transition-colors">
-                  <UploadCloud className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-gray-900">1GB Dedicated Cloud Workspaces</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Editors upload 4K raw footage and master exports directly to Cloudflare R2 storage using S3 presigned URLs with zero egress costs and instant team sync.
-                </p>
-                <div className="pt-2 flex items-center gap-1.5 text-[11px] font-bold text-gray-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>S3 Direct-to-Browser Uploads</span>
-                </div>
-              </div>
-
-              {/* Bento 2: Frame-Accurate Review Queue */}
-              <div className="bg-gray-50/80 hover:bg-white rounded-2xl p-6 border border-gray-200/90 hover:border-gray-300 hover:shadow-lg transition-all duration-300 space-y-4 group">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center font-black group-hover:bg-gray-900 group-hover:text-white transition-colors">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-gray-900">Frame-Accurate Review Queue</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Inspect submitted video cuts inside an interactive modal. View file sizes in MB, compare version histories (v1 vs v2), and log timestamped feedback notes.
-                </p>
-                <div className="pt-2 flex items-center gap-1.5 text-[11px] font-bold text-gray-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>One-Click Approve / Revision Actions</span>
-                </div>
-              </div>
-
-              {/* Bento 3: Multi-Task Project Builder */}
-              <div className="bg-gray-50/80 hover:bg-white rounded-2xl p-6 border border-gray-200/90 hover:border-gray-300 hover:shadow-lg transition-all duration-300 space-y-4 group">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center font-black group-hover:bg-gray-900 group-hover:text-white transition-colors">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-gray-900">Granular Subtask Milestones</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Break campaigns down into independent subtasks (Rough Cut, Motion Graphics, DaVinci Grade) and assign distinct specialists to each milestone with automated deadlines.
-                </p>
-                <div className="pt-2 flex items-center gap-1.5 text-[11px] font-bold text-gray-800">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Multi-Editor Team Synchronization</span>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* 9. SUPPORTED EDITING SOFTWARE & CODEC COMPATIBILITY */}
+      {/* 11. SUPPORTED EDITING SOFTWARE & CODEC COMPATIBILITY */}
       <section id="software" className="py-8 px-4 sm:px-8 max-w-7xl mx-auto">
         <Reveal threshold={0.15}>
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
@@ -1108,50 +1615,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </Reveal>
       </section>
 
-      {/* 10. SOCIAL PROOF & TESTIMONIALS */}
-      <section className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
-        <Reveal threshold={0.15}>
-          <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-wider mb-2">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>Client & Creator Stories</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                Trusted by Top Agencies & YouTubers
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((t, i) => (
-                <div key={i} className="bg-gray-50 p-6 rounded-2xl border border-gray-200 flex flex-col justify-between space-y-4">
-                  <div>
-                    <div className="flex items-center gap-1 text-amber-500 mb-3">
-                      {[...Array(5)].map((_, idx) => (
-                        <Star key={idx} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    <p className="text-xs text-gray-700 leading-relaxed font-normal italic">
-                      "{t.quote}"
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-3 border-t border-gray-200">
-                    <img src={t.avatar} alt={t.author} className="w-10 h-10 rounded-full object-cover shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold text-gray-900">{t.author}</div>
-                      <div className="text-[10px] text-gray-500">{t.role} • {t.company}</div>
-                      <div className="text-[9px] font-semibold text-emerald-600 mt-0.5">{t.stats}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* 11. INTERACTIVE FAQ ACCORDION */}
+      {/* 12. INTERACTIVE FAQ ACCORDION */}
       <section id="faq" className="py-8 px-4 sm:px-8 max-w-4xl mx-auto">
         <Reveal threshold={0.15}>
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
@@ -1189,7 +1653,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </Reveal>
       </section>
 
-      {/* 12. "JOIN AS AN EDITOR / HIRE TALENT" BOTTOM LAUNCHPAD */}
+      {/* 13. "JOIN AS AN EDITOR / HIRE TALENT" BOTTOM LAUNCHPAD */}
       <section className="py-10 px-4 sm:px-8 max-w-7xl mx-auto">
         <Reveal threshold={0.15}>
           <div className="relative overflow-hidden rounded-3xl bg-white p-8 sm:p-12 border border-gray-200/90 shadow-sm">
@@ -1264,7 +1728,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </Reveal>
       </section>
 
-      {/* 13. INTERACTIVE SHOWREEL PREVIEW MODAL */}
+      {/* 14. INTERACTIVE SHOWREEL PREVIEW MODAL */}
       {selectedShowreel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
           <div className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-200 animate-scale-up">
@@ -1354,7 +1818,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
         </div>
       )}
 
-      {/* 14. COMPREHENSIVE MULTI-COLUMN FOOTER */}
+      {/* 15. COMPREHENSIVE MULTI-COLUMN FOOTER */}
       <footer className="bg-white text-gray-600 pt-16 pb-10 px-4 sm:px-8 border-t border-gray-200/80 mt-12 shadow-2xs">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
@@ -1377,10 +1841,10 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
             <div>
               <div className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Platform</div>
               <ul className="space-y-2 text-xs font-medium text-gray-500">
+                <li><a href="#studio" className="hover:text-gray-900 transition-colors">Interactive Studio</a></li>
+                <li><a href="#estimator" className="hover:text-gray-900 transition-colors">Instant Match Wizard</a></li>
                 <li><a href="#roster" className="hover:text-gray-900 transition-colors">Talent Directory</a></li>
                 <li><a href="#showreels" className="hover:text-gray-900 transition-colors">4K Showreels</a></li>
-                <li><a href="#workflow" className="hover:text-gray-900 transition-colors">Review Queue OS</a></li>
-                <li><a href="#calculator" className="hover:text-gray-900 transition-colors">ROI Calculator</a></li>
                 <li><button onClick={() => onNavigate('/admin/dashboard')} className="hover:text-gray-900 transition-colors">Admin Portal</button></li>
               </ul>
             </div>
@@ -1391,8 +1855,8 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               <ul className="space-y-2 text-xs font-medium text-gray-500">
                 <li><button onClick={() => onNavigate('/login')} className="hover:text-gray-900 transition-colors">Join as an Editor</button></li>
                 <li><button onClick={() => onNavigate('/editor/dashboard')} className="hover:text-gray-900 transition-colors">Editor Workspace</button></li>
+                <li><a href="#vetting" className="hover:text-gray-900 transition-colors">5-Stage Vetting</a></li>
                 <li><a href="#software" className="hover:text-gray-900 transition-colors">Supported NLEs</a></li>
-                <li><a href="#workflow" className="hover:text-gray-900 transition-colors">1GB Storage Info</a></li>
               </ul>
             </div>
 
@@ -1401,7 +1865,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               <div className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Company & Trust</div>
               <ul className="space-y-2 text-xs font-medium text-gray-500">
                 <li><a href="#faq" className="hover:text-gray-900 transition-colors">Security & Privacy</a></li>
-                <li><a href="#faq" className="hover:text-gray-900 transition-colors">Terms of Service</a></li>
+                <li><a href="#comparison" className="hover:text-gray-900 transition-colors">Competitive Matrix</a></li>
                 <li><a href="#faq" className="hover:text-gray-900 transition-colors">Community Guidelines</a></li>
                 <li><a href="#faq" className="hover:text-gray-900 transition-colors">Support & Contact</a></li>
               </ul>
