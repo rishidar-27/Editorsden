@@ -18,11 +18,11 @@ export function Button({ variant = 'primary', size = 'md', className = '', child
     lg: 'text-sm px-5 py-2.5',
   };
   const variants: Record<ButtonVariant, string> = {
-    primary: 'bg-gray-900 text-white hover:bg-black shadow-2xs',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-    outline: 'border border-gray-300 text-ink-900 bg-transparent hover:bg-gray-050',
-    ghost: 'text-gray-700 hover:bg-gray-100',
-    destructive: 'border border-red-500 text-red-500 bg-transparent hover:bg-red-050',
+    primary: 'bg-gray-900 text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 shadow-2xs',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-100 dark:hover:bg-zinc-700',
+    outline: 'border border-gray-300 dark:border-zinc-700 text-ink-900 dark:text-gray-100 bg-transparent hover:bg-gray-050 dark:hover:bg-zinc-800',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800',
+    destructive: 'border border-red-500 text-red-500 bg-transparent hover:bg-red-050 dark:hover:bg-red-950/30',
   };
   return (
     <button className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...props}>
@@ -41,15 +41,15 @@ interface BadgeProps {
 
 export function Badge({ variant, children, className = '' }: BadgeProps) {
   const variants: Record<BadgeVariant, string> = {
-    verified: 'bg-mint-050 text-mint-700',
-    pending: 'bg-amber-050 text-amber-700',
-    rejected: 'bg-red-050 text-red-700',
-    neutral: 'bg-gray-100 text-gray-700',
-    featured: 'bg-coral-050 text-coral-700',
-    info: 'bg-gray-100 text-gray-800',
-    overdue: 'bg-red-050 text-red-700',
-    urgent: 'bg-amber-050 text-amber-700',
-    inactive: 'bg-gray-100 text-gray-500',
+    verified: 'bg-mint-050 dark:bg-emerald-950/40 text-mint-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40',
+    pending: 'bg-amber-050 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-800/40',
+    rejected: 'bg-red-050 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200/50 dark:border-red-800/40',
+    neutral: 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-zinc-700',
+    featured: 'bg-coral-050 dark:bg-orange-950/40 text-coral-700 dark:text-orange-300',
+    info: 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-zinc-700',
+    overdue: 'bg-red-050 dark:bg-red-950/40 text-red-700 dark:text-red-300',
+    urgent: 'bg-amber-050 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300',
+    inactive: 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400',
   };
   const dotColors: Record<BadgeVariant, string> = {
     verified: 'bg-mint-500',
@@ -57,7 +57,7 @@ export function Badge({ variant, children, className = '' }: BadgeProps) {
     rejected: 'bg-red-500',
     neutral: 'bg-gray-400',
     featured: 'bg-coral-500',
-    info: 'bg-gray-700',
+    info: 'bg-gray-700 dark:bg-gray-300',
     overdue: 'bg-red-500',
     urgent: 'bg-amber-500',
     inactive: 'bg-gray-400',
@@ -81,7 +81,7 @@ export function Card({ children, className = '', hover = false, onClick }: CardP
   return (
     <div
       onClick={onClick}
-      className={`bg-surface-0 border border-gray-200 rounded-card ${hover ? 'transition-all duration-150 ease-out-soft hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] hover:-translate-y-0.5' : ''} ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`bg-surface-0 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-card ${hover ? 'transition-all duration-150 ease-out-soft hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] hover:-translate-y-0.5' : ''} ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
       {children}
     </div>
@@ -149,17 +149,17 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export function Input({ label, error, icon, className = '', ...props }: InputProps) {
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{label}</label>}
       <div className="relative">
-        {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>}
+        {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500">{icon}</div>}
         <input
-          className={`w-full px-3 py-2 text-sm bg-surface-0 border rounded-lg transition-colors duration-150 focus-ring placeholder:text-gray-400 ${
-            error ? 'border-red-300' : 'border-gray-200'
+          className={`w-full px-3 py-2 text-sm bg-surface-0 dark:bg-zinc-900 border text-gray-900 dark:text-white rounded-lg transition-colors duration-150 focus-ring placeholder:text-gray-400 dark:placeholder:text-zinc-500 ${
+            error ? 'border-red-300 dark:border-red-700' : 'border-gray-200 dark:border-zinc-700'
           } ${icon ? 'pl-9' : ''} ${className}`}
           {...props}
         />
       </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   );
 }
@@ -172,14 +172,14 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 export function Textarea({ label, error, className = '', ...props }: TextareaProps) {
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{label}</label>}
       <textarea
-        className={`w-full px-3 py-2 text-sm bg-surface-0 border rounded-lg transition-colors duration-150 focus-ring placeholder:text-gray-400 resize-none ${
-          error ? 'border-red-300' : 'border-gray-200'
+        className={`w-full px-3 py-2 text-sm bg-surface-0 dark:bg-zinc-900 border text-gray-900 dark:text-white rounded-lg transition-colors duration-150 focus-ring placeholder:text-gray-400 dark:placeholder:text-zinc-500 resize-none ${
+          error ? 'border-red-300 dark:border-red-700' : 'border-gray-200 dark:border-zinc-700'
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   );
 }
@@ -192,19 +192,19 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export function Select({ label, error, className = '', children, ...props }: SelectProps) {
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
+      {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{label}</label>}
       <div className="relative">
         <select
-          className={`w-full appearance-none px-3 py-2 pr-9 text-sm bg-surface-0 border rounded-lg transition-colors duration-150 focus-ring ${
-            error ? 'border-red-300' : 'border-gray-200'
+          className={`w-full appearance-none px-3 py-2 pr-9 text-sm bg-surface-0 dark:bg-zinc-900 border text-gray-900 dark:text-white rounded-lg transition-colors duration-150 focus-ring ${
+            error ? 'border-red-300 dark:border-red-700' : 'border-gray-200 dark:border-zinc-700'
           } ${className}`}
           {...props}
         >
           {children}
         </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500 pointer-events-none" />
       </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   );
 }
@@ -217,10 +217,10 @@ interface SkillTagProps {
 
 export function SkillTag({ children, onRemove, className = '' }: SkillTagProps) {
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md ${className}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-md border border-transparent dark:border-zinc-700 ${className}`}>
       {children}
       {onRemove && (
-        <button onClick={onRemove} className="hover:text-gray-900 transition-colors">
+        <button onClick={onRemove} className="hover:text-gray-900 dark:hover:text-white transition-colors">
           <X className="w-3 h-3" />
         </button>
       )}
@@ -246,16 +246,14 @@ export function ProgressBar({ value, max = 100, className = '', animateOnMount =
   }, [value, max, animateOnMount]);
 
   return (
-    <div className={`w-full h-1.5 bg-gray-100 rounded-full overflow-hidden ${className}`}>
+    <div className={`w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden ${className}`}>
       <div
-        className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out-soft"
+        className="h-full bg-gray-900 dark:bg-white rounded-full transition-all duration-300 ease-out-soft"
         style={{ width: `${width}%` }}
       />
     </div>
   );
 }
-
-
 
 interface CheckboxProps {
   checked: boolean;
@@ -268,10 +266,10 @@ export function Checkbox({ checked, onChange, className = '' }: CheckboxProps) {
     <button
       onClick={onChange}
       className={`w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 focus-ring ${
-        checked ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-surface-0 hover:border-gray-400'
+        checked ? 'bg-gray-900 border-gray-900 dark:bg-white dark:border-white' : 'border-gray-300 dark:border-zinc-600 bg-surface-0 dark:bg-zinc-900 hover:border-gray-400 dark:hover:border-zinc-500'
       } ${className}`}
     >
-      {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+      {checked && <Check className="w-3 h-3 text-white dark:text-gray-900" strokeWidth={3} />}
     </button>
   );
 }
@@ -287,7 +285,7 @@ export function KebabMenu({ items }: KebabMenuProps) {
       <button
         onClick={() => setOpen(!open)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors focus-ring"
+        className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-ring"
       >
         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
           <circle cx="8" cy="3" r="1.5" />
@@ -296,13 +294,13 @@ export function KebabMenu({ items }: KebabMenuProps) {
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-44 bg-surface-0 border border-gray-200 rounded-lg shadow-lg py-1 z-50 animate-scale-in">
+        <div className="absolute right-0 top-full mt-1 w-44 bg-surface-0 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg shadow-lg py-1 z-50 animate-scale-in">
           {items.map((item, i) => (
             <button
               key={i}
               onMouseDown={item.onClick}
               className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                item.variant === 'destructive' ? 'text-red-500 hover:bg-red-050' : 'text-gray-700 hover:bg-gray-100'
+                item.variant === 'destructive' ? 'text-red-500 hover:bg-red-050 dark:hover:bg-red-950/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
               }`}
             >
               {item.label}
@@ -319,7 +317,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className = '' }: SkeletonProps) {
-  return <div className={`bg-gray-100 rounded animate-pulse-skeleton ${className}`} />;
+  return <div className={`bg-gray-100 dark:bg-zinc-800 rounded animate-pulse-skeleton ${className}`} />;
 }
 
 interface EmptyStateProps {
@@ -332,9 +330,9 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-gray-400 mb-3">{icon}</div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
-      <p className="text-sm text-gray-600 mb-4 max-w-sm">{description}</p>
+      <div className="text-gray-400 dark:text-zinc-500 mb-3">{icon}</div>
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
+      <p className="text-sm text-gray-600 dark:text-zinc-400 mb-4 max-w-sm">{description}</p>
       {action}
     </div>
   );
@@ -352,14 +350,14 @@ export function Modal({ open, onClose, title, children, className = '' }: ModalP
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" />
       <div
-        className={`relative bg-white rounded-2xl border border-gray-100 shadow-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto scrollbar-thin animate-scale-in ${className}`}
+        className={`relative bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-2xl w-full max-w-lg max-h-[88vh] overflow-y-auto scrollbar-thin animate-scale-in text-gray-900 dark:text-white ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-20">
-          <h2 className="text-base font-bold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 sticky top-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm z-20">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white">{title}</h2>
+          <button onClick={onClose} className="p-1.5 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -380,17 +378,33 @@ export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-md animate-toast-in bg-surface-0 ${
-            toast.variant === 'success' ? 'border-mint-200' : toast.variant === 'error' ? 'border-red-200' : 'border-gray-200'
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-md animate-toast-in bg-surface-0 dark:bg-zinc-900 ${
+            toast.variant === 'success' ? 'border-mint-200 dark:border-mint-800' : toast.variant === 'error' ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-zinc-700'
           }`}
         >
-          <span className={`w-2 h-2 rounded-full ${toast.variant === 'success' ? 'bg-mint-500' : toast.variant === 'error' ? 'bg-red-500' : 'bg-gray-900'}`} />
-          <span className="text-sm text-gray-800 flex-1">{toast.message}</span>
-          <button onClick={() => onRemove(toast.id)} className="text-gray-400 hover:text-gray-700 transition-colors">
+          <span className={`w-2 h-2 rounded-full ${toast.variant === 'success' ? 'bg-mint-500' : toast.variant === 'error' ? 'bg-red-500' : 'bg-gray-900 dark:bg-white'}`} />
+          <span className="text-sm text-gray-800 dark:text-gray-200 flex-1">{toast.message}</span>
+          <button onClick={() => onRemove(toast.id)} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
       ))}
+    </div>
+  );
+}
+
+export function LoadingSplash() {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FAFAFA] dark:bg-[#09090B] font-sans transition-colors">
+      <div className="flex flex-col items-center gap-5 animate-pulse">
+        <div className="text-4xl font-black tracking-tight text-gray-900 dark:text-white flex items-baseline select-none">
+          <span>Gogangs</span>
+          <span className="text-pink-500 font-black text-5xl leading-none ml-0.5">.</span>
+        </div>
+        <div className="w-36 h-1 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden relative">
+          <div className="absolute inset-y-0 left-0 bg-gray-900 dark:bg-white rounded-full w-1/3 animate-shimmer-sweep" />
+        </div>
+      </div>
     </div>
   );
 }

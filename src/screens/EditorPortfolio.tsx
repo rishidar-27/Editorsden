@@ -103,14 +103,14 @@ export function EditorPortfolio() {
   };
 
   return (
-    <div className="bg-[#FAF9FF] min-h-screen py-8 px-4 lg:px-8 font-sans text-gray-900">
+    <div className="bg-[#FAF9FF] dark:bg-[#09090B] min-h-screen py-8 px-4 lg:px-8 font-sans text-gray-900 dark:text-zinc-100 transition-colors">
       <div className="max-w-[1140px] mx-auto">
         
         {/* Header Section */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Portfolio</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Drag to reorder. Star up to 3 items</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Portfolio</h1>
+            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Drag to reorder. Star up to 3 items</p>
           </div>
 
           <div className="flex items-center gap-3">

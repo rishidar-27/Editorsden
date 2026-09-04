@@ -83,6 +83,8 @@ interface AppState {
   };
   addToast: (message: string, variant?: Toast['variant']) => void;
   removeToast: (id: string) => void;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -110,6 +112,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [activity, setActivity] = useState<ActivityEvent[]>(initialActivity);
   const [assets, setAssets] = useState<EditorAsset[]>(initialAssets);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('gogangs_theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('gogangs_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('gogangs_theme', 'light');
+      }
+    } catch {}
+  }, [darkMode]);
+
+  const toggleDarkMode = useCallback(() => {
+    setDarkMode((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     try {
@@ -387,6 +414,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addProject, updateSubtask, assignEditors,
       getEditorStorageStats, addEditorAsset, deleteEditorAssets, upgradeStorageTier,
       addToast, removeToast,
+      darkMode, toggleDarkMode,
     }}>
       {children}
     </AppContext.Provider>

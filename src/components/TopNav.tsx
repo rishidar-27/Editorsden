@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Bell, Menu, X, Search, ChevronDown, LogOut, User as UserIcon, ExternalLink } from 'lucide-react';
+import { Bell, Menu, X, Search, ChevronDown, LogOut, User as UserIcon, ExternalLink, Sun, Moon } from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '@/context';
 import { Avatar } from './ui';
@@ -18,7 +18,7 @@ interface TopNavProps {
 }
 
 export function TopNav({ items, currentRoute, onNavigate, showSearch = false, showNotifications = true }: TopNavProps) {
-  const { user, getCurrentEditor, logout, projects } = useApp();
+  const { user, getCurrentEditor, logout, projects, darkMode, toggleDarkMode } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -122,7 +122,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-40 h-16 bg-white border-b border-gray-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+      <nav className="fixed top-0 left-0 right-0 z-40 h-16 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-gray-200/80 dark:border-zinc-800 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-colors">
         <div className="max-w-[1400px] mx-auto h-full px-4 lg:px-8 flex items-center justify-between gap-6">
           {/* Left: Logo + Nav Links */}
           <div className="flex items-center gap-8 h-full min-w-0">
@@ -142,13 +142,13 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                     onClick={() => onNavigate(item.route)}
                     className={`h-16 px-3.5 text-sm transition-all flex items-center gap-1.5 border-b-2 ${
                       active
-                        ? 'text-gray-900 font-bold border-gray-900'
-                        : 'text-gray-600 hover:text-gray-900 font-medium border-transparent'
+                        ? 'text-gray-900 dark:text-white font-bold border-gray-900 dark:border-white'
+                        : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium border-transparent'
                     }`}
                   >
                     <span>{item.label}</span>
                     {isReview && liveReviewCount > 0 && (
-                      <span className="px-1.5 py-0.5 text-xs font-bold rounded-full bg-gray-900 text-white shadow-2xs">
+                      <span className="px-1.5 py-0.5 text-xs font-bold rounded-full bg-gray-900 text-white dark:bg-white dark:text-zinc-950 shadow-2xs">
                         {liveReviewCount}
                       </span>
                     )}
@@ -158,23 +158,37 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
             </div>
           </div>
 
-          {/* Right: Search, Notifications, Avatar */}
-          <div className="flex items-center gap-3">
+          {/* Right: Search, Dark Mode Toggle, Notifications, Avatar */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {showSearch && (
               <div className="hidden md:flex items-center relative">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
+                <Search className="w-4 h-4 text-gray-400 dark:text-zinc-500 absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Search editors, projects..."
                   onClick={() => setSearchOpen(true)}
                   readOnly
-                  className="w-60 pl-9 pr-9 py-1.5 text-xs bg-gray-100/90 border border-transparent rounded-lg cursor-pointer hover:bg-gray-100 focus:outline-none focus:bg-white focus:border-gray-300 transition-all placeholder:text-gray-400 text-gray-800"
+                  className="w-60 pl-9 pr-9 py-1.5 text-xs bg-gray-100/90 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-850 focus:outline-none focus:bg-white dark:focus:bg-zinc-900 focus:border-gray-300 dark:focus:border-zinc-700 transition-all placeholder:text-gray-400 dark:placeholder:text-zinc-500 text-gray-800 dark:text-zinc-200"
                 />
-                <span className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-semibold text-gray-500 bg-white border border-gray-200 rounded shadow-2xs pointer-events-none">
+                <span className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-semibold text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded shadow-2xs pointer-events-none">
                   ⌘K
                 </span>
               </div>
             )}
+
+            {/* Dark Mode Toggle Button */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-amber-400 animate-spin-slow transition-transform" />
+              ) : (
+                <Moon className="w-5 h-5 text-gray-700 transition-transform" />
+              )}
+            </button>
 
             {/* Notifications Dropdown */}
             {showNotifications && (
@@ -182,26 +196,28 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                 <button
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
                   className={`relative p-2 rounded-full transition-colors ${
-                    notificationsOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100'
+                    notificationsOpen
+                      ? 'bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white'
+                      : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
                   }`}
                   title="Notifications"
                 >
                   <Bell className="w-5 h-5 stroke-[1.75]" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gray-900 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white shadow-2xs">
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gray-900 text-white dark:bg-zinc-100 dark:text-zinc-900 text-[9px] font-bold flex items-center justify-center border-2 border-white dark:border-zinc-950 shadow-2xs">
                       {unreadCount}
                     </span>
                   )}
                 </button>
 
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden animate-scale-in z-50 font-sans">
+                  <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-scale-in z-50 font-sans">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 bg-gray-50/70">
+                    <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/70 dark:bg-zinc-850/50">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-900">Notifications</span>
+                        <span className="text-xs font-bold text-gray-900 dark:text-white">Notifications</span>
                         {unreadCount > 0 && (
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-gray-200 text-gray-800 rounded-full">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-full">
                             {unreadCount} new
                           </span>
                         )}
@@ -209,7 +225,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                       {unreadCount > 0 && (
                         <button
                           onClick={markAllAsRead}
-                          className="text-[11px] font-semibold text-gray-900 hover:underline"
+                          className="text-[11px] font-semibold text-gray-900 dark:text-zinc-300 hover:underline"
                         >
                           Mark all as read
                         </button>
@@ -217,9 +233,9 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                     </div>
 
                     {/* Notification List */}
-                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-zinc-800/60">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-xs text-gray-400">
+                        <div className="p-6 text-center text-xs text-gray-400 dark:text-zinc-500">
                           No notifications at this time.
                         </div>
                       ) : (
@@ -227,19 +243,19 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                           <div
                             key={item.id}
                             onClick={() => markAsRead(item.id, item.route)}
-                            className={`p-3.5 hover:bg-gray-100/60 cursor-pointer transition-colors flex items-start gap-3 ${
-                              item.unread ? 'bg-gray-50/80' : 'bg-white'
+                            className={`p-3.5 hover:bg-gray-100/60 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors flex items-start gap-3 ${
+                              item.unread ? 'bg-gray-50/80 dark:bg-zinc-850/40' : 'bg-white dark:bg-zinc-900'
                             }`}
                           >
-                            <div className="w-2 h-2 rounded-full bg-gray-900 mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ opacity: item.unread ? 1 : 0 }} />
+                            <div className="w-2 h-2 rounded-full bg-gray-900 dark:bg-zinc-100 mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ opacity: item.unread ? 1 : 0 }} />
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-1">
-                                <h4 className={`text-xs ${item.unread ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'}`}>
+                                <h4 className={`text-xs ${item.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-semibold text-gray-700 dark:text-zinc-300'}`}>
                                   {item.title}
                                 </h4>
-                                <span className="text-[10px] text-gray-400 whitespace-nowrap">{item.time}</span>
+                                <span className="text-[10px] text-gray-400 dark:text-zinc-500 whitespace-nowrap">{item.time}</span>
                               </div>
-                              <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2 leading-snug">
+                              <p className="text-[11px] text-gray-500 dark:text-zinc-400 mt-0.5 line-clamp-2 leading-snug">
                                 {item.message}
                               </p>
                             </div>
@@ -249,13 +265,13 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                     </div>
 
                     {/* Footer */}
-                    <div className="p-2 border-t border-gray-100 bg-gray-50/50 text-center">
+                    <div className="p-2 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-850/30 text-center">
                       <button
                         onClick={() => {
                           setNotificationsOpen(false);
                           onNavigate('/editor/projects');
                         }}
-                        className="text-[11px] font-bold text-gray-900 hover:underline py-1 inline-block"
+                        className="text-[11px] font-bold text-gray-900 dark:text-zinc-200 hover:underline py-1 inline-block"
                       >
                         View all tasks & assignments →
                       </button>
@@ -269,34 +285,34 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
             <div className="relative" ref={avatarRef}>
               <button
                 onClick={() => setAvatarOpen(!avatarOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-gray-100 transition-all"
+                className="flex items-center gap-1.5 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all"
               >
                 <img
                   src={user?.type === 'admin' ? 'https://i.pravatar.cc/150?u=admin' : currentEditor?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'}
                   alt="Avatar"
-                  className="w-8 h-8 rounded-full border border-gray-200 object-cover shadow-2xs"
+                  className="w-8 h-8 rounded-full border border-gray-200 dark:border-zinc-700 object-cover shadow-2xs"
                 />
-                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" />
               </button>
               {avatarOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-1.5 animate-scale-in z-50">
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-xl shadow-xl py-1.5 animate-scale-in z-50">
                   {user?.type === 'editor' && (
                     <>
                       <button
                         onClick={() => { setAvatarOpen(false); onNavigate(`/editor/${currentEditor?.id}`); }}
-                        className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors text-left"
                       >
-                        <UserIcon className="w-4 h-4 text-gray-400" />
+                        <UserIcon className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
                         View public profile
                       </button>
-                      <div className="h-px bg-gray-100 my-1" />
+                      <div className="h-px bg-gray-100 dark:bg-zinc-800 my-1" />
                     </>
                   )}
                   <button
                     onClick={() => { setAvatarOpen(false); logout(); onNavigate('/'); }}
-                    className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors text-left"
+                    className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors text-left"
                   >
-                    <LogOut className="w-4 h-4 text-red-500" />
+                    <LogOut className="w-4 h-4 text-red-500 dark:text-red-400" />
                     Logout
                   </button>
                 </div>
@@ -306,7 +322,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -315,23 +331,33 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
 
         {/* Mobile dropdown panel */}
         {mobileOpen && (
-          <div className="lg:hidden absolute top-16 left-0 right-0 bg-surface-0 border-b border-gray-200 shadow-lg animate-fade-in">
+          <div className="lg:hidden absolute top-16 left-0 right-0 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 shadow-lg animate-fade-in">
             <div className="px-4 py-3 flex flex-col gap-1">
               {items.map((item) => (
                 <button
                   key={item.route}
                   onClick={() => { onNavigate(item.route); setMobileOpen(false); }}
                   className={`text-left px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    isActive(item.route) ? 'text-gray-900 bg-gray-100 font-bold' : 'text-gray-600 hover:bg-gray-100'
+                    isActive(item.route) ? 'text-gray-900 dark:text-white bg-gray-100 dark:bg-zinc-900 font-bold' : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-900'
                   }`}
                 >
                   {item.label}
                 </button>
               ))}
+              <div className="h-px bg-gray-100 dark:bg-zinc-850 my-1" />
+              <button
+                onClick={toggleDarkMode}
+                className="text-left px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-lg transition-colors flex items-center justify-between"
+              >
+                <span>Appearance</span>
+                <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 font-normal">
+                  {darkMode ? <><Sun className="w-4 h-4 text-amber-400" /> Dark</> : <><Moon className="w-4 h-4" /> Light</>}
+                </span>
+              </button>
               {showSearch && (
                 <button
                   onClick={() => { setSearchOpen(true); setMobileOpen(false); }}
-                  className="text-left px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+                  className="text-left px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-lg transition-colors flex items-center gap-2"
                 >
                   <Search className="w-4 h-4" />
                   Search
@@ -345,31 +371,31 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
       {/* Search overlay */}
       {searchOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 animate-fade-in" onClick={() => setSearchOpen(false)}>
-          <div className="absolute inset-0 bg-ink-950/20" />
-          <div className="relative w-full max-w-xl bg-surface-0 rounded-card border border-gray-200 shadow-xl animate-scale-in overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-              <Search className="w-5 h-5 text-gray-400" />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+          <div className="relative w-full max-w-xl bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl animate-scale-in overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-200 dark:border-zinc-800">
+              <Search className="w-5 h-5 text-gray-400 dark:text-zinc-500" />
               <input
                 autoFocus
                 placeholder="Search editors, projects, tasks..."
-                className="flex-1 text-sm bg-transparent outline-none placeholder:text-gray-400"
+                className="flex-1 text-sm bg-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-zinc-500 text-gray-900 dark:text-white"
               />
-              <button onClick={() => setSearchOpen(false)} className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+              <button onClick={() => setSearchOpen(false)} className="text-xs text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
                 ESC
               </button>
             </div>
             <div className="py-2">
-              <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Recent</div>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400" />
+              <div className="px-4 py-2 text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Recent</div>
+              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
+                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
                 Marcus Chen — Verified Editor
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400" />
+              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
+                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
                 Aurora Skincare — Q4 Launch Campaign
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400" />
+              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
+                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
                 Review Queue — 3 pending
               </button>
             </div>

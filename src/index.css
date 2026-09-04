@@ -17,17 +17,292 @@
     line-height: 22px;
     color: #33333A;
     background-color: #FAFAFA;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1, h2, h3 {
+  .dark body {
+    color: #E4E4E7;
+    background-color: #09090B;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter Tight', system-ui, sans-serif;
     color: #101013;
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #FAFAFA;
   }
 
   ::selection {
     background-color: #ECECEF;
     color: #101013;
   }
+
+  .dark ::selection {
+    background-color: #27272A;
+    color: #FAFAFA;
+  }
+}
+
+/* =========================================================
+   COMPREHENSIVE DARK THEME SYSTEM
+   Transforms all surfaces, typography, cards, inputs, badges & borders
+   into a cohesive, monochromatic dark aesthetic.
+   ========================================================= */
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Base Surfaces & Backgrounds */
+.dark .bg-white {
+  background-color: #121215 !important;
+}
+
+.dark .bg-surface-0 {
+  background-color: #121215 !important;
+}
+
+.dark .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark .bg-white\/80,
+.dark .bg-white\/90,
+.dark .bg-white\/95 {
+  background-color: rgba(18, 18, 21, 0.95) !important;
+}
+
+/* All gray background variations (handles bg-gray-50, bg-gray-50/70, bg-gray-100/60, etc.) */
+.dark [class*="bg-surface-50"],
+.dark [class*="bg-gray-50"],
+.dark [class*="bg-[#f4f6fb]"],
+.dark [class*="bg-[#FAF9FF]"],
+.dark [class*="bg-[#FAFAFA]"] {
+  background-color: #141418 !important;
+}
+
+.dark [class*="bg-surface-100"],
+.dark [class*="bg-gray-100"] {
+  background-color: #1A1A20 !important;
+}
+
+.dark [class*="bg-gray-200"] {
+  background-color: #24242C !important;
+}
+
+.dark [class*="bg-gray-300"] {
+  background-color: #30303A !important;
+}
+
+/* Dark Mode Tinted Badges & Status Pills (handles bg-emerald-50, bg-emerald-100/70, etc.) */
+.dark [class*="bg-emerald-50"],
+.dark [class*="bg-emerald-100"],
+.dark [class*="bg-mint-050"],
+.dark [class*="bg-mint-100"] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.dark [class*="bg-amber-50"],
+.dark [class*="bg-amber-100"],
+.dark [class*="bg-[#FFFBEB]"],
+.dark [class*="bg-\[\#FFFBEB\]"] {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #FBBF24 !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+.dark [class*="bg-blue-50"],
+.dark [class*="bg-blue-100"] {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #60A5FA !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.dark [class*="bg-purple-50"],
+.dark [class*="bg-purple-100"],
+.dark [class*="bg-violet-50"],
+.dark [class*="bg-violet-100"] {
+  background-color: rgba(168, 85, 247, 0.15) !important;
+  color: #C084FC !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.dark [class*="bg-red-50"],
+.dark [class*="bg-red-100"] {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #F87171 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Borders */
+.dark [class*="border-gray-50"],
+.dark [class*="border-gray-100"],
+.dark [class*="border-gray-200"],
+.dark [class*="border-gray-300"],
+.dark [class*="border-slate-"] {
+  border-color: #27272A !important;
+}
+
+.dark .border-emerald-200 {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.dark .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.dark .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.dark .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Typography / Text Colors */
+.dark [class*="text-gray-900"],
+.dark [class*="text-ink-950"],
+.dark [class*="text-ink-900"] {
+  color: #FAFAFA !important;
+}
+
+.dark [class*="text-gray-800"],
+.dark [class*="text-ink-800"] {
+  color: #F4F4F5 !important;
+}
+
+.dark [class*="text-gray-700"],
+.dark [class*="text-ink-700"] {
+  color: #E4E4E7 !important;
+}
+
+.dark [class*="text-gray-600"],
+.dark [class*="text-ink-600"] {
+  color: #CBD5E1 !important;
+}
+
+.dark [class*="text-gray-500"],
+.dark [class*="text-gray-400"] {
+  color: #94A3B8 !important;
+}
+
+.dark [class*="text-emerald-700"],
+.dark [class*="text-emerald-800"],
+.dark [class*="text-emerald-900"],
+.dark [class*="text-mint-700"] {
+  color: #34D399 !important;
+}
+
+.dark [class*="text-amber-700"],
+.dark [class*="text-amber-800"],
+.dark [class*="text-amber-900"] {
+  color: #FBBF24 !important;
+}
+
+.dark [class*="text-blue-700"],
+.dark [class*="text-blue-800"],
+.dark [class*="text-blue-900"] {
+  color: #60A5FA !important;
+}
+
+.dark [class*="text-red-700"],
+.dark [class*="text-red-800"],
+.dark [class*="text-red-900"] {
+  color: #F87171 !important;
+}
+
+/* Small Avatar & Icon Backdrops on Cards */
+.dark .w-6.h-6.bg-white,
+.dark .w-7.h-7.bg-white,
+.dark .w-8.h-8.bg-white,
+.dark .w-10.h-10.bg-white,
+.dark .w-12.h-12.bg-white {
+  background-color: #1A1A20 !important;
+  border-color: #2E2E38 !important;
+}
+
+/* Hover States */
+.dark .hover\:bg-gray-50:hover,
+.dark [class*="hover:bg-gray-50"]:hover {
+  background-color: #1A1A20 !important;
+}
+
+.dark .hover\:bg-gray-100:hover,
+.dark [class*="hover:bg-gray-100"]:hover {
+  background-color: #24242C !important;
+}
+
+.dark .hover\:bg-gray-200:hover,
+.dark [class*="hover:bg-gray-200"]:hover {
+  background-color: #30303A !important;
+}
+
+.dark .hover\:text-gray-900:hover,
+.dark .hover\:text-gray-800:hover,
+.dark [class*="hover:text-gray-900"]:hover,
+.dark [class*="hover:text-gray-800"]:hover {
+  color: #FFFFFF !important;
+}
+
+.dark .hover\:text-gray-700:hover,
+.dark [class*="hover:text-gray-700"]:hover {
+  color: #FAFAFA !important;
+}
+
+.dark .hover\:border-gray-300:hover,
+.dark [class*="hover:border-gray-300"]:hover {
+  border-color: #3F3F46 !important;
+}
+
+/* Form Inputs, Textareas & Selects */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #16161A !important;
+  border-color: #2B2B33 !important;
+  color: #FAFAFA !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717A !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #52525B !important;
+  outline: none !important;
+}
+
+/* Elevation / Shadows */
+.dark .shadow-2xs,
+.dark .shadow-xs,
+.dark .shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Divide rules */
+.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.dark [class*="divide-gray-"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #27272A !important;
 }
 
 @layer utilities {
@@ -52,6 +327,13 @@
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: #C1C1C7;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #27272A;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #3F3F46;
   }
 
   /* Custom Rich Micro-Animations */

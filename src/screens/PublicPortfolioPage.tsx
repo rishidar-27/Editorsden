@@ -31,7 +31,9 @@ import {
   UploadCloud,
   Check,
   Cpu,
-  MonitorPlay
+  MonitorPlay,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useApp } from '@/context';
 
@@ -41,7 +43,7 @@ interface PublicPortfolioPageProps {
 }
 
 export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPageProps) {
-  const { getEditor, addToast } = useApp();
+  const { getEditor, addToast, darkMode, toggleDarkMode } = useApp();
   const rawEditor = getEditor(editorId);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -256,10 +258,10 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb] text-gray-900 font-sans selection:bg-gray-900 selection:text-white">
+    <div className="min-h-screen bg-[#f4f6fb] dark:bg-[#09090B] text-gray-900 dark:text-zinc-100 font-sans selection:bg-gray-900 selection:text-white transition-colors">
       
       {/* 1. STICKY TOP BRAND & BACK HEADER */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-8 py-3.5 transition-all shadow-2xs">
+      <header className="sticky top-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-gray-200/80 dark:border-zinc-800 px-4 sm:px-8 py-3.5 transition-all shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-6">
@@ -267,29 +269,43 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
               onClick={() => onNavigate('/')}
               className="flex items-center gap-1.5 focus:outline-none group hover:scale-105 transition-transform cursor-pointer"
             >
-              <span className="text-xl font-black tracking-tight text-gray-900 flex items-center">
-                gogangs<span className="text-pink-500 font-black text-2xl leading-none">.</span>
+              <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white flex items-center">
+                Gogangs<span className="text-pink-500 font-black text-2xl leading-none">.</span>
               </span>
             </button>
 
             <button
               onClick={() => onNavigate('/')}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl border border-gray-200 transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Directory</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Available for Hire
             </span>
 
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-gray-700" />
+              )}
+            </button>
+
             <button
               onClick={() => setBookingModalOpen(true)}
-              className="bg-gray-900 hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Book {editor.fullName.split(' ')[0]}</span>

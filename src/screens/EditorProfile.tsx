@@ -94,25 +94,25 @@ export function EditorProfile() {
   );
 
   return (
-    <div className="bg-[#f4f6fb] min-h-screen py-6 px-4 lg:px-8 font-sans text-gray-900">
+    <div className="bg-[#f4f6fb] dark:bg-[#09090B] min-h-screen py-6 px-4 lg:px-8 font-sans text-gray-900 dark:text-zinc-100 transition-colors">
       <div className="max-w-[1140px] mx-auto space-y-6">
         
         {/* Compact Header Bar */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
               <img 
                 src={editor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'} 
                 alt={editor.fullName} 
-                className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-2xs" 
+                className="w-14 h-14 rounded-2xl object-cover border-2 border-white dark:border-zinc-700 shadow-2xs" 
               />
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white shadow-2xs">
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-2xs">
                 <Check className="w-3 h-3 stroke-[3]" />
               </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Creator Profile'}</h1>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{editor.fullName || 'Creator Profile'}</h1>
                 <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Verified Top 1%
