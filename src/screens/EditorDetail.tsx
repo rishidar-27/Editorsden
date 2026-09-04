@@ -42,7 +42,8 @@ import {
   Eye,
   CheckCheck,
   X,
-  FolderSync
+  FolderSync,
+  ArrowRight
 } from 'lucide-react';
 
 interface EditorDetailProps {
