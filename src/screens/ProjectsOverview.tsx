@@ -53,8 +53,8 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
       trend: '↗ 20%',
       trendUp: true,
       subtext: 'vs last 30 days',
-      icon: <Folder className="w-5 h-5 text-violet-600" />,
-      bg: 'bg-violet-100/70',
+      icon: <Folder className="w-5 h-5 text-gray-900" />,
+      bg: 'bg-gray-100',
     },
     {
       label: 'Deliverables in Flight',
@@ -145,7 +145,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
             <span>Campaign Projects</span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
               {projects.length} Active
             </span>
           </h1>
@@ -163,7 +163,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
           </button>
           <button
             onClick={() => onNavigate('/admin/projects/new')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>New Campaign Project</span>
@@ -204,7 +204,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
               placeholder="Search projects by name, client, or deliverable..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors placeholder:text-gray-400 text-gray-800"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:bg-white transition-colors placeholder:text-gray-400 text-gray-800"
             />
           </div>
 
@@ -215,7 +215,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
                 onClick={() => setStatusFilter(tab)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   statusFilter === tab
-                    ? 'bg-violet-600 text-white shadow-2xs'
+                    ? 'bg-gray-900 text-white shadow-2xs'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -226,7 +226,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
             {(search || statusFilter !== 'All') && (
               <button
                 onClick={clearFilters}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-violet-700 hover:underline"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-gray-900 hover:underline"
               >
                 <RotateCcw className="w-3 h-3" />
                 Reset
@@ -265,16 +265,16 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
               <Card
                 key={p.id}
                 onClick={() => onNavigate(`/admin/projects/${p.id}`)}
-                className="p-4 sm:p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs hover:border-violet-200 hover:shadow-xs transition-all cursor-pointer group"
+                className="p-4 sm:p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs hover:border-gray-300 hover:shadow-xs transition-all cursor-pointer group"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
                   {/* Left Column: Project Info & Meta (4 cols) */}
                   <div className="lg:col-span-4 flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-violet-100/80 text-violet-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
                       <Bookmark className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 space-y-1">
-                      <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-violet-700 transition-colors">
+                      <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-black transition-colors">
                         {p.title}
                       </h3>
                       <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -300,7 +300,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
                           </span>
                         )}
                         <span className="text-gray-300">•</span>
-                        <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100 flex items-center gap-1">
+                        <span className="text-[10px] font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200 flex items-center gap-1">
                           <HardDrive className="w-3 h-3" />
                           R2 Bucket
                         </span>
@@ -313,7 +313,7 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
                     {p.subtasks.slice(0, 3).map((st) => (
                       <div key={st.id} className="flex items-center justify-between text-xs gap-2">
                         <span className="text-gray-700 text-[11.5px] truncate flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-violet-600 shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-900 shrink-0" />
                           {st.title}
                         </span>
                         <span
@@ -376,14 +376,14 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
                       <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
-                            progressPercent === 100 ? 'bg-emerald-500' : 'bg-violet-600'
+                            progressPercent === 100 ? 'bg-emerald-500' : 'bg-gray-900'
                           }`}
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
                     </div>
 
-                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-violet-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-900 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                   </div>
                 </div>
               </Card>

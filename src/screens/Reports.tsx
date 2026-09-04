@@ -70,8 +70,8 @@ export function Reports({ onNavigate }: ReportsProps) {
       trend: '92% utilization',
       trendUp: true,
       subtext: `${totalEditors} total accounts`,
-      icon: <Activity className="w-5 h-5 text-violet-600" />,
-      bg: 'bg-violet-100/70',
+      icon: <Activity className="w-5 h-5 text-gray-900" />,
+      bg: 'bg-gray-100',
     },
   ];
 
@@ -118,7 +118,7 @@ export function Reports({ onNavigate }: ReportsProps) {
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
             <span>Analytics & Creator Telemetry</span>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
               Q3 Live Telemetry
             </span>
           </h1>
@@ -128,7 +128,7 @@ export function Reports({ onNavigate }: ReportsProps) {
         </div>
         <button
           onClick={handleExport}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
         >
           <Download className="w-4 h-4" />
           <span>Export Analytics CSV</span>
@@ -166,7 +166,7 @@ export function Reports({ onNavigate }: ReportsProps) {
               placeholder="Search creators in report by name, city, or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 focus:bg-white transition-colors"
             />
           </div>
 
@@ -174,7 +174,7 @@ export function Reports({ onNavigate }: ReportsProps) {
             <select
               value={availabilityFilter}
               onChange={(e) => setAvailabilityFilter(e.target.value)}
-              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
             >
               <option value="All">All Availabilities</option>
               <option value="Full-Time">Full-Time</option>
@@ -185,7 +185,7 @@ export function Reports({ onNavigate }: ReportsProps) {
             <select
               value={skillFilter}
               onChange={(e) => setSkillFilter(e.target.value)}
-              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+              className="px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
             >
               <option value="All">All Skills</option>
               {allSkills.map((s) => (
@@ -202,7 +202,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                   setAvailabilityFilter('All');
                   setSkillFilter('All');
                 }}
-                className="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold text-violet-700 hover:underline"
+                className="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold text-gray-900 hover:underline"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Reset
@@ -249,7 +249,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
                       />
                       <div>
-                        <p className="font-bold text-gray-900 group-hover:text-violet-700 transition-colors">{e.fullName}</p>
+                        <p className="font-bold text-gray-900 group-hover:text-black transition-colors">{e.fullName}</p>
                         <p className="text-[11px] text-gray-400">{e.email}</p>
                       </div>
                     </div>
@@ -262,7 +262,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                       {e.skills.slice(0, 2).map((s) => (
                         <span
                           key={s}
-                          className="px-2 py-0.5 bg-violet-50 text-violet-700 rounded text-[10.5px] font-medium"
+                          className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded text-[10.5px] font-medium"
                         >
                           {s}
                         </span>
@@ -297,7 +297,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                         ev.stopPropagation();
                         onNavigate(`/admin/editor/${e.id}`);
                       }}
-                      className="text-xs font-bold text-violet-600 hover:text-violet-800 hover:underline"
+                      className="text-xs font-bold text-gray-900 hover:text-black hover:underline"
                     >
                       View Studio Profile →
                     </button>

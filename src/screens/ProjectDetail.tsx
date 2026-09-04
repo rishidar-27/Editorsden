@@ -49,7 +49,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
   if (!project) {
     return (
       <div className="max-w-[1280px] mx-auto px-4 py-16 text-center">
-        <div className="w-16 h-16 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-gray-100 text-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <FolderKanban className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Project not found</h2>
@@ -83,34 +83,34 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
   const getTaskIcon = (type: TaskType) => {
     switch (type) {
       case 'Reels Editing':
-        return <Film className="w-4 h-4 text-pink-600" />;
+        return <Film className="w-4 h-4 text-gray-900" />;
       case 'Commercial Ads':
-        return <Sparkles className="w-4 h-4 text-violet-600" />;
+        return <Sparkles className="w-4 h-4 text-gray-900" />;
       case 'YouTube Editing':
-        return <Video className="w-4 h-4 text-red-600" />;
+        return <Video className="w-4 h-4 text-gray-800" />;
       case 'Motion Graphics':
-        return <Sparkles className="w-4 h-4 text-indigo-600" />;
+        return <Sparkles className="w-4 h-4 text-gray-900" />;
       case 'Thumbnail Design':
-        return <FileText className="w-4 h-4 text-emerald-600" />;
+        return <FileText className="w-4 h-4 text-gray-700" />;
       default:
-        return <Video className="w-4 h-4 text-blue-600" />;
+        return <Video className="w-4 h-4 text-gray-800" />;
     }
   };
 
   const getTaskIconBg = (type: TaskType) => {
     switch (type) {
       case 'Reels Editing':
-        return 'bg-pink-50 border-pink-100';
+        return 'bg-gray-100 border-gray-200';
       case 'Commercial Ads':
-        return 'bg-violet-50 border-violet-100';
+        return 'bg-gray-100 border-gray-200';
       case 'YouTube Editing':
-        return 'bg-red-50 border-red-100';
+        return 'bg-gray-100 border-gray-200';
       case 'Motion Graphics':
-        return 'bg-indigo-50 border-indigo-100';
+        return 'bg-gray-100 border-gray-200';
       case 'Thumbnail Design':
-        return 'bg-emerald-50 border-emerald-100';
+        return 'bg-gray-100 border-gray-200';
       default:
-        return 'bg-blue-50 border-blue-100';
+        return 'bg-gray-100 border-gray-200';
     }
   };
 
@@ -185,7 +185,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <button
             onClick={() => onNavigate('/admin/projects')}
-            className="inline-flex items-center gap-1.5 font-medium text-gray-600 hover:text-violet-700 transition-colors py-1 px-2.5 rounded-lg hover:bg-violet-50"
+            className="inline-flex items-center gap-1.5 font-medium text-gray-600 hover:text-gray-900 transition-colors py-1 px-2.5 rounded-lg hover:bg-gray-100"
           >
             <ArrowLeft className="w-4 h-4" />
             Projects
@@ -207,7 +207,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Add Subtask</span>
@@ -220,7 +220,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-violet-50 text-violet-700 border border-violet-100">
+              <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-900 border border-gray-200">
                 Campaign Project
               </span>
               <Badge variant={reviewCount > 0 ? 'pending' : progressPercent === 100 ? 'verified' : 'info'}>
@@ -234,7 +234,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
 
             <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-gray-500 pt-1">
               <span className="flex items-center gap-1.5 text-gray-700 font-semibold">
-                <Building2 className="w-4 h-4 text-violet-500" />
+                <Building2 className="w-4 h-4 text-gray-700" />
                 {project.clientName}
               </span>
               <span className="text-gray-300">•</span>
@@ -255,11 +255,11 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
             <div className="flex-1 space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-gray-700">Project Progress</span>
-                <span className="font-extrabold text-violet-700 text-sm">{progressPercent}%</span>
+                <span className="font-extrabold text-gray-900 text-sm">{progressPercent}%</span>
               </div>
               <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                 <div
-                  className="bg-violet-600 h-full rounded-full transition-all duration-500"
+                  className="bg-gray-900 h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -287,11 +287,11 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
         <Card className="p-4 bg-white border border-gray-100 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-semibold text-gray-500">In Progress</span>
-            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+            <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-blue-600">{inProgressCount}</div>
+          <div className="text-2xl font-extrabold text-gray-900">{inProgressCount}</div>
           <span className="text-[11px] text-gray-400 font-medium">Currently being edited</span>
         </Card>
 
@@ -333,7 +333,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                     onClick={() => setStatusFilter(tab)}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                       statusFilter === tab
-                        ? 'bg-violet-600 text-white shadow-2xs'
+                        ? 'bg-gray-900 text-white shadow-2xs'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
@@ -356,7 +356,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   placeholder="Filter subtasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 focus:bg-white transition-colors"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-900 focus:bg-white transition-colors"
                 />
               </div>
             </div>
@@ -455,7 +455,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                                 href={st.deliverableLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-violet-600 hover:text-violet-800 font-semibold hover:underline text-[11px]"
+                                className="inline-flex items-center gap-1 text-gray-900 hover:text-black font-semibold hover:underline text-[11px]"
                               >
                                 <ExternalLink className="w-3 h-3" />
                                 View Deliverable
@@ -543,7 +543,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                 Project Overview
               </h3>
-              <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
                 ID: {project.id}
               </span>
             </div>
@@ -567,7 +567,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   href="https://drive.google.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-700 font-semibold hover:underline"
+                  className="inline-flex items-center gap-1.5 text-gray-900 hover:text-black font-semibold hover:underline"
                 >
                   <FolderKanban className="w-3.5 h-3.5" />
                   drive.google.com/campaign-assets
@@ -611,7 +611,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                         </div>
                       </div>
 
-                      <span className="text-[11px] font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="text-[11px] font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full shrink-0">
                         {tasksForEditor.length} tasks
                       </span>
                     </div>
@@ -654,7 +654,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
           <Card className="w-full max-w-md p-6 bg-white rounded-2xl shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-900">
                   <Plus className="w-4 h-4" />
                 </div>
                 <h3 className="text-base font-bold text-gray-900">Add New Subtask</h3>
@@ -676,7 +676,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   placeholder="e.g. YouTube Video Edit (10 mins)"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
                 />
               </div>
 
@@ -685,7 +685,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                 <select
                   value={newTaskType}
                   onChange={(e) => setNewTaskType(e.target.value as TaskType)}
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
                 >
                   <option value="Reels Editing">Reels Editing</option>
                   <option value="YouTube Editing">YouTube Editing</option>
@@ -703,7 +703,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   type="date"
                   value={newDeadline}
                   onChange={(e) => setNewDeadline(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
                 />
               </div>
 
@@ -712,7 +712,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                 <select
                   value={newEditorId}
                   onChange={(e) => setNewEditorId(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
                 >
                   <option value="">-- Unassigned --</option>
                   {editors.map((ed) => (
@@ -767,17 +767,17 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
               </div>
 
               {reviewModalSubtask.deliverableLink && (
-                <div className="p-3 bg-violet-50/60 border border-violet-100 rounded-xl">
-                  <span className="text-xs font-bold text-violet-900 block mb-1">
+                <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                  <span className="text-xs font-bold text-gray-900 block mb-1">
                     Submitted Deliverable Link:
                   </span>
                   <a
                     href={reviewModalSubtask.deliverableLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs font-semibold text-violet-700 hover:underline flex items-center gap-1.5 break-all"
+                    className="text-xs font-semibold text-gray-900 hover:underline flex items-center gap-1.5 break-all"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0 text-gray-600" />
                     {reviewModalSubtask.deliverableLink}
                   </a>
                 </div>
@@ -792,7 +792,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   value={reviewFeedback}
                   onChange={(e) => setReviewFeedback(e.target.value)}
                   placeholder="e.g. Great edit! Please adjust the background music volume at 0:45..."
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
                 />
               </div>
             </div>

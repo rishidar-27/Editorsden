@@ -270,7 +270,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#ede9fe] text-[#4f46e5] flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-900 flex items-center justify-center shrink-0 shadow-2xs">
               <Inbox className="w-6 h-6 stroke-[2]" />
             </div>
             <div>
@@ -294,7 +294,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
 
             <button
               onClick={() => onNavigate('/admin/projects')}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#ede9fe]/50 hover:bg-[#ede9fe] text-[#3b28cc] border border-[#3b28cc]/20 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
             >
               <FolderKanban className="w-4 h-4" />
               <span>View Kanban</span>
@@ -321,13 +321,13 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
             onClick={() => setActiveTab('all')}
             className={`p-5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-4 cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-white border-[#3b28cc] ring-2 ring-[#3b28cc]/20 shadow-md -translate-y-0.5'
+                ? 'bg-white border-gray-900 ring-2 ring-gray-300 shadow-md -translate-y-0.5'
                 : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-sm'
             }`}
           >
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                activeTab === 'all' ? 'bg-[#3b28cc] text-white shadow-xs' : 'bg-[#ede9fe] text-[#4f46e5]'
+                activeTab === 'all' ? 'bg-gray-900 text-white shadow-xs' : 'bg-gray-100 text-gray-800'
               }`}>
                 <Inbox className="w-6 h-6 stroke-[2]" />
               </div>
@@ -339,9 +339,9 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
             </div>
             {/* Subtle Chart Bars */}
             <div className="flex items-end gap-1 opacity-25">
-              <div className="w-1.5 h-4 bg-[#4f46e5] rounded-full" />
-              <div className="w-1.5 h-7 bg-[#4f46e5] rounded-full" />
-              <div className="w-1.5 h-10 bg-[#4f46e5] rounded-full" />
+              <div className="w-1.5 h-4 bg-gray-900 rounded-full" />
+              <div className="w-1.5 h-7 bg-gray-900 rounded-full" />
+              <div className="w-1.5 h-10 bg-gray-900 rounded-full" />
             </div>
           </button>
 
@@ -445,7 +445,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
               <select
                 value={projectFilter}
                 onChange={(e) => setProjectFilter(e.target.value)}
-                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#3b28cc] cursor-pointer transition-colors"
+                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
               >
                 <option value="All">All Projects</option>
                 {projects.map((p) => (
@@ -460,7 +460,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
               <select
                 value={editorFilter}
                 onChange={(e) => setEditorFilter(e.target.value)}
-                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#3b28cc] cursor-pointer transition-colors"
+                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
               >
                 <option value="All">All Editors</option>
                 {editors.map((e) => (
@@ -475,7 +475,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
               <select
                 value={taskTypeFilter}
                 onChange={(e) => setTaskTypeFilter(e.target.value)}
-                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#3b28cc] cursor-pointer transition-colors"
+                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
               >
                 <option value="All">All Types</option>
                 <option value="Reels Editing">Reels</option>
@@ -492,7 +492,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value as any)}
-                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-[#3b28cc] cursor-pointer transition-colors"
+                className="w-full appearance-none pl-3 pr-7 py-2 bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
               >
                 <option value="newest">⇅ Newest first</option>
                 <option value="oldest">⇅ Oldest first</option>
@@ -509,7 +509,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
               placeholder="Search submissions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#3b28cc] focus:bg-white placeholder:text-gray-400 text-gray-800 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50/70 hover:bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:bg-white placeholder:text-gray-400 text-gray-800 transition-colors"
             />
           </div>
         </div>
@@ -527,7 +527,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                       type="checkbox"
                       checked={selectedIds.length > 0 && selectedIds.length === filteredSubmissions.length}
                       onChange={handleSelectAll}
-                      className="w-4 h-4 rounded border-gray-300 text-[#3b28cc] focus:ring-[#3b28cc] cursor-pointer"
+                      className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-400 cursor-pointer"
                     />
                   </th>
                   <th className="py-3 px-1.5 w-6 hidden xl:table-cell">#</th>
@@ -556,7 +556,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                     return (
                       <tr
                         key={subtask.id}
-                        className={`hover:bg-indigo-50/20 transition-colors ${isChecked ? 'bg-indigo-50/30' : 'bg-white'}`}
+                        className={`hover:bg-gray-50 transition-colors ${isChecked ? 'bg-gray-100/70' : 'bg-white'}`}
                       >
                         {/* Checkbox */}
                         <td className="py-3.5 px-3">
@@ -564,7 +564,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleToggleSelect(subtask.id)}
-                            className="w-4 h-4 rounded border-gray-300 text-[#3b28cc] focus:ring-[#3b28cc] cursor-pointer"
+                            className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-400 cursor-pointer"
                           />
                         </td>
 
@@ -591,8 +591,8 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center border border-gray-100">
                               {thumbnailUrl === 'ae-gradient' ? (
-                                <div className="w-full h-full bg-gradient-to-tr from-[#12002f] via-[#48129c] to-[#ec4899] flex items-center justify-center p-0.5">
-                                  <span className="text-[#a78bfa] font-extrabold text-[10px]">Ae</span>
+                                <div className="w-full h-full bg-gradient-to-tr from-gray-900 via-zinc-800 to-black flex items-center justify-center p-0.5">
+                                  <span className="text-white font-extrabold text-[10px]">Ae</span>
                                 </div>
                               ) : (
                                 <img
@@ -620,10 +620,10 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <button
                                 onClick={() => setPreviewItem({ subtask, project, editor })}
-                                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3b28cc] hover:text-[#2a1a9e] bg-[#ede9fe]/70 hover:bg-[#ede9fe] border border-[#3b28cc]/20 px-2 py-0.5 rounded-lg transition-colors cursor-pointer group"
+                                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-900 hover:text-black bg-gray-100 hover:bg-gray-200 border border-gray-200 px-2 py-0.5 rounded-lg transition-colors cursor-pointer group"
                                 title="Click to view file queue, versions, and editor comments"
                               >
-                                <Eye className="w-3 h-3 text-[#3b28cc] group-hover:scale-110 transition-transform shrink-0" />
+                                <Eye className="w-3 h-3 text-gray-800 group-hover:scale-110 transition-transform shrink-0" />
                                 <span>View Queue ({(subtask.deliverablesQueue || []).length} {subtask.deliverablesQueue?.length === 1 ? 'file' : 'files'})</span>
                               </button>
 
@@ -643,7 +643,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
 
                         {/* Task Type */}
                         <td className="py-3.5 px-2.5 hidden lg:table-cell">
-                          <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#ede9fe] text-[#4f46e5] whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-800 whitespace-nowrap">
                             {subtask.taskType}
                           </span>
                         </td>
@@ -658,7 +658,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                 : subtask.status === 'Sent Back'
                                 ? 'bg-red-50 text-red-700 border border-red-200'
-                                : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'bg-gray-100 text-gray-700 border border-gray-200'
                             }`}
                           >
                             <span
@@ -669,7 +669,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                                   ? 'bg-amber-600'
                                   : subtask.status === 'Sent Back'
                                   ? 'bg-red-600'
-                                  : 'bg-blue-600'
+                                  : 'bg-gray-600'
                               }`}
                             />
                             <span>{subtask.status}</span>
@@ -686,7 +686,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                         <td className="py-3.5 px-2 text-center hidden xl:table-cell">
                           <button
                             onClick={() => setPreviewItem({ subtask, project, editor })}
-                            className="inline-flex items-center gap-1 text-gray-500 hover:text-[#3b28cc] font-semibold text-xs transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 cursor-pointer"
+                            className="inline-flex items-center gap-1 text-gray-500 hover:text-black font-semibold text-xs transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 cursor-pointer"
                             title="View comments, notes & feedback"
                           >
                             <MessageSquare className="w-3.5 h-3.5 text-gray-400" />
@@ -700,7 +700,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                             {/* View Submission Queue / Files */}
                             <button
                               onClick={() => setPreviewItem({ subtask, project, editor })}
-                              className="w-7 h-7 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-[#3b28cc] border border-[#3b28cc]/20 flex items-center justify-center transition-colors shadow-2xs"
+                              className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 flex items-center justify-center transition-colors shadow-2xs"
                               title="View Deliverables Queue & Feedback"
                             >
                               <Eye className="w-3.5 h-3.5" />
@@ -758,7 +758,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                 return (
                   <div
                     key={subtask.id}
-                    className={`p-4 space-y-3 transition-colors ${isChecked ? 'bg-indigo-50/30' : 'bg-white'}`}
+                    className={`p-4 space-y-3 transition-colors ${isChecked ? 'bg-gray-100/70' : 'bg-white'}`}
                   >
                     {/* Header: Checkbox + Editor + Status */}
                     <div className="flex items-center justify-between gap-2">
@@ -767,7 +767,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => handleToggleSelect(subtask.id)}
-                          className="w-4 h-4 rounded border-gray-300 text-[#3b28cc] focus:ring-[#3b28cc] cursor-pointer"
+                          className="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-400 cursor-pointer"
                         />
                         <img
                           src={editor?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'}
@@ -788,7 +788,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                             ? 'bg-amber-50 text-amber-700 border border-amber-200'
                             : subtask.status === 'Sent Back'
                             ? 'bg-red-50 text-red-700 border border-red-200'
-                            : 'bg-blue-50 text-blue-700 border border-blue-200'
+                            : 'bg-gray-100 text-gray-700 border border-gray-200'
                         }`}
                       >
                         <span
@@ -799,7 +799,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                               ? 'bg-amber-600'
                               : subtask.status === 'Sent Back'
                               ? 'bg-red-600'
-                              : 'bg-blue-600'
+                              : 'bg-gray-600'
                           }`}
                         />
                         <span>{subtask.status}</span>
@@ -810,8 +810,8 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                     <div className="bg-gray-50/70 p-3 rounded-xl border border-gray-100 flex items-start gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center border border-gray-200">
                         {thumbnailUrl === 'ae-gradient' ? (
-                          <div className="w-full h-full bg-gradient-to-tr from-[#12002f] via-[#48129c] to-[#ec4899] flex items-center justify-center p-0.5">
-                            <span className="text-[#a78bfa] font-extrabold text-[10px]">Ae</span>
+                          <div className="w-full h-full bg-gradient-to-tr from-gray-900 via-zinc-800 to-black flex items-center justify-center p-0.5">
+                            <span className="text-white font-extrabold text-[10px]">Ae</span>
                           </div>
                         ) : (
                           <img
@@ -824,7 +824,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1">
                           <p className="text-xs font-bold text-gray-900 truncate">{subtask.title}</p>
-                          <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">
+                          <span className="text-[10px] font-semibold text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
                             {subtask.taskType}
                           </span>
                         </div>
@@ -833,9 +833,9 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                         <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
                           <button
                             onClick={() => setPreviewItem({ subtask, project, editor })}
-                            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#3b28cc] bg-white border border-gray-200 px-2 py-0.5 rounded-md hover:bg-gray-50"
+                            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-900 bg-white border border-gray-200 px-2 py-0.5 rounded-md hover:bg-gray-50"
                           >
-                            <Eye className="w-3 h-3 text-[#3b28cc]" />
+                            <Eye className="w-3 h-3 text-gray-800" />
                             <span>View Queue ({(subtask.deliverablesQueue || []).length} files)</span>
                           </button>
 
@@ -860,7 +860,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                     <div className="flex items-center justify-between pt-1">
                       <button
                         onClick={() => setPreviewItem({ subtask, project, editor })}
-                        className="inline-flex items-center gap-1 text-gray-500 hover:text-[#3b28cc] font-semibold text-xs"
+                        className="inline-flex items-center gap-1 text-gray-500 hover:text-black font-semibold text-xs"
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-gray-400" />
                         <span>{commentsCount} comments</span>
@@ -871,7 +871,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                           onClick={() => setPreviewItem({ subtask, project, editor })}
                           className="px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 flex items-center gap-1"
                         >
-                          <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                          <Eye className="w-3.5 h-3.5 text-gray-700" />
                           <span>View Files</span>
                         </button>
 
@@ -924,7 +924,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                 >
                   ‹
                 </button>
-                <button className="w-7 h-7 rounded-lg bg-[#3b28cc] text-white font-bold flex items-center justify-center shadow-2xs">
+                <button className="w-7 h-7 rounded-lg bg-gray-900 text-white font-bold flex items-center justify-center shadow-2xs">
                   1
                 </button>
                 <button
@@ -969,7 +969,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                 placeholder="Specify the exact revisions needed (e.g., Color grading in scene 2 needs to be warmer, trim 3s from the intro, adjust voiceover audio levels)..."
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
-                className="w-full p-3 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#3b28cc] placeholder:text-gray-400 text-gray-800 resize-none transition-colors"
+                className="w-full p-3 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 placeholder:text-gray-400 text-gray-800 resize-none transition-colors"
               />
             </div>
 
@@ -1077,7 +1077,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-gray-900">
-                  <Layers className="w-4 h-4 text-indigo-600" />
+                  <Layers className="w-4 h-4 text-gray-900" />
                   <span>Submission Files Queue ({(previewItem.subtask.deliverablesQueue || []).length} {previewItem.subtask.deliverablesQueue?.length === 1 ? 'version' : 'versions'})</span>
                 </div>
                 <span className="text-[11px] text-gray-400">Latest cut at the top</span>
@@ -1090,17 +1090,17 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                     return (
                       <div
                         key={item.id}
-                        className="p-4 bg-white border border-gray-200/90 rounded-2xl space-y-3 shadow-2xs hover:border-[#3b28cc]/30 transition-colors"
+                        className="p-4 bg-white border border-gray-200 rounded-2xl space-y-3 shadow-2xs hover:border-gray-400 transition-colors"
                       >
                         {/* File Top Details */}
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-xl bg-[#ede9fe] text-[#4f46e5] flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center shrink-0">
                               <Film className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#3b28cc] text-white">
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-gray-900 text-white">
                                   v{item.version} {idx === 0 ? '• Latest' : ''}
                                 </span>
                                 <p className="text-xs font-bold text-gray-900 truncate" title={item.fileName}>
@@ -1119,7 +1119,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                             </span>
                             <button
                               onClick={() => addToast(`Opening deliverable file: ${item.fileName}...`, 'info')}
-                              className="p-1.5 text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 border border-gray-200 rounded-lg transition-colors"
+                              className="p-1.5 text-gray-500 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors"
                               title="Download / Open file"
                             >
                               <Download className="w-3.5 h-3.5" />
@@ -1129,9 +1129,9 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
 
                         {/* Editor Comments & Notes Box */}
                         {item.notes ? (
-                          <div className="bg-indigo-50/50 border border-indigo-100/80 rounded-xl p-3 text-xs">
-                            <div className="flex items-center gap-1.5 font-bold text-indigo-900 text-[11px] mb-1">
-                              <MessageSquare className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs">
+                            <div className="flex items-center gap-1.5 font-bold text-gray-900 text-[11px] mb-1">
+                              <MessageSquare className="w-3.5 h-3.5 text-gray-700 shrink-0" />
                               <span>Editor's Comments & Change Notes:</span>
                             </div>
                             <p className="text-gray-700 italic leading-relaxed pl-5">

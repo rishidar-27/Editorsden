@@ -96,7 +96,7 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
           <div className="flex flex-col sm:items-end items-start gap-1">
             <button
               onClick={() => onNavigate('/editor/projects')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#3b28cc] hover:bg-[#3120b3] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all hover:shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all hover:shadow-sm"
             >
               <FolderKanban className="w-4 h-4" />
               <span>View All Tasks</span>
@@ -125,12 +125,12 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
 
           {/* Card 2: Active Tasks */}
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-800 flex items-center justify-center shrink-0">
               <FileText className="w-6 h-6 stroke-[2]" />
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-gray-400">Active Tasks</p>
-              <h3 className="text-2xl font-bold text-blue-600 leading-snug">{activeCount}</h3>
+              <h3 className="text-2xl font-bold text-gray-900 leading-snug">{activeCount}</h3>
               <p className="text-[11px] text-gray-400 font-medium">In progress or assigned</p>
             </div>
           </div>
@@ -168,7 +168,7 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
             {/* Header */}
             <div className="flex items-center justify-between pb-1">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-[#ede9fe] text-[#3b28cc] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center">
                   <FileText className="w-3.5 h-3.5 stroke-[2.5]" />
                 </div>
                 <div>
@@ -181,7 +181,7 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
 
               <button
                 onClick={() => onNavigate('/editor/projects')}
-                className="text-xs font-bold text-[#3b28cc] hover:text-[#2d1ea6] flex items-center gap-1 transition-colors"
+                className="text-xs font-bold text-gray-900 hover:text-black flex items-center gap-1 transition-colors"
               >
                 <span>View all tasks</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -218,9 +218,9 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
                       {/* Thumbnail */}
                       <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center">
                         {t.thumbnailUrl === 'ae-gradient' ? (
-                          <div className="w-full h-full bg-gradient-to-br from-[#12002f] via-[#48129c] to-[#ec4899] flex items-center justify-center relative p-1.5">
-                            <div className="w-8 h-8 rounded-lg bg-[#00005b]/60 border border-purple-300/30 flex items-center justify-center shadow-inner">
-                              <span className="text-[#a78bfa] font-extrabold text-sm tracking-tighter">Ae</span>
+                          <div className="w-full h-full bg-gradient-to-br from-gray-900 via-zinc-800 to-black flex items-center justify-center relative p-1.5">
+                            <div className="w-8 h-8 rounded-lg bg-zinc-900/80 border border-zinc-700 flex items-center justify-center shadow-inner">
+                              <span className="text-zinc-200 font-extrabold text-sm tracking-tighter">Ae</span>
                             </div>
                           </div>
                         ) : (
@@ -238,8 +238,8 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
                           <h4 className="font-bold text-gray-900 text-sm truncate">
                             {t.title}
                           </h4>
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#ede9fe] text-[#4f46e5]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#4f46e5]" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-800">
+                            <span className="w-1.5 h-1.5 rounded-full bg-gray-900" />
                             {t.status}
                           </span>
                         </div>
@@ -292,12 +292,12 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
             {/* Header */}
             <div className="flex items-center justify-between pb-1">
               <div className="flex items-center gap-2">
-                <UserIcon className="w-5 h-5 text-[#3b28cc] stroke-[2]" />
+                <UserIcon className="w-5 h-5 text-gray-900 stroke-[2]" />
                 <h3 className="font-bold text-gray-900 text-base">My Creator Profile</h3>
               </div>
               <button
                 onClick={() => onNavigate('/editor/profile')}
-                className="text-xs font-semibold text-[#3b28cc] hover:text-[#2d1ea6] flex items-center gap-1 transition-colors"
+                className="text-xs font-semibold text-gray-900 hover:underline flex items-center gap-1 transition-colors"
               >
                 <Edit2 className="w-3.5 h-3.5" />
                 <span>Edit</span>
@@ -349,7 +349,7 @@ export function EditorDashboard({ onNavigate }: EditorDashboardProps) {
             <div className="pt-2">
               <button
                 onClick={() => onNavigate('/editor/portfolio')}
-                className="w-full py-2.5 px-4 bg-[#ede9fe] hover:bg-[#e0d9fc] text-[#3b28cc] font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Manage Public Portfolio</span>
                 <span className="text-sm leading-none">↗</span>

@@ -145,7 +145,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <button
           onClick={() => onNavigate('/admin/projects')}
-          className="inline-flex items-center gap-1.5 font-medium text-gray-600 hover:text-violet-700 transition-colors py-1 px-2.5 rounded-lg hover:bg-violet-50"
+          className="inline-flex items-center gap-1.5 font-medium text-gray-600 hover:text-gray-900 transition-colors py-1 px-2.5 rounded-lg hover:bg-gray-100"
         >
           <ArrowLeft className="w-4 h-4" />
           Projects
@@ -167,11 +167,11 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       </div>
 
       {/* Quick Template Presets Bar */}
-      <Card className="p-4 bg-violet-50/60 border border-violet-100 rounded-2xl shadow-2xs space-y-3">
+      <Card className="p-4 bg-gray-50 border border-gray-200 rounded-2xl shadow-2xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-600 shrink-0" />
-            <span className="text-xs font-bold text-violet-900">
+            <Sparkles className="w-4 h-4 text-gray-800 shrink-0" />
+            <span className="text-xs font-bold text-gray-900">
               1-Click Campaign Presets:
             </span>
           </div>
@@ -179,28 +179,28 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
             <button
               type="button"
               onClick={() => applyPreset('social')}
-              className="px-3 py-1.5 bg-white hover:bg-violet-100/60 border border-violet-200 text-violet-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+              className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
             >
               Social Media Suite
             </button>
             <button
               type="button"
               onClick={() => applyPreset('youtube')}
-              className="px-3 py-1.5 bg-white hover:bg-violet-100/60 border border-violet-200 text-violet-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+              className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
             >
               YouTube Video Series
             </button>
             <button
               type="button"
               onClick={() => applyPreset('podcast')}
-              className="px-3 py-1.5 bg-white hover:bg-violet-100/60 border border-violet-200 text-violet-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+              className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
             >
               Podcast & Clips
             </button>
             <button
               type="button"
               onClick={() => applyPreset('full')}
-              className="px-3 py-1.5 bg-white hover:bg-violet-100/60 border border-violet-200 text-violet-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+              className="px-3 py-1.5 bg-white hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
             >
               Enterprise Brand Film
             </button>
@@ -211,7 +211,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       {/* Project Meta Card */}
       <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
         <h2 className="text-base font-bold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3">
-          <Building2 className="w-4 h-4 text-violet-600" />
+          <Building2 className="w-4 h-4 text-gray-900" />
           Project Overview & Client Brief
         </h2>
 
@@ -226,7 +226,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
               placeholder="e.g. Aurora Skincare — Q4 Nationwide Launch Campaign"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 shadow-2xs font-medium"
+              className="w-full px-3.5 py-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 shadow-2xs font-medium"
             />
           </div>
 
@@ -240,7 +240,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
               placeholder="e.g. Aurora Cosmetics Inc."
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 shadow-2xs font-medium"
+              className="w-full px-3.5 py-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 shadow-2xs font-medium"
             />
           </div>
         </div>
@@ -261,7 +261,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
               type="number"
               value={budgetEstimate}
               onChange={(e) => setBudgetEstimate(Number(e.target.value))}
-              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 font-bold text-gray-900"
+              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-bold text-gray-900"
             />
             <p className="text-[10.5px] text-gray-400">Funds locked safely in escrow until final client approval.</p>
           </div>
@@ -269,17 +269,17 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
           <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
+                <HardDrive className="w-3.5 h-3.5 text-gray-700" />
                 Cloudflare R2 Bucket Provisioning
               </label>
-              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
                 $0 Egress
               </span>
             </div>
             <select
               value={storagePreset}
               onChange={(e) => setStoragePreset(e.target.value as any)}
-              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 font-semibold text-gray-800"
+              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-semibold text-gray-800"
             >
               <option value="Standard_1GB">Standard Workspace (1 GB Included per Editor)</option>
               <option value="Pro_50GB">Pro High-Speed Workspace (50 GB Bucket)</option>
@@ -294,7 +294,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-violet-600" />
+            <Layers className="w-4 h-4 text-gray-900" />
             <h2 className="text-base font-bold text-gray-900">
               Deliverables & Subtasks ({subtasks.length})
             </h2>
@@ -322,7 +322,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
                 key={st.id}
                 className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3.5 bg-gray-50/80 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors"
               >
-                <div className="w-6 h-6 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-xs font-bold shrink-0">
+                <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-900 flex items-center justify-center text-xs font-bold shrink-0">
                   {i + 1}
                 </div>
 
@@ -332,7 +332,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
                     placeholder="Deliverable title (e.g. Hero Commercial 60s Cut)"
                     value={st.title}
                     onChange={(e) => updateSubtaskField(st.id, 'title', e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 font-medium text-gray-900"
+                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-900"
                   />
                 </div>
 
@@ -342,7 +342,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
                     onChange={(e) =>
                       updateSubtaskField(st.id, 'taskType', e.target.value as TaskType)
                     }
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 font-semibold text-gray-700"
+                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-semibold text-gray-700"
                   >
                     {allTaskTypes.map((t) => (
                       <option key={t} value={t}>
@@ -357,7 +357,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
                     type="date"
                     value={st.deadline}
                     onChange={(e) => updateSubtaskField(st.id, 'deadline', e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-violet-500 font-medium text-gray-700"
+                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-700"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
         <Button
           onClick={handleCreate}
           disabled={!title.trim() || !clientName.trim() || subtasks.length === 0}
-          className="bg-violet-600 hover:bg-violet-700 text-white font-bold"
+          className="bg-gray-900 hover:bg-black text-white font-bold"
         >
           <FolderPlus className="w-4 h-4 mr-1.5" />
           Create Campaign & Assign Creators

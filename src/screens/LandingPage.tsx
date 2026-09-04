@@ -934,7 +934,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                   </span>
                 </div>
 
-                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-b from-blue-400 to-indigo-600 shadow-md ring-2 ring-gray-200 group-hover:scale-105 transition-transform my-1">
+                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-b from-gray-700 to-black shadow-md ring-2 ring-gray-200 group-hover:scale-105 transition-transform my-1">
                   <img src={rosterEditors[0].avatar} alt="Marcus" className="w-full h-full rounded-full object-cover" />
                 </div>
 
@@ -1263,7 +1263,7 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                       </div>
                       <div className="p-2.5 rounded-xl bg-white border border-gray-200 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">00:32:00</span>
+                          <span className="text-[10px] font-mono bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded font-bold">00:32:00</span>
                           <span className="text-gray-700 font-medium">ACES Color Match (Applied in v2)</span>
                         </div>
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -1510,13 +1510,13 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
                   <div className="flex-1 h-7 bg-gray-900 rounded-lg flex items-center p-1 gap-1 border border-gray-800">
                     <div 
                       onClick={() => setActiveTimelinePin(0)}
-                      className="h-full bg-blue-900/60 hover:bg-blue-800/80 border border-blue-600/40 rounded px-2 flex items-center text-[9px] font-bold text-blue-200 w-1/4 cursor-pointer transition-colors"
+                      className="h-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded px-2 flex items-center text-[9px] font-bold text-zinc-200 w-1/4 cursor-pointer transition-colors"
                     >
                       Macro_Cut_01.mov (00:14)
                     </div>
                     <div 
                       onClick={() => setActiveTimelinePin(1)}
-                      className="h-full bg-blue-900/60 hover:bg-blue-800/80 border border-blue-600/40 rounded px-2 flex items-center text-[9px] font-bold text-blue-200 w-1/3 cursor-pointer transition-colors"
+                      className="h-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded px-2 flex items-center text-[9px] font-bold text-zinc-200 w-1/3 cursor-pointer transition-colors"
                     >
                       Kinetic_3D_Type.mov
                     </div>

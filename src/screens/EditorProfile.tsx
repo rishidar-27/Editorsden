@@ -138,7 +138,7 @@ export function EditorProfile() {
 
             <Button 
               onClick={handleSave} 
-              className="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition-all flex items-center gap-1.5 shrink-0"
+              className="bg-gray-900 hover:bg-black text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition-all flex items-center gap-1.5 shrink-0"
             >
               {saved ? (
                 <><Check className="w-3.5 h-3.5" /> Saved!</>
@@ -158,7 +158,7 @@ export function EditorProfile() {
             {/* Personal Information Card */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
               <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center">
                   <User className="w-3.5 h-3.5" />
                 </div>
                 <h2 className="text-sm font-bold text-gray-900">Personal & Contact Information</h2>
@@ -210,14 +210,14 @@ export function EditorProfile() {
               <div className="space-y-3 text-xs">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5 text-violet-600" />
+                    <Cpu className="w-3.5 h-3.5 text-gray-900" />
                     Primary Workstation / GPU
                   </label>
                   <input
                     type="text"
                     value={hardwareSpecs.workstation}
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, workstation: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
                 </div>
 
@@ -230,20 +230,20 @@ export function EditorProfile() {
                     type="text"
                     value={hardwareSpecs.displays}
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, displays: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Wifi className="w-3.5 h-3.5 text-blue-600" />
+                    <Wifi className="w-3.5 h-3.5 text-gray-900" />
                     Network Pipeline & Audio Monitoring
                   </label>
                   <input
                     type="text"
                     value={hardwareSpecs.connectivity}
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, connectivity: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
                 </div>
               </div>
@@ -252,7 +252,7 @@ export function EditorProfile() {
             {/* Links & Social Media Card */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
               <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center">
                   <Globe className="w-3.5 h-3.5" />
                 </div>
                 <h2 className="text-sm font-bold text-gray-900">Links & Social Presence</h2>
@@ -313,7 +313,7 @@ export function EditorProfile() {
               
               <div className="flex flex-wrap gap-1.5">
                 {skills.map((skill) => (
-                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-violet-100 text-violet-800 font-bold px-2.5 py-1 rounded-lg text-xs">
+                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-gray-100 text-gray-900 font-bold px-2.5 py-1 rounded-lg text-xs">
                     {skill}
                   </SkillTag>
                 ))}
@@ -333,7 +333,7 @@ export function EditorProfile() {
                       <button
                         key={skill}
                         onClick={() => addSkill(skill)}
-                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition-colors font-semibold"
+                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors font-semibold"
                       >
                         + {skill}
                       </button>
@@ -356,11 +356,11 @@ export function EditorProfile() {
                       onClick={() => toggleSoftware(sw)}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
                         selected
-                          ? 'bg-violet-50 border-violet-300 text-violet-800 shadow-2xs'
+                          ? 'bg-gray-900 border-gray-900 text-white shadow-2xs'
                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      {selected && <Check className="w-3.5 h-3.5 text-violet-600" />}
+                      {selected && <Check className="w-3.5 h-3.5 text-white" />}
                       {sw}
                     </button>
                   );

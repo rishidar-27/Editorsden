@@ -18,7 +18,7 @@ export function Button({ variant = 'primary', size = 'md', className = '', child
     lg: 'text-sm px-5 py-2.5',
   };
   const variants: Record<ButtonVariant, string> = {
-    primary: 'bg-violet-500 text-white hover:bg-violet-600',
+    primary: 'bg-gray-900 text-white hover:bg-black shadow-2xs',
     secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
     outline: 'border border-gray-300 text-ink-900 bg-transparent hover:bg-gray-050',
     ghost: 'text-gray-700 hover:bg-gray-100',
@@ -46,7 +46,7 @@ export function Badge({ variant, children, className = '' }: BadgeProps) {
     rejected: 'bg-red-050 text-red-700',
     neutral: 'bg-gray-100 text-gray-700',
     featured: 'bg-coral-050 text-coral-700',
-    info: 'bg-violet-050 text-violet-700',
+    info: 'bg-gray-100 text-gray-800',
     overdue: 'bg-red-050 text-red-700',
     urgent: 'bg-amber-050 text-amber-700',
     inactive: 'bg-gray-100 text-gray-500',
@@ -57,7 +57,7 @@ export function Badge({ variant, children, className = '' }: BadgeProps) {
     rejected: 'bg-red-500',
     neutral: 'bg-gray-400',
     featured: 'bg-coral-500',
-    info: 'bg-violet-500',
+    info: 'bg-gray-700',
     overdue: 'bg-red-500',
     urgent: 'bg-amber-500',
     inactive: 'bg-gray-400',
@@ -248,7 +248,7 @@ export function ProgressBar({ value, max = 100, className = '', animateOnMount =
   return (
     <div className={`w-full h-1.5 bg-gray-100 rounded-full overflow-hidden ${className}`}>
       <div
-        className="h-full bg-violet-500 rounded-full transition-all duration-300 ease-out-soft"
+        className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out-soft"
         style={{ width: `${width}%` }}
       />
     </div>
@@ -268,7 +268,7 @@ export function Checkbox({ checked, onChange, className = '' }: CheckboxProps) {
     <button
       onClick={onChange}
       className={`w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 focus-ring ${
-        checked ? 'bg-violet-500 border-violet-500' : 'border-gray-300 bg-surface-0 hover:border-gray-400'
+        checked ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-surface-0 hover:border-gray-400'
       } ${className}`}
     >
       {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
@@ -384,7 +384,7 @@ export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
             toast.variant === 'success' ? 'border-mint-200' : toast.variant === 'error' ? 'border-red-200' : 'border-gray-200'
           }`}
         >
-          <span className={`w-2 h-2 rounded-full ${toast.variant === 'success' ? 'bg-mint-500' : toast.variant === 'error' ? 'bg-red-500' : 'bg-violet-500'}`} />
+          <span className={`w-2 h-2 rounded-full ${toast.variant === 'success' ? 'bg-mint-500' : toast.variant === 'error' ? 'bg-red-500' : 'bg-gray-900'}`} />
           <span className="text-sm text-gray-800 flex-1">{toast.message}</span>
           <button onClick={() => onRemove(toast.id)} className="text-gray-400 hover:text-gray-700 transition-colors">
             <X className="w-4 h-4" />

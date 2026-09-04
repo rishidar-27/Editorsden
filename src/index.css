@@ -25,8 +25,8 @@
   }
 
   ::selection {
-    background-color: #E1DAF8;
-    color: #241757;
+    background-color: #ECECEF;
+    color: #101013;
   }
 }
 
@@ -36,7 +36,7 @@
   }
 
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-200 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 
   .scrollbar-thin::-webkit-scrollbar {

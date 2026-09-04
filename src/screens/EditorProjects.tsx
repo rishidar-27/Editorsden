@@ -162,9 +162,9 @@ export function EditorProjects() {
 
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
-    if (['mp4', 'mov', 'mkv', 'avi', 'webm'].includes(ext || '')) return <Film className="w-5 h-5 text-indigo-600" />;
-    if (['prproj', 'aep', 'drp', 'psd'].includes(ext || '')) return <FileCode className="w-5 h-5 text-purple-600" />;
-    if (['zip', 'rar', '7z', 'tar'].includes(ext || '')) return <Archive className="w-5 h-5 text-amber-600" />;
+    if (['mp4', 'mov', 'mkv', 'avi', 'webm'].includes(ext || '')) return <Film className="w-5 h-5 text-gray-900" />;
+    if (['prproj', 'aep', 'drp', 'psd'].includes(ext || '')) return <FileCode className="w-5 h-5 text-zinc-700" />;
+    if (['zip', 'rar', '7z', 'tar'].includes(ext || '')) return <Archive className="w-5 h-5 text-gray-600" />;
     return <File className="w-5 h-5 text-gray-500" />;
   };
 
@@ -258,7 +258,7 @@ export function EditorProjects() {
           {/* Card 1: Total Tasks */}
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#ede9fe] text-[#4f46e5] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center shrink-0">
                 <FileText className="w-6 h-6 stroke-[2]" />
               </div>
               <div>
@@ -269,29 +269,29 @@ export function EditorProjects() {
             </div>
             {/* Subtle Chart Bars */}
             <div className="flex items-end gap-1 opacity-25">
-              <div className="w-1.5 h-4 bg-[#4f46e5] rounded-full" />
-              <div className="w-1.5 h-7 bg-[#4f46e5] rounded-full" />
-              <div className="w-1.5 h-10 bg-[#4f46e5] rounded-full" />
+              <div className="w-1.5 h-4 bg-gray-900 rounded-full" />
+              <div className="w-1.5 h-7 bg-gray-900 rounded-full" />
+              <div className="w-1.5 h-10 bg-gray-900 rounded-full" />
             </div>
           </div>
 
           {/* Card 2: In Progress */}
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                <Play className="w-6 h-6 stroke-[2] fill-blue-500/20" />
+              <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-800 flex items-center justify-center shrink-0">
+                <Play className="w-6 h-6 stroke-[2] fill-gray-800/20" />
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400">In Progress</p>
-                <h3 className="text-2xl font-bold text-blue-600 leading-snug">{inProgressCount}</h3>
+                <h3 className="text-2xl font-bold text-gray-900 leading-snug">{inProgressCount}</h3>
                 <p className="text-[11px] text-gray-400 font-normal">Currently editing</p>
               </div>
             </div>
             {/* Subtle Chart Bars */}
             <div className="flex items-end gap-1 opacity-25">
-              <div className="w-1.5 h-5 bg-blue-500 rounded-full" />
-              <div className="w-1.5 h-8 bg-blue-500 rounded-full" />
-              <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+              <div className="w-1.5 h-5 bg-gray-700 rounded-full" />
+              <div className="w-1.5 h-8 bg-gray-700 rounded-full" />
+              <div className="w-1.5 h-6 bg-gray-700 rounded-full" />
             </div>
           </div>
 
@@ -355,7 +355,7 @@ export function EditorProjects() {
                   onClick={() => setActiveFilter(tab.id as any)}
                   className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all ${
                     active
-                      ? 'bg-[#3b28cc] text-white shadow-xs'
+                      ? 'bg-gray-900 text-white shadow-xs'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/70'
                   }`}
                 >
@@ -374,7 +374,7 @@ export function EditorProjects() {
                 placeholder="Search my tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#3b28cc] placeholder:text-gray-400 text-gray-800 transition-colors"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 placeholder:text-gray-400 text-gray-800 transition-colors"
               />
             </div>
 
@@ -437,9 +437,9 @@ export function EditorProjects() {
                   {/* Top Thumbnail Image Banner */}
                   <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
                     {thumbnailUrl === 'ae-gradient' ? (
-                      <div className="w-full h-full bg-gradient-to-tr from-[#12002f] via-[#4a119e] to-[#ec4899] flex items-center justify-center relative p-2">
-                        <div className="w-16 h-16 rounded-2xl bg-[#030040]/70 border border-purple-300/30 flex items-center justify-center shadow-lg">
-                          <span className="text-[#a78bfa] font-extrabold text-2xl tracking-tighter">Ae</span>
+                      <div className="w-full h-full bg-gradient-to-tr from-gray-900 via-zinc-800 to-black flex items-center justify-center relative p-2">
+                        <div className="w-16 h-16 rounded-2xl bg-black/70 border border-zinc-700 flex items-center justify-center shadow-lg">
+                          <span className="text-white font-extrabold text-2xl tracking-tighter">Ae</span>
                         </div>
                       </div>
                     ) : (
@@ -452,7 +452,7 @@ export function EditorProjects() {
 
                     {/* Top Left Badge on image */}
                     <div className="absolute top-3.5 left-3.5">
-                      <span className="px-3 py-1 bg-white/95 backdrop-blur-xs text-[#3b28cc] font-semibold text-xs rounded-lg shadow-2xs">
+                      <span className="px-3 py-1 bg-white/95 backdrop-blur-xs text-gray-900 font-semibold text-xs rounded-lg shadow-2xs">
                         {subtask.taskType}
                       </span>
                     </div>
@@ -496,7 +496,7 @@ export function EditorProjects() {
                               : subtask.status === 'Ready for Review'
                               ? 'bg-amber-50 text-amber-700'
                               : subtask.status === 'In Progress'
-                              ? 'bg-[#ede9fe] text-[#4f46e5]'
+                              ? 'bg-gray-100 text-gray-900'
                               : 'bg-gray-100 text-gray-700'
                           }`}
                         >
@@ -507,7 +507,7 @@ export function EditorProjects() {
                                 : subtask.status === 'Ready for Review'
                                 ? 'bg-amber-600'
                                 : subtask.status === 'In Progress'
-                                ? 'bg-[#4f46e5]'
+                                ? 'bg-gray-900'
                                 : 'bg-gray-500'
                             }`}
                           />
@@ -515,8 +515,8 @@ export function EditorProjects() {
                         </span>
 
                         {submissionCount > 0 && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
-                            <Layers className="w-3 h-3 text-indigo-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-full border border-gray-200">
+                            <Layers className="w-3 h-3 text-gray-700" />
                             {submissionCount} file{submissionCount !== 1 ? 's' : ''} in queue
                           </span>
                         )}
@@ -534,7 +534,7 @@ export function EditorProjects() {
                         {subtask.status === 'Assigned' ? (
                           <button
                             onClick={() => handleStartWorking(project.id, subtask.id, subtask.title)}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3b28cc] hover:bg-[#3120b3] text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
                           >
                             <Play className="w-3.5 h-3.5 fill-white" />
                             <span>Start Working</span>
@@ -547,7 +547,7 @@ export function EditorProjects() {
                               setSelectedFile(null);
                               setSubmissionNotes('');
                             }}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3b28cc] hover:bg-[#3120b3] text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-2xs transition-colors"
                           >
                             <Send className="w-3.5 h-3.5" />
                             <span>Submit Deliverable</span>
@@ -601,7 +601,7 @@ export function EditorProjects() {
                 <p className="text-sm font-bold text-gray-900">{modalData.subtask.title}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{modalData.project.title}</p>
               </div>
-              <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#3b28cc] text-xs font-semibold shrink-0">
+              <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-900 text-xs font-semibold shrink-0">
                 {modalData.subtask.taskType}
               </span>
             </div>
@@ -637,7 +637,7 @@ export function EditorProjects() {
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center">
                     <Layers className="w-3.5 h-3.5" />
                   </div>
                   <span className="text-xs font-bold text-gray-900">
@@ -654,7 +654,7 @@ export function EditorProjects() {
                   {modalData.subtask.deliverablesQueue.map((item, idx) => (
                     <div
                       key={item.id}
-                      className="p-3 bg-white border border-gray-200 rounded-xl shadow-2xs flex items-center justify-between gap-3 hover:border-indigo-300 transition-colors"
+                      className="p-3 bg-white border border-gray-200 rounded-xl shadow-2xs flex items-center justify-between gap-3 hover:border-gray-400 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
@@ -662,7 +662,7 @@ export function EditorProjects() {
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#3b28cc] text-white">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-gray-900 text-white">
                               v{item.version || (modalData.subtask.deliverablesQueue!.length - idx)}
                             </span>
                             <p className="text-xs font-bold text-gray-900 truncate">{item.fileName}</p>
@@ -685,7 +685,7 @@ export function EditorProjects() {
                             href={item.fileUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
                             title="Preview / Download file"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -698,7 +698,7 @@ export function EditorProjects() {
               ) : (
                 <div className="p-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/50 text-center space-y-1">
                   <p className="text-xs font-semibold text-gray-700">No deliverable files in queue yet</p>
-                  <p className="text-[11px] text-gray-400">Upload your file below to add <strong className="text-indigo-600">version 1 (v1)</strong> to the review queue.</p>
+                  <p className="text-[11px] text-gray-400">Upload your file below to add <strong className="text-gray-900">version 1 (v1)</strong> to the review queue.</p>
                 </div>
               )}
             </div>
@@ -708,10 +708,10 @@ export function EditorProjects() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-                    <UploadCloud className="w-4 h-4 text-indigo-600" />
+                    <UploadCloud className="w-4 h-4 text-gray-900" />
                     <span>Upload New File (Appends on Top of Queue) *</span>
                   </label>
-                  <span className="text-[11px] text-indigo-700 font-semibold bg-indigo-50 px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] text-gray-700 font-semibold bg-gray-100 px-2 py-0.5 rounded-md">
                     Direct File Upload Only
                   </span>
                 </div>
@@ -736,24 +736,24 @@ export function EditorProjects() {
                     onClick={() => fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
                       isDragging
-                        ? 'border-[#3b28cc] bg-indigo-50/60'
-                        : 'border-gray-200 hover:border-indigo-400 hover:bg-gray-50/70 bg-white'
+                        ? 'border-gray-900 bg-gray-100'
+                        : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50/70 bg-white'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#3b28cc] flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                    <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-900 flex items-center justify-center mx-auto mb-3 shadow-2xs">
                       <UploadCloud className="w-6 h-6 stroke-[2]" />
                     </div>
                     <p className="text-xs font-bold text-gray-800">
-                      Drag and drop your deliverable video/file here, or <span className="text-[#3b28cc] hover:underline">Browse</span>
+                      Drag and drop your deliverable video/file here, or <span className="text-gray-900 font-bold underline">Browse</span>
                     </p>
                     <p className="text-[11px] text-gray-400 mt-1">
                       Supports MP4, MOV, MKV, PRPROJ, AEP, DRP, ZIP up to 5GB
                     </p>
                   </div>
                 ) : (
-                  <div className="p-3.5 bg-indigo-50/40 border border-indigo-200 rounded-2xl flex items-center justify-between gap-3">
+                  <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-indigo-100 flex items-center justify-center shadow-2xs shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-2xs shrink-0">
                         {getFileIcon(selectedFile.name)}
                       </div>
                       <div className="min-w-0">
@@ -788,23 +788,23 @@ export function EditorProjects() {
                   value={submissionNotes}
                   onChange={(e) => setSubmissionNotes(e.target.value)}
                   disabled={isUploading}
-                  className="w-full p-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#3b28cc] placeholder:text-gray-400 text-gray-800 resize-none transition-colors"
+                  className="w-full p-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 placeholder:text-gray-400 text-gray-800 resize-none transition-colors"
                 />
               </div>
 
               {/* Upload Progress Bar */}
               {isUploading && (
-                <div className="space-y-1.5 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
-                  <div className="flex items-center justify-between text-xs font-semibold text-indigo-900">
+                <div className="space-y-1.5 p-3 bg-gray-100 border border-gray-200 rounded-xl">
+                  <div className="flex items-center justify-between text-xs font-semibold text-gray-900">
                     <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-spin" />
+                      <Sparkles className="w-3.5 h-3.5 text-gray-900 animate-spin" />
                       Uploading deliverable to queue...
                     </span>
                     <span>{uploadProgress}%</span>
                   </div>
-                  <div className="w-full h-2 bg-indigo-200/60 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-indigo-600 rounded-full transition-all duration-200"
+                      className="h-full bg-gray-900 rounded-full transition-all duration-200"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
@@ -832,7 +832,7 @@ export function EditorProjects() {
                   variant="primary"
                   size="sm"
                   disabled={!selectedFile || isUploading}
-                  className="bg-[#3b28cc] hover:bg-[#3120b3] text-white disabled:opacity-50"
+                  className="bg-gray-900 hover:bg-black text-white disabled:opacity-50"
                 >
                   <Send className="w-3.5 h-3.5 mr-1" />
                   {isUploading ? 'Uploading...' : `Upload & Queue Deliverable (v${(modalData.subtask.deliverablesQueue?.length || 0) + 1})`}
@@ -862,7 +862,7 @@ export function EditorProjects() {
                 type="button"
                 variant="primary"
                 size="sm"
-                className="bg-[#3b28cc] hover:bg-[#3120b3] text-white"
+                className="bg-gray-900 hover:bg-black text-white"
                 onClick={() => setShowNewTaskNotice(false)}
               >
                 Got it

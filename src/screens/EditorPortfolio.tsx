@@ -123,7 +123,7 @@ export function EditorPortfolio() {
             {/* Add Work Button */}
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-[#6D28D9] hover:bg-purple-800 text-white font-semibold px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2 text-sm"
+              className="bg-gray-900 hover:bg-black text-white font-semibold px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2 text-sm"
             >
               <Plus className="w-4 h-4" />
               Add work
@@ -193,15 +193,15 @@ export function EditorPortfolio() {
         </div>
 
         {/* Drag and Drop Banner */}
-        <div className="border-2 border-dashed border-purple-200/80 bg-purple-50/30 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
-          <GripVertical className="w-6 h-6 text-[#7C3AED] mb-1.5" />
+        <div className="border-2 border-dashed border-gray-200 bg-gray-50/50 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
+          <GripVertical className="w-6 h-6 text-gray-700 mb-1.5" />
           <h4 className="text-sm font-bold text-gray-900">Drag & drop to reorder your works</h4>
           <p className="text-xs text-gray-500 mt-0.5">Anyone can see up to 3 works on your public profile.</p>
         </div>
 
       </div>
 
-      {/* ================= ADD PORTFOLIO ITEM MODAL (100% MATCH TO IMAGE) ================= */}
+      {/* ================= ADD PORTFOLIO ITEM MODAL ================= */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in" onClick={() => setShowAddModal(false)}>
           <div 
@@ -226,11 +226,11 @@ export function EditorPortfolio() {
                 onClick={() => setActiveTab('upload')}
                 className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center text-center gap-1.5 ${
                   activeTab === 'upload'
-                    ? 'border-[#7C3AED] bg-purple-50/20 text-[#7C3AED]'
+                    ? 'border-gray-900 bg-gray-50 text-gray-900'
                     : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <Upload className="w-5 h-5 text-[#7C3AED]" />
+                <Upload className="w-5 h-5 text-gray-900" />
                 <span className="text-xs font-bold">Upload video file</span>
                 <span className="text-[10px] text-gray-400">MP4, MOV up to 2GB</span>
               </button>
@@ -240,7 +240,7 @@ export function EditorPortfolio() {
                 onClick={() => setActiveTab('link')}
                 className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center justify-center text-center gap-1.5 ${
                   activeTab === 'link'
-                    ? 'border-[#7C3AED] bg-purple-50/20 text-[#7C3AED]'
+                    ? 'border-gray-900 bg-gray-50 text-gray-900'
                     : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
@@ -252,7 +252,7 @@ export function EditorPortfolio() {
 
             {/* SECTION 1: PROJECT DETAILS */}
             <div className="mb-6">
-              <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-3">PROJECT DETAILS</h3>
+              <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-3">PROJECT DETAILS</h3>
               
               {/* Title & Project Type */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-3.5">
@@ -263,7 +263,7 @@ export function EditorPortfolio() {
                     placeholder="e.g. Brand Commercial — Aurora Skincare"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                   />
                 </div>
                 <div>
@@ -271,7 +271,7 @@ export function EditorPortfolio() {
                   <select
                     value={projectType}
                     onChange={(e) => setProjectType(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                   >
                     <option value="Commercial Ads">Commercial Ads</option>
                     <option value="Reels Editing">Reels Editing</option>
@@ -292,7 +292,7 @@ export function EditorPortfolio() {
                     placeholder="e.g. Aurora Skincare"
                     value={client}
                     onChange={(e) => setClient(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                   />
                 </div>
                 <div>
@@ -300,7 +300,7 @@ export function EditorPortfolio() {
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                   >
                     <option value="Video Editor">Video Editor</option>
                     <option value="Lead Editor & Motion Designer">Lead Editor & Motion Designer</option>
@@ -319,7 +319,7 @@ export function EditorPortfolio() {
                       type="date"
                       value={dateCompleted}
                       onChange={(e) => setDateCompleted(e.target.value)}
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                      className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                     />
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export function EditorPortfolio() {
                       placeholder="e.g. 01:20"
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
+                      className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400"
                     />
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export function EditorPortfolio() {
 
             {/* SECTION 2: MEDIA */}
             <div className="mb-6">
-              <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-3">MEDIA</h3>
+              <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-3">MEDIA</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
                 {/* Video Link */}
@@ -351,7 +351,7 @@ export function EditorPortfolio() {
                     placeholder="https://youtube.com/watch?v=..."
                     value={videoLink}
                     onChange={(e) => setVideoLink(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] mb-1"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 mb-1"
                   />
                   <p className="text-[10px] text-gray-400">Supports YouTube, Vimeo, Google Drive and more.</p>
                 </div>
@@ -360,9 +360,9 @@ export function EditorPortfolio() {
                 <div className="sm:col-span-5">
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Thumbnail *</label>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-20 border-2 border-dashed border-purple-200 bg-purple-50/10 rounded-xl p-2 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-purple-50/20 transition-colors">
-                      <ImageIcon className="w-4 h-4 text-[#7C3AED] mb-0.5" />
-                      <span className="text-[11px] font-bold text-[#7C3AED]">Upload thumbnail</span>
+                    <div className="flex-1 h-20 border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-2 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-100 transition-colors">
+                      <ImageIcon className="w-4 h-4 text-gray-700 mb-0.5" />
+                      <span className="text-[11px] font-bold text-gray-900">Upload thumbnail</span>
                       <span className="text-[9px] text-gray-400">JPG, PNG up to 5MB</span>
                     </div>
 
@@ -386,7 +386,7 @@ export function EditorPortfolio() {
 
             {/* SECTION 3: DESCRIPTION */}
             <div className="mb-6">
-              <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-1">DESCRIPTION</h3>
+              <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-1">DESCRIPTION</h3>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Short description (optional)</label>
               <div className="relative">
                 <textarea
@@ -395,7 +395,7 @@ export function EditorPortfolio() {
                   placeholder="Describe your project, the goal, and your creative approach..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] resize-none"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 resize-none"
                 />
                 <span className="absolute bottom-2.5 right-3 text-[10px] text-gray-400">
                   {description.length} / 500
@@ -407,12 +407,12 @@ export function EditorPortfolio() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {/* Tools & Skills */}
               <div>
-                <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-2">TOOLS & SKILLS</h3>
+                <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-2">TOOLS & SKILLS</h3>
                 <div className="flex flex-wrap items-center gap-1.5">
                   {skillsList.map((sk) => (
-                    <span key={sk} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#F0EBFE] text-[#7C3AED] text-xs font-semibold">
+                    <span key={sk} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-900 text-xs font-semibold">
                       {sk}
-                      <button type="button" onClick={() => handleRemoveSkill(sk)} className="hover:text-purple-900">
+                      <button type="button" onClick={() => handleRemoveSkill(sk)} className="hover:text-black">
                         <X className="w-3 h-3" />
                       </button>
                     </span>
@@ -427,13 +427,13 @@ export function EditorPortfolio() {
                       onChange={(e) => setNewSkillInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddSkill()}
                       onBlur={handleAddSkill}
-                      className="w-20 px-2 py-0.5 text-xs border border-purple-300 rounded-lg outline-none"
+                      className="w-20 px-2 py-0.5 text-xs border border-gray-300 rounded-lg outline-none"
                     />
                   ) : (
                     <button
                       type="button"
                       onClick={() => setShowSkillInput(true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:border-purple-300 hover:text-[#7C3AED] text-xs font-medium transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-900 text-xs font-medium transition-colors"
                     >
                       <Plus className="w-3 h-3" /> Add more
                     </button>
@@ -443,7 +443,7 @@ export function EditorPortfolio() {
 
               {/* Links (Optional) */}
               <div>
-                <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-2">LINKS (OPTIONAL)</h3>
+                <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-2">LINKS (OPTIONAL)</h3>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Instagram link</label>
                 <div className="relative">
                   <input
@@ -451,7 +451,7 @@ export function EditorPortfolio() {
                     placeholder="https://instagram.com/username"
                     value={instagramLink}
                     onChange={(e) => setInstagramLink(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] pr-9"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 pr-9"
                   />
                   <Instagram className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
                 </div>
@@ -462,13 +462,13 @@ export function EditorPortfolio() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 pt-4 border-t border-gray-100">
               {/* Feature checkbox */}
               <div>
-                <h3 className="text-[11px] font-bold text-[#7C3AED] tracking-wider uppercase mb-2">PORTFOLIO SETTINGS</h3>
+                <h3 className="text-[11px] font-bold text-gray-900 tracking-wider uppercase mb-2">PORTFOLIO SETTINGS</h3>
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={featured}
                     onChange={(e) => setFeatured(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 text-[#7C3AED] rounded border-gray-300 focus:ring-[#7C3AED]"
+                    className="mt-0.5 w-4 h-4 text-gray-900 rounded border-gray-300 focus:ring-gray-400"
                   />
                   <div>
                     <span className="text-xs font-semibold text-gray-900 flex items-center gap-1">
@@ -486,7 +486,7 @@ export function EditorPortfolio() {
                   <select
                     value={visibility}
                     onChange={(e) => setVisibility(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] appearance-none"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 appearance-none"
                   >
                     <option value="Public">Public</option>
                     <option value="Private">Private</option>
@@ -509,7 +509,7 @@ export function EditorPortfolio() {
               <button
                 type="button"
                 onClick={handleAddToPortfolio}
-                className="px-5 py-2 rounded-xl bg-[#6D28D9] text-white text-xs font-semibold hover:bg-purple-800 transition-colors shadow-xs"
+                className="px-5 py-2 rounded-xl bg-gray-900 text-white text-xs font-semibold hover:bg-black transition-colors shadow-xs"
               >
                 Add to portfolio
               </button>

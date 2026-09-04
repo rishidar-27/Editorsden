@@ -119,7 +119,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       icon: Star,
       trend: 'Top 1% Tier',
       trendUp: true,
-      color: 'text-amber-700 bg-amber-50',
+      color: 'text-gray-900 bg-gray-100',
     },
     {
       label: 'On-Time Velocity',
@@ -128,7 +128,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       icon: Zap,
       trend: 'Zero missed SLAs',
       trendUp: true,
-      color: 'text-indigo-700 bg-indigo-50',
+      color: 'text-gray-900 bg-gray-100',
     },
     {
       label: 'R2 Cloud Workspace',
@@ -137,7 +137,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       icon: UploadCloud,
       trend: 'Zero Egress Fees',
       trendUp: true,
-      color: 'text-blue-700 bg-blue-50',
+      color: 'text-gray-900 bg-gray-100',
     },
   ];
 
@@ -223,7 +223,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       due: 'May 22, 2025',
       progress: 65,
       escrowBudget: '$950',
-      statusColor: 'bg-blue-100 text-blue-900 border-blue-200',
+      statusColor: 'bg-gray-100 text-gray-900 border-gray-200',
     },
     {
       id: 'proj-3',
@@ -331,7 +331,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       timestamp: '1 hour ago',
       user: editor.fullName,
       tag: 'Submission',
-      color: 'bg-blue-600',
+      color: 'bg-gray-900',
     },
     {
       event: 'Milestone "Commercial Ads Brand Master 4K" Approved by Admin ($1,200 Released)',
@@ -345,7 +345,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       timestamp: '1 day ago',
       user: editor.fullName,
       tag: 'R2 Storage Sync',
-      color: 'bg-indigo-600',
+      color: 'bg-zinc-700',
     },
     {
       event: 'Assigned to new high-ticket campaign "Aurora Skincare — Q4 Global Launch"',
@@ -664,9 +664,9 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
 
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { name: 'DaVinci Resolve Studio 19', tag: 'Master Tier', color: 'bg-amber-100 text-amber-900 border-amber-200' },
-                      { name: 'Adobe Premiere Pro 2025', tag: 'Top 1%', color: 'bg-blue-100 text-blue-900 border-blue-200' },
-                      { name: 'After Effects & Blender VFX', tag: 'Pro Motion', color: 'bg-purple-100 text-purple-900 border-purple-200' },
+                      { name: 'DaVinci Resolve Studio 19', tag: 'Master Tier', color: 'bg-gray-900 text-white border-gray-900' },
+                      { name: 'Adobe Premiere Pro 2025', tag: 'Top 1%', color: 'bg-gray-100 text-gray-900 border-gray-200' },
+                      { name: 'After Effects & Blender VFX', tag: 'Pro Motion', color: 'bg-zinc-100 text-zinc-900 border-zinc-200' },
                       { name: 'ACES 1.3 & HDR Grading', tag: 'Certified', color: 'bg-emerald-100 text-emerald-900 border-emerald-200' },
                       { name: 'Apple ProRes 422/4444', tag: 'Lossless', color: 'bg-gray-100 text-gray-900 border-gray-200' },
                     ].map((item, i) => (

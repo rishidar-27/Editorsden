@@ -65,7 +65,7 @@ export function EditorVerification() {
       title: 'Hardware & Render Benchmark',
       description: 'Minimum 32GB RAM, Dedicated GPU (Apple Silicon / RTX 4080+), 1Gbps Fiber connection.',
       status: 'Passed (Score: 98/100)',
-      icon: <Cpu className="w-4 h-4 text-violet-600" />,
+      icon: <Cpu className="w-4 h-4 text-gray-900" />,
     },
     {
       num: '02',
@@ -79,7 +79,7 @@ export function EditorVerification() {
       title: 'Audio Dynamics & -14 LUFS Broadcast Standard',
       description: 'Pristine dialogue isolation, spectral de-noise, and broadcast LUFS compliance.',
       status: 'Passed (Score: 96/100)',
-      icon: <Volume2 className="w-4 h-4 text-blue-600" />,
+      icon: <Volume2 className="w-4 h-4 text-gray-900" />,
     },
     {
       num: '04',
@@ -93,7 +93,7 @@ export function EditorVerification() {
       title: 'Rapid Turnaround Speed Test',
       description: 'Same-day 4-hour rough assembly delivery test on raw multi-cam footage.',
       status: 'Passed (Score: 100/100)',
-      icon: <Zap className="w-4 h-4 text-purple-600" />,
+      icon: <Zap className="w-4 h-4 text-gray-900" />,
     },
   ];
 
@@ -101,7 +101,7 @@ export function EditorVerification() {
     <div className="max-w-[960px] mx-auto px-4 lg:px-8 py-8 space-y-6 font-sans">
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-          <ShieldCheck className="w-7 h-7 text-violet-600" />
+          <ShieldCheck className="w-7 h-7 text-gray-900" />
           <span>Editor Verification & Quality Badging</span>
         </h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -135,7 +135,7 @@ export function EditorVerification() {
       <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-violet-600" />
+            <Award className="w-4 h-4 text-gray-900" />
             <h2 className="text-base font-bold text-gray-900">
               5-Stage Quality Benchmark Results
             </h2>
@@ -291,7 +291,7 @@ export function EditorVerification() {
             </div>
 
             <div className="pt-3 border-t border-gray-100 flex justify-end">
-              <Button onClick={handleSubmit} disabled={!resumeLink} className="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs">
+              <Button onClick={handleSubmit} disabled={!resumeLink} className="bg-gray-900 hover:bg-black text-white font-bold text-xs">
                 <ShieldCheck className="w-4 h-4 mr-1.5" />
                 Submit Verification Package
               </Button>

@@ -232,7 +232,7 @@ export function EditorStorageManager() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-            <HardDrive className="w-7 h-7 text-violet-600" />
+            <HardDrive className="w-7 h-7 text-gray-900" />
             Storage & Cloud Assets
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -245,9 +245,9 @@ export function EditorStorageManager() {
             variant="outline"
             size="sm"
             onClick={() => setIsUpgradeModalOpen(true)}
-            className="border-violet-300 text-violet-700 bg-violet-50/50 hover:bg-violet-100/70 font-bold text-xs shadow-2xs"
+            className="border-gray-300 text-gray-900 bg-gray-50 hover:bg-gray-100 font-bold text-xs shadow-2xs"
           >
-            <Sparkles className="w-3.5 h-3.5 mr-1 text-violet-600" />
+            <Sparkles className="w-3.5 h-3.5 mr-1 text-gray-900" />
             Upgrade Storage Plan
           </Button>
         </div>
@@ -259,7 +259,7 @@ export function EditorStorageManager() {
         <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-500">Storage Used</span>
-            <div className="w-8 h-8 rounded-xl bg-violet-100/70 text-violet-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center">
               <HardDrive className="w-4 h-4" />
             </div>
           </div>
@@ -299,7 +299,7 @@ export function EditorStorageManager() {
         <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-500">Files Stored</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-100/70 text-blue-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center">
               <Film className="w-4 h-4" />
             </div>
           </div>
@@ -307,7 +307,7 @@ export function EditorStorageManager() {
             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
               {displayAssetsList.length} <span className="text-sm font-semibold text-gray-400">videos</span>
             </h2>
-            <span className="text-xs font-bold text-blue-600">Cloudflare R2</span>
+            <span className="text-xs font-bold text-gray-900">Cloudflare R2</span>
           </div>
           <span className="text-[11px] text-gray-400 font-medium block mt-1">
             ProRes, MP4, MOV masters
@@ -340,7 +340,7 @@ export function EditorStorageManager() {
               <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
                 Current Storage Tier:
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-violet-100 text-violet-800">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-gray-900 text-white">
                 1 GB Free Creator Tier
               </span>
             </div>
@@ -371,7 +371,7 @@ export function EditorStorageManager() {
                   ? 'bg-red-500'
                   : isNearLimit
                   ? 'bg-amber-500'
-                  : 'bg-gradient-to-r from-violet-500 to-indigo-600'
+                  : 'bg-gray-900'
               }`}
               style={{ width: `${percentageUsed}%` }}
             />
@@ -391,15 +391,15 @@ export function EditorStorageManager() {
           <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
-                <UploadCloud className="w-4 h-4 text-violet-600" />
+                <UploadCloud className="w-4 h-4 text-gray-900" />
                 Upload New Deliverable
               </h3>
-              <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
                 Cloudflare R2
               </span>
             </div>
 
-            <div className="border-2 border-dashed border-violet-200 bg-violet-50/20 hover:bg-violet-50/50 transition-colors rounded-2xl p-6 text-center space-y-3 relative cursor-pointer group">
+            <div className="border-2 border-dashed border-gray-300 bg-gray-50/50 hover:bg-gray-100/70 transition-colors rounded-2xl p-6 text-center space-y-3 relative cursor-pointer group">
               <input
                 type="file"
                 accept="video/*"
@@ -407,7 +407,7 @@ export function EditorStorageManager() {
                 disabled={isUploading}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
-              <div className="w-12 h-12 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-900 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
                 <FileVideo className="w-6 h-6" />
               </div>
               <div>
@@ -417,26 +417,26 @@ export function EditorStorageManager() {
             </div>
 
             {isUploading && (
-              <div className="space-y-1.5 p-3 bg-violet-50/80 rounded-xl border border-violet-100">
-                <div className="flex justify-between text-xs font-bold text-violet-900">
+              <div className="space-y-1.5 p-3 bg-gray-100 rounded-xl border border-gray-200">
+                <div className="flex justify-between text-xs font-bold text-gray-900">
                   <span>Uploading to R2...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="w-full bg-violet-200 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-violet-600 h-full rounded-full transition-all duration-300"
+                    className="bg-gray-900 h-full rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
               </div>
             )}
 
-            <div className="p-3.5 rounded-xl bg-violet-50/40 border border-violet-100 text-[11.5px] text-violet-900 space-y-1">
+            <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-100 text-[11.5px] text-gray-800 space-y-1">
               <span className="font-bold flex items-center gap-1">
-                <Info className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+                <Info className="w-3.5 h-3.5 text-gray-700 shrink-0" />
                 How the 1 GB bucket works:
               </span>
-              <p className="text-violet-800 text-[11px] leading-relaxed">
+              <p className="text-gray-600 text-[11px] leading-relaxed">
                 When you submit deliverables for clients, they store directly in your Cloudflare R2 bucket. Once client approval is complete, you can delete old raw files to reset your space without paying!
               </p>
             </div>
@@ -478,7 +478,7 @@ export function EditorStorageManager() {
                     placeholder="Search file name..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors"
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:bg-white transition-colors"
                   />
                 </div>
 
@@ -489,7 +489,7 @@ export function EditorStorageManager() {
                       onClick={() => setFilterType(t)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
                         filterType === t
-                          ? 'bg-violet-600 text-white shadow-2xs'
+                          ? 'bg-gray-900 text-white shadow-2xs'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -529,7 +529,7 @@ export function EditorStorageManager() {
                           type="checkbox"
                           checked={selectedIds.length === filteredAssets.length && filteredAssets.length > 0}
                           onChange={toggleSelectAll}
-                          className="rounded border-gray-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
+                          className="rounded border-gray-300 text-gray-900 focus:ring-gray-400 cursor-pointer"
                         />
                       </th>
                       <th className="py-3 px-4">ASSET NAME</th>
@@ -549,7 +549,7 @@ export function EditorStorageManager() {
                         <tr
                           key={asset.id}
                           className={`hover:bg-gray-50/80 transition-colors cursor-pointer ${
-                            isSelected ? 'bg-violet-50/40' : ''
+                            isSelected ? 'bg-gray-100/70' : ''
                           }`}
                           onClick={() => toggleSelect(asset.id)}
                         >
@@ -558,17 +558,17 @@ export function EditorStorageManager() {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleSelect(asset.id)}
-                              className="rounded border-gray-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
+                              className="rounded border-gray-300 text-gray-900 focus:ring-gray-400 cursor-pointer"
                             />
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5 max-w-[280px]">
-                              <div className="w-8 h-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+                              <div className="w-8 h-8 rounded-lg bg-gray-100 text-gray-900 flex items-center justify-center shrink-0">
                                 <Film className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
-                                <p className="font-bold text-gray-900 truncate hover:text-violet-700 transition-colors" title={asset.fileName}>
+                                <p className="font-bold text-gray-900 truncate hover:text-black transition-colors" title={asset.fileName}>
                                   {asset.fileName}
                                 </p>
                                 <p className="text-[10px] text-gray-400 truncate">
@@ -608,7 +608,7 @@ export function EditorStorageManager() {
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => setPreviewAsset(asset)}
-                                className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+                                className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                                 title="Preview Video Details"
                               >
                                 <Play className="w-3.5 h-3.5" />
@@ -651,8 +651,8 @@ export function EditorStorageManager() {
                 className="w-full h-full object-cover opacity-80"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-white/90 text-violet-700 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <Play className="w-6 h-6 fill-violet-700 ml-1" />
+                <div className="w-14 h-14 rounded-full bg-white/90 text-gray-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Play className="w-6 h-6 fill-gray-900 ml-1" />
                 </div>
               </div>
               <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 bg-black/70 text-white rounded text-[10px] font-bold">
@@ -671,7 +671,7 @@ export function EditorStorageManager() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-medium">Storage Engine:</span>
-                <span className="font-bold text-violet-700">Cloudflare R2 ($0 Egress)</span>
+                <span className="font-bold text-gray-900">Cloudflare R2 ($0 Egress)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-medium">R2 Object Key:</span>
@@ -687,7 +687,7 @@ export function EditorStorageManager() {
                 href={previewAsset.publicUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 px-3.5 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors"
+                className="inline-flex items-center gap-1 px-3.5 py-2 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl shadow-2xs transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Open Direct CDN URL
@@ -711,8 +711,8 @@ export function EditorStorageManager() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Plan 1: Pro 50GB */}
-              <div className="p-4 rounded-2xl border-2 border-violet-500 bg-violet-50/30 space-y-3 relative">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-violet-600 text-white uppercase tracking-wider">
+              <div className="p-4 rounded-2xl border-2 border-gray-900 bg-gray-50 space-y-3 relative">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-900 text-white uppercase tracking-wider">
                   Popular
                 </span>
                 <div>

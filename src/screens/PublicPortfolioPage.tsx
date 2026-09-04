@@ -304,7 +304,7 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
         <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/90 shadow-sm relative overflow-hidden">
           
           {/* Ambient Decorative Gradient in Background */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-100/40 via-purple-100/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-gray-100/60 via-zinc-100/40 to-transparent rounded-full blur-3xl pointer-events-none" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
             
@@ -378,11 +378,11 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
                   <span>{editor.email}</span>
                 </a>
                 <span className="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 flex items-center gap-1.5">
-                  <Linkedin className="w-3.5 h-3.5 text-blue-600" />
+                  <Linkedin className="w-3.5 h-3.5 text-gray-900" />
                   <span>linkedin.com/in/{editor.fullName.toLowerCase().replace(' ', '')}</span>
                 </span>
                 <span className="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 flex items-center gap-1.5">
-                  <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                  <Instagram className="w-3.5 h-3.5 text-gray-900" />
                   <span>@{editor.fullName.toLowerCase().replace(' ', '')}.edits</span>
                 </span>
               </div>

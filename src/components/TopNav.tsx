@@ -142,13 +142,13 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                     onClick={() => onNavigate(item.route)}
                     className={`h-16 px-3.5 text-sm transition-all flex items-center gap-1.5 border-b-2 ${
                       active
-                        ? 'text-[#3b28cc] font-bold border-[#3b28cc]'
+                        ? 'text-gray-900 font-bold border-gray-900'
                         : 'text-gray-600 hover:text-gray-900 font-medium border-transparent'
                     }`}
                   >
                     <span>{item.label}</span>
                     {isReview && liveReviewCount > 0 && (
-                      <span className="px-1.5 py-0.5 text-xs font-bold rounded-full bg-amber-400 text-gray-900 shadow-2xs">
+                      <span className="px-1.5 py-0.5 text-xs font-bold rounded-full bg-gray-900 text-white shadow-2xs">
                         {liveReviewCount}
                       </span>
                     )}
@@ -182,13 +182,13 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                 <button
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
                   className={`relative p-2 rounded-full transition-colors ${
-                    notificationsOpen ? 'bg-indigo-50 text-[#3b28cc]' : 'text-gray-700 hover:bg-gray-100'
+                    notificationsOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   title="Notifications"
                 >
                   <Bell className="w-5 h-5 stroke-[1.75]" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#e11d48] text-white text-[9px] font-bold flex items-center justify-center border-2 border-white shadow-2xs">
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gray-900 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white shadow-2xs">
                       {unreadCount}
                     </span>
                   )}
@@ -201,7 +201,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-gray-900">Notifications</span>
                         {unreadCount > 0 && (
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-[#ede9fe] text-[#4f46e5] rounded-full">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-gray-200 text-gray-800 rounded-full">
                             {unreadCount} new
                           </span>
                         )}
@@ -209,7 +209,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                       {unreadCount > 0 && (
                         <button
                           onClick={markAllAsRead}
-                          className="text-[11px] font-semibold text-[#3b28cc] hover:underline"
+                          className="text-[11px] font-semibold text-gray-900 hover:underline"
                         >
                           Mark all as read
                         </button>
@@ -227,11 +227,11 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                           <div
                             key={item.id}
                             onClick={() => markAsRead(item.id, item.route)}
-                            className={`p-3.5 hover:bg-indigo-50/40 cursor-pointer transition-colors flex items-start gap-3 ${
-                              item.unread ? 'bg-indigo-50/20' : 'bg-white'
+                            className={`p-3.5 hover:bg-gray-100/60 cursor-pointer transition-colors flex items-start gap-3 ${
+                              item.unread ? 'bg-gray-50/80' : 'bg-white'
                             }`}
                           >
-                            <div className="w-2 h-2 rounded-full bg-[#3b28cc] mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ opacity: item.unread ? 1 : 0 }} />
+                            <div className="w-2 h-2 rounded-full bg-gray-900 mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ opacity: item.unread ? 1 : 0 }} />
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-1">
                                 <h4 className={`text-xs ${item.unread ? 'font-bold text-gray-900' : 'font-semibold text-gray-700'}`}>
@@ -255,7 +255,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                           setNotificationsOpen(false);
                           onNavigate('/editor/projects');
                         }}
-                        className="text-[11px] font-bold text-[#3b28cc] hover:underline py-1 inline-block"
+                        className="text-[11px] font-bold text-gray-900 hover:underline py-1 inline-block"
                       >
                         View all tasks & assignments →
                       </button>
@@ -322,7 +322,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                   key={item.route}
                   onClick={() => { onNavigate(item.route); setMobileOpen(false); }}
                   className={`text-left px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    isActive(item.route) ? 'text-violet-700 bg-violet-050 font-semibold' : 'text-gray-600 hover:bg-gray-100'
+                    isActive(item.route) ? 'text-gray-900 bg-gray-100 font-bold' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   {item.label}
