@@ -2,7 +2,27 @@ import { useState } from 'react';
 import { Input, Textarea, Select, Button, SkillTag } from '@/components/ui';
 import { useApp } from '@/context';
 import { allSkills, allSoftware } from '@/data';
-import { Check, Plus, User, Mail, Phone, MapPin, Globe, Linkedin, Instagram, Briefcase, Clock, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  Check,
+  Plus,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Linkedin,
+  Instagram,
+  Briefcase,
+  Clock,
+  ShieldCheck,
+  Sparkles,
+  Cpu,
+  Tv,
+  Wifi,
+  ExternalLink,
+  Layers,
+  Award,
+} from 'lucide-react';
 import type { AvailabilityStatus, Skill, Software } from '@/types';
 
 const availabilityOptions: AvailabilityStatus[] = ['Full-Time', 'Part-Time', 'Weekends', 'Not Available'];
@@ -26,6 +46,13 @@ export function EditorProfile() {
     hoursPerWeek: editor?.hoursPerWeek || 0,
   });
 
+  const [hardwareSpecs, setHardwareSpecs] = useState({
+    workstation: 'Apple Mac Studio M2 Ultra (128GB Unified Memory, 24-Core CPU)',
+    displays: 'Dual ASUS ProArt 32" 4K HDR (Calibrated Rec.709 & DCI-P3 Delta E < 1.5)',
+    connectivity: '1 Gbps Symmetrical Fiber Optical (Low-Latency R2 Sync)',
+    audioMonitors: 'Yamaha HS8 Studio Reference Monitors + Sennheiser HD 650 Pro',
+  });
+
   const [skills, setSkills] = useState<Skill[]>(editor?.skills || []);
   const [software, setSoftware] = useState<Software[]>(editor?.editingSoftware || []);
   const [skillInput, setSkillInput] = useState('');
@@ -39,7 +66,7 @@ export function EditorProfile() {
       editingSoftware: software,
     });
     setSaved(true);
-    addToast('Profile updated successfully', 'success');
+    addToast('Studio profile and hardware specs updated successfully!', 'success');
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -67,64 +94,77 @@ export function EditorProfile() {
   );
 
   return (
-    <div className="bg-[#FAF9FF] min-h-screen py-5 px-3 lg:px-6 font-sans text-gray-900">
-      <div className="max-w-[1060px] mx-auto">
+    <div className="bg-[#f4f6fb] min-h-screen py-6 px-4 lg:px-8 font-sans text-gray-900">
+      <div className="max-w-[1140px] mx-auto space-y-6">
         
         {/* Compact Header Bar */}
-        <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)] mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
               <img 
-                src={editor.avatarUrl || 'https://i.pravatar.cc/150?u=editor'} 
+                src={editor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'} 
                 alt={editor.fullName} 
-                className="w-12 h-12 rounded-xl object-cover border border-white shadow-2xs" 
+                className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-2xs" 
               />
-              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center text-white">
-                <Check className="w-2.5 h-2.5 stroke-[3]" />
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white shadow-2xs">
+                <Check className="w-3 h-3 stroke-[3]" />
               </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Editor Profile'}</h1>
-                <span className="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-[#E6F8F0] text-[#10B981] flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  Verified
+                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">{editor.fullName || 'Creator Profile'}</h1>
+                <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Verified Top 1%
                 </span>
               </div>
-              <p className="text-[11px] text-gray-500 mt-0.5">
-                Manage your personal info, portfolio links, skills, and work availability.
+              <p className="text-xs text-gray-500 mt-0.5">
+                Manage your creator studio credentials, hardware benchmarking, and public portfolio.
               </p>
             </div>
           </div>
 
-          <Button 
-            onClick={handleSave} 
-            className="bg-[#6D28D9] hover:bg-purple-800 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-2xs transition-all flex items-center gap-1.5 shrink-0"
-          >
-            {saved ? (
-              <><Check className="w-3.5 h-3.5" /> Saved!</>
-            ) : (
-              <><Sparkles className="w-3.5 h-3.5" /> Save changes</>
-            )}
-          </Button>
+          <div className="flex items-center gap-2.5">
+            <a
+              href={`#/editor/${editor.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-colors"
+            >
+              <Globe className="w-3.5 h-3.5 text-gray-500" />
+              <span>View Public Portfolio</span>
+              <ExternalLink className="w-3 h-3 text-gray-400" />
+            </a>
+
+            <Button 
+              onClick={handleSave} 
+              className="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition-all flex items-center gap-1.5 shrink-0"
+            >
+              {saved ? (
+                <><Check className="w-3.5 h-3.5" /> Saved!</>
+              ) : (
+                <><Sparkles className="w-3.5 h-3.5" /> Save Changes</>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* 2-Column Grid Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Left Column (7 cols) */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="lg:col-span-7 space-y-6">
             
             {/* Personal Information Card */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
                   <User className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm font-bold text-gray-900">Personal Information</h2>
+                <h2 className="text-sm font-bold text-gray-900">Personal & Contact Information</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <Input 
                   label="Full Name" 
                   value={form.fullName} 
@@ -153,16 +193,72 @@ export function EditorProfile() {
               </div>
             </div>
 
+            {/* Hardware & Workstation Specs (NEW) */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <Cpu className="w-3.5 h-3.5" />
+                  </div>
+                  <h2 className="text-sm font-bold text-gray-900">Studio Workstation & Hardware Benchmark</h2>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                  4K 60FPS Certified
+                </span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-violet-600" />
+                    Primary Workstation / GPU
+                  </label>
+                  <input
+                    type="text"
+                    value={hardwareSpecs.workstation}
+                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, workstation: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                    <Tv className="w-3.5 h-3.5 text-emerald-600" />
+                    Color-Calibrated Displays
+                  </label>
+                  <input
+                    type="text"
+                    value={hardwareSpecs.displays}
+                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, displays: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                    <Wifi className="w-3.5 h-3.5 text-blue-600" />
+                    Network Pipeline & Audio Monitoring
+                  </label>
+                  <input
+                    type="text"
+                    value={hardwareSpecs.connectivity}
+                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, connectivity: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Links & Social Media Card */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-[#F0EBFE] text-[#7C3AED] flex items-center justify-center">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
                   <Globe className="w-3.5 h-3.5" />
                 </div>
                 <h2 className="text-sm font-bold text-gray-900">Links & Social Presence</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <Input 
                   label="LinkedIn Profile" 
                   placeholder="linkedin.com/in/..." 
@@ -178,14 +274,14 @@ export function EditorProfile() {
                   icon={<Instagram className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
-                  label="Portfolio Website" 
+                  label="Personal Portfolio Website" 
                   placeholder="yourname.studio" 
                   value={form.portfolioLink} 
                   onChange={(e) => setForm({ ...form, portfolioLink: e.target.value })} 
                   icon={<Globe className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
-                  label="Experience (Years)" 
+                  label="Industry Experience (Years)" 
                   type="number" 
                   min="0" 
                   value={form.experience} 
@@ -196,11 +292,11 @@ export function EditorProfile() {
             </div>
 
             {/* Bio Card */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <h2 className="text-sm font-bold text-gray-900 mb-2">About / Bio</h2>
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900">Creator Bio & Narrative Style</h2>
               <Textarea
                 rows={3}
-                placeholder="Tell clients and admins about your editing style, niche, and achievements..."
+                placeholder="Describe your editing philosophy, favorite niches, pacing style, and major commercial highlights..."
                 value={form.bio}
                 onChange={(e) => setForm({ ...form, bio: e.target.value })}
               />
@@ -209,35 +305,35 @@ export function EditorProfile() {
           </div>
 
           {/* Right Column (5 cols) */}
-          <div className="lg:col-span-5 space-y-4">
+          <div className="lg:col-span-5 space-y-6">
             
             {/* Skills & Specialties */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <h2 className="text-sm font-bold text-gray-900 mb-2.5">Skills & Specialties</h2>
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900">Editing Disciplines & Skills</h2>
               
-              <div className="flex flex-wrap gap-1.5 mb-3">
+              <div className="flex flex-wrap gap-1.5">
                 {skills.map((skill) => (
-                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-[#F0EBFE] text-[#7C3AED] font-semibold px-2.5 py-0.5 rounded-full text-[11px]">
+                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-violet-100 text-violet-800 font-bold px-2.5 py-1 rounded-lg text-xs">
                     {skill}
                   </SkillTag>
                 ))}
-                {skills.length === 0 && <p className="text-[11px] text-gray-500">No skills added yet.</p>}
+                {skills.length === 0 && <p className="text-xs text-gray-400">No skills added yet.</p>}
               </div>
 
-              <div className="relative">
+              <div className="relative pt-1">
                 <Input
-                  placeholder="Type to search and add skills..."
+                  placeholder="Type to add skills..."
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   icon={<Plus className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 {skillInput && filteredSkills.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20 max-h-40 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20 max-h-40 overflow-y-auto">
                     {filteredSkills.map((skill) => (
                       <button
                         key={skill}
                         onClick={() => addSkill(skill)}
-                        className="w-full text-left px-3 py-1.5 text-[11px] text-gray-700 hover:bg-[#F0EBFE] hover:text-[#7C3AED] transition-colors font-medium"
+                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition-colors font-semibold"
                       >
                         + {skill}
                       </button>
@@ -248,8 +344,8 @@ export function EditorProfile() {
             </div>
 
             {/* Editing Software */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <h2 className="text-sm font-bold text-gray-900 mb-2.5">Editing Software</h2>
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900">Creative Software Suite</h2>
               
               <div className="flex flex-wrap gap-1.5">
                 {allSoftware.map((sw) => {
@@ -258,13 +354,13 @@ export function EditorProfile() {
                     <button
                       key={sw}
                       onClick={() => toggleSoftware(sw)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
                         selected
-                          ? 'bg-[#F0EBFE] border-[#7C3AED]/40 text-[#7C3AED]'
-                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                          ? 'bg-violet-50 border-violet-300 text-violet-800 shadow-2xs'
+                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      {selected && <Check className="w-3 h-3 text-[#7C3AED]" />}
+                      {selected && <Check className="w-3.5 h-3.5 text-violet-600" />}
                       {sw}
                     </button>
                   );
@@ -273,15 +369,15 @@ export function EditorProfile() {
             </div>
 
             {/* Work Availability */}
-            <div className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-[#FFF4E5] text-[#F97316] flex items-center justify-center">
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
                   <Clock className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm font-bold text-gray-900">Work Availability</h2>
+                <h2 className="text-sm font-bold text-gray-900">Work Capacity & Availability</h2>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <Select
                   label="Status"
                   value={form.availability}
@@ -311,3 +407,4 @@ export function EditorProfile() {
     </div>
   );
 }
+

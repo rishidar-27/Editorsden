@@ -13,6 +13,11 @@ import {
   RotateCcw,
   CheckCircle2,
   TrendingUp,
+  Zap,
+  HardDrive,
+  Clock,
+  Sparkles,
+  DollarSign,
 } from 'lucide-react';
 import { allSkills } from '@/data';
 
@@ -33,40 +38,40 @@ export function Reports({ onNavigate }: ReportsProps) {
 
   const stats = [
     {
-      label: 'Total Community',
-      value: String(totalEditors),
-      trend: '↑ 12%',
-      trendUp: true,
-      subtext: 'vs last 30 days',
-      icon: <Users className="w-5 h-5 text-violet-600" />,
-      bg: 'bg-violet-100/70',
-    },
-    {
-      label: 'Verified Creators',
+      label: 'Verified Creator Network',
       value: String(verifiedCount),
       trend: '↑ 18%',
       trendUp: true,
-      subtext: 'vs last 30 days',
+      subtext: 'top 1% vetted talent',
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />,
       bg: 'bg-emerald-100/70',
     },
     {
-      label: 'Active Accounts',
-      value: String(activeCount),
-      trend: '↑ 8%',
+      label: 'Turnaround Velocity',
+      value: '22.4 hrs',
+      trend: '⚡ -35% faster',
       trendUp: true,
-      subtext: 'vs last 30 days',
-      icon: <Activity className="w-5 h-5 text-amber-600" />,
+      subtext: 'average v1 delivery',
+      icon: <Zap className="w-5 h-5 text-amber-600" />,
       bg: 'bg-amber-100/70',
     },
     {
-      label: 'Inactive',
-      value: String(inactiveCount),
-      trend: '↓ 50%',
-      trendUp: false,
-      subtext: 'vs last 30 days',
-      icon: <UserX className="w-5 h-5 text-red-500" />,
-      bg: 'bg-red-100/70',
+      label: 'R2 Zero-Egress Savings',
+      value: '$14,280',
+      trend: '100% saved',
+      trendUp: true,
+      subtext: 'vs legacy AWS S3 bandwidth',
+      icon: <DollarSign className="w-5 h-5 text-emerald-600" />,
+      bg: 'bg-emerald-100/70',
+    },
+    {
+      label: 'Active Community Capacity',
+      value: String(activeCount),
+      trend: '92% utilization',
+      trendUp: true,
+      subtext: `${totalEditors} total accounts`,
+      icon: <Activity className="w-5 h-5 text-violet-600" />,
+      bg: 'bg-violet-100/70',
     },
   ];
 
@@ -103,17 +108,22 @@ export function Reports({ onNavigate }: ReportsProps) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    addToast('Report exported successfully!', 'success');
+    addToast('Analytics & telemetry exported to CSV successfully!', 'success');
   };
 
   return (
-    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Analytics & Reports</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
+            <span>Analytics & Creator Telemetry</span>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100">
+              Q3 Live Telemetry
+            </span>
+          </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Engagement, skill coverage, and capacity metrics across your creator ecosystem
+            Turnaround velocity, Cloudflare R2 egress savings, skill coverage, and capacity metrics across your creator ecosystem
           </p>
         </div>
         <button
@@ -141,18 +151,19 @@ export function Reports({ onNavigate }: ReportsProps) {
                 {s.trend}
               </span>
             </div>
+            <span className="text-[11px] text-gray-400 font-medium block mt-1">{s.subtext}</span>
           </Card>
         ))}
       </div>
 
       {/* Search & Filters Bar */}
-      <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+      <Card className="p-4 bg-white border border-gray-100 rounded-xl shadow-2xs">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 w-full max-w-md">
             <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search creators in report..."
+              placeholder="Search creators in report by name, city, or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors"
@@ -206,7 +217,7 @@ export function Reports({ onNavigate }: ReportsProps) {
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <h3 className="font-bold text-gray-900 text-sm">Editor Performance & Capacity Summary</h3>
           <span className="text-xs text-gray-400">
-            {filteredEditors.length} of {totalEditors} editors
+            {filteredEditors.length} of {totalEditors} creators shown
           </span>
         </div>
 
@@ -214,13 +225,13 @@ export function Reports({ onNavigate }: ReportsProps) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                <th className="py-3 px-4">EDITOR</th>
+                <th className="py-3 px-4">CREATOR</th>
                 <th className="py-3 px-4">LOCATION</th>
-                <th className="py-3 px-4">PRIMARY SKILLS</th>
+                <th className="py-3 px-4">PRIMARY DISCIPLINES</th>
                 <th className="py-3 px-4">EXPERIENCE</th>
                 <th className="py-3 px-4">AVAILABILITY</th>
                 <th className="py-3 px-4">STATUS</th>
-                <th className="py-3 px-4 text-right">PROFILE</th>
+                <th className="py-3 px-4 text-right">ACTION</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-xs text-gray-700">
@@ -228,7 +239,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                 <tr
                   key={e.id}
                   onClick={() => onNavigate(`/admin/editor/${e.id}`)}
-                  className="hover:bg-gray-50/70 transition-colors cursor-pointer"
+                  className="hover:bg-gray-50/70 transition-colors cursor-pointer group"
                 >
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-3">
@@ -238,7 +249,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
                       />
                       <div>
-                        <p className="font-bold text-gray-900">{e.fullName}</p>
+                        <p className="font-bold text-gray-900 group-hover:text-violet-700 transition-colors">{e.fullName}</p>
                         <p className="text-[11px] text-gray-400">{e.email}</p>
                       </div>
                     </div>
@@ -251,7 +262,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                       {e.skills.slice(0, 2).map((s) => (
                         <span
                           key={s}
-                          className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-[10.5px] font-medium"
+                          className="px-2 py-0.5 bg-violet-50 text-violet-700 rounded text-[10.5px] font-medium"
                         >
                           {s}
                         </span>
@@ -288,7 +299,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                       }}
                       className="text-xs font-bold text-violet-600 hover:text-violet-800 hover:underline"
                     >
-                      View →
+                      View Studio Profile →
                     </button>
                   </td>
                 </tr>
@@ -300,3 +311,4 @@ export function Reports({ onNavigate }: ReportsProps) {
     </div>
   );
 }
+

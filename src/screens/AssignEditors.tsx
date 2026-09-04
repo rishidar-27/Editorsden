@@ -18,6 +18,9 @@ import {
   RotateCcw,
   Film,
   Building2,
+  Zap,
+  Cpu,
+  ShieldCheck,
 } from 'lucide-react';
 import { allSkills } from '@/data';
 import type { Editor } from '@/types';
@@ -131,7 +134,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
   };
 
   return (
-    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6 font-sans">
       {/* Breadcrumb Navigation & Top Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -149,7 +152,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
             {project.title}
           </button>
           <span className="text-gray-300">/</span>
-          <span className="font-semibold text-gray-900 truncate">Assign Editors</span>
+          <span className="font-semibold text-gray-900 truncate">Assign Creators</span>
         </div>
 
         <button
@@ -157,7 +160,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-xl shadow-2xs transition-all hover:shadow-sm"
         >
           <Check className="w-4 h-4" />
-          <span>Done & Back to Project</span>
+          <span>Done & Back to Campaign</span>
         </button>
       </div>
 
@@ -174,6 +177,10 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                 <Building2 className="w-3.5 h-3.5 text-gray-400" />
                 {project.clientName}
               </span>
+              <span className="text-gray-300">•</span>
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                Cloudflare R2 Workspace Enabled
+              </span>
             </div>
 
             <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
@@ -181,21 +188,21 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
             </h1>
 
             <p className="text-xs text-gray-500">
-              Project: <span className="font-semibold text-gray-700">{project.title}</span>
+              Campaign: <span className="font-semibold text-gray-700">{project.title}</span>
             </p>
           </div>
 
           {/* Assignment Status Pill */}
-          <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl">
-            <div className="w-9 h-9 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-gray-900">
-                {assignedEditors.length} Editor{assignedEditors.length !== 1 ? 's' : ''} Assigned
+                {assignedEditors.length} Creator{assignedEditors.length !== 1 ? 's' : ''} Assigned
               </div>
               <p className="text-[11px] text-gray-500">
-                {assignedEditors.length > 0 ? 'Assigned to work on this deliverable' : 'Subtask currently unassigned'}
+                {assignedEditors.length > 0 ? 'Work assigned to deliverable queue' : 'Deliverable currently unassigned'}
               </p>
             </div>
           </div>
@@ -213,10 +220,10 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                 <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search verified editors by name or city..."
+                  placeholder="Search verified editors by name, software, or city..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors"
+                  className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500 focus:bg-white transition-colors text-gray-800"
                 />
               </div>
 
@@ -274,7 +281,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
               </div>
 
               <span className="text-gray-400 text-[11px] font-medium">
-                Showing {sortedEditors.length} verified editors
+                Showing {sortedEditors.length} vetted creators
               </span>
             </div>
           </Card>
@@ -297,14 +304,15 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                 const isAssigned = assignedIds.includes(e.id);
                 const isSkillMatch = e.skills.includes(subtask.taskType as never);
                 const activeTasks = editorTaskCounts[e.id] || 0;
+                const matchScore = isSkillMatch ? 98 : 84;
 
                 return (
                   <Card
                     key={e.id}
-                    className={`p-4 sm:p-5 bg-white border rounded-xl shadow-2xs transition-all ${
+                    className={`p-4 sm:p-5 bg-white border rounded-2xl shadow-2xs transition-all ${
                       isAssigned
                         ? 'border-violet-300 bg-violet-50/20 shadow-xs ring-1 ring-violet-200'
-                        : 'border-gray-100 hover:border-gray-200 hover:shadow-xs'
+                        : 'border-gray-100 hover:border-violet-200 hover:shadow-xs'
                     }`}
                   >
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
@@ -328,12 +336,10 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                               {e.fullName}
                             </h3>
 
-                            {isSkillMatch && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                <Sparkles className="w-3 h-3 text-emerald-600" />
-                                Recommended Match
-                              </span>
-                            )}
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-extrabold bg-violet-50 text-violet-700 border border-violet-100">
+                              <Sparkles className="w-3 h-3 text-violet-600" />
+                              {matchScore}% AI Match
+                            </span>
 
                             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
                               <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
@@ -346,8 +352,8 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                             <span className="text-gray-300">•</span>
                             <span className="font-semibold text-gray-700">{e.availability}</span>
                             <span className="text-gray-300">•</span>
-                            <span className="text-gray-500">
-                              {activeTasks === 0 ? '🟢 Available now' : `🟡 ${activeTasks} active task${activeTasks > 1 ? 's' : ''}`}
+                            <span className="text-gray-600 font-medium">
+                              {activeTasks === 0 ? '🟢 Available now (0 tasks)' : `🟡 ${activeTasks} active task${activeTasks > 1 ? 's' : ''}`}
                             </span>
                           </p>
 
@@ -372,8 +378,9 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
 
                           {/* Software stack preview */}
                           {e.editingSoftware && e.editingSoftware.length > 0 && (
-                            <p className="text-[11px] text-gray-400 pt-0.5">
-                              Tools: {e.editingSoftware.join(', ')}
+                            <p className="text-[11px] text-gray-400 pt-0.5 flex items-center gap-1.5">
+                              <Cpu className="w-3 h-3 text-gray-400" />
+                              <span>Tools: {e.editingSoftware.join(', ')}</span>
                             </p>
                           )}
                         </div>
@@ -397,7 +404,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                             className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-xl shadow-2xs hover:shadow-sm transition-all"
                           >
                             <Plus className="w-4 h-4" />
-                            <span>Assign</span>
+                            <span>Assign Creator</span>
                           </button>
                         )}
 
@@ -405,7 +412,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                           onClick={() => onNavigate(`/admin/editor/${e.id}`)}
                           className="text-[11px] text-gray-400 hover:text-violet-600 font-medium inline-flex items-center gap-1 transition-colors"
                         >
-                          <span>View Profile</span>
+                          <span>View Studio Profile</span>
                           <ExternalLink className="w-3 h-3" />
                         </button>
                       </div>
@@ -420,7 +427,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
         {/* Right Column: Sticky Assignment Sidebar (4 cols) */}
         <div className="lg:col-span-4 space-y-4 sticky top-20">
           {/* Currently Assigned Card */}
-          <Card className="p-5 bg-white border border-gray-100 rounded-xl shadow-2xs space-y-4">
+          <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
@@ -437,9 +444,9 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
 
             {assignedEditors.length === 0 ? (
               <div className="py-6 text-center space-y-2">
-                <p className="text-xs text-gray-400">No editors currently assigned to this task.</p>
+                <p className="text-xs text-gray-400">No creators currently assigned to this task.</p>
                 <p className="text-[11px] text-gray-400">
-                  Select editors from the list on the left to assign them.
+                  Select creators from the list on the left to assign them.
                 </p>
               </div>
             ) : (
@@ -475,15 +482,15 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                 className="w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-all text-center flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Save & Back to Project</span>
+                <span>Save & Back to Campaign</span>
               </button>
             </div>
           </Card>
 
           {/* Subtask Brief & Requirement Details */}
-          <Card className="p-5 bg-white border border-gray-100 rounded-xl shadow-2xs space-y-3.5 text-xs">
+          <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-3.5 text-xs">
             <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-              <h4 className="font-bold text-gray-700">Subtask Scope</h4>
+              <h4 className="font-bold text-gray-900">Deliverable Scope</h4>
               <span className="text-gray-400 text-[11px]">ID: {subtask.id}</span>
             </div>
 
@@ -509,3 +516,4 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
     </div>
   );
 }
+
