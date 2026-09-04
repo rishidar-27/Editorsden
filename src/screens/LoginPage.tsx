@@ -16,14 +16,14 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       if (mode === 'login') {
-        const result = login(email, password);
+        const result = await login(email, password);
         if (result.success) {
           if (result.userType === 'admin') {
             onNavigate('/admin/dashboard');
@@ -34,7 +34,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           setError(result.error || 'Invalid credentials');
         }
       } else {
-        const result = register(email, password);
+        const result = await register(email, password);
         if (result.success) {
           addToast('Account created! Start building your profile.', 'success');
           onNavigate('/editor/profile');
@@ -42,8 +42,11 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           setError(result.error || 'Registration failed');
         }
       }
+    } catch {
+      setError('An error occurred during authentication');
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
@@ -112,6 +115,34 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                   : 'Already have an account? Sign in'}
               </button>
             </div>
+
+            {mode === 'login' && (
+              <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col gap-2">
+                <div className="text-xs font-medium text-gray-500 text-center uppercase tracking-wider">Demo Quick Access</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@gogangs.com');
+                      setPassword('admin123');
+                    }}
+                    className="px-2.5 py-1.5 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-button transition-colors text-center"
+                  >
+                    👑 Admin Demo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('marcus@gogangs.com');
+                      setPassword('demo1234');
+                    }}
+                    className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-button transition-colors text-center"
+                  >
+                    🎬 Editor Demo
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

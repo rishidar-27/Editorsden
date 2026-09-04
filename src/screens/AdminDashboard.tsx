@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui';
+import { useApp } from '@/context';
 import {
   Users,
   ShieldCheck,
@@ -8,10 +9,12 @@ import {
   UserX,
   AlertTriangle,
   ArrowRight,
-  MoreVertical,
   Calendar,
   ChevronDown,
   Briefcase,
+  ExternalLink,
+  Film,
+  Sparkles,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -19,204 +22,151 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
-  const [selectedRange] = useState('May 12 – May 18, 2025');
+  const { editors, projects, activity } = useApp();
+  const [selectedRange] = useState('Aug 20 – Aug 28, 2026');
 
-  // Stat metrics matching reference mock
+  // Dynamic stat metrics from context
+  const totalEditors = editors.length;
+  const verifiedEditors = editors.filter((e) => e.verificationStatus === 'Verified').length;
+  const pendingEditors = editors.filter((e) => e.verificationStatus === 'Pending').length;
+  const activeEditors = editors.filter((e) => e.active).length;
+  const inactiveEditors = editors.filter((e) => !e.active).length;
+
   const metrics = [
     {
       label: 'Total Editors',
-      value: '15',
+      value: String(totalEditors),
       trend: '↑ 12%',
       trendUp: true,
       subtext: 'vs last 7 days',
       icon: <Users className="w-5 h-5 text-violet-600" />,
       bg: 'bg-violet-100/70',
+      route: '/admin/editors',
     },
     {
       label: 'Verified Editors',
-      value: '9',
+      value: String(verifiedEditors),
       trend: '↑ 18%',
       trendUp: true,
       subtext: 'vs last 7 days',
       icon: <ShieldCheck className="w-5 h-5 text-emerald-600" />,
       bg: 'bg-emerald-100/70',
+      route: '/admin/editors',
     },
     {
       label: 'Pending Verification',
-      value: '5',
+      value: String(pendingEditors),
       trend: '↓ 7%',
       trendUp: false,
       subtext: 'vs last 7 days',
       icon: <Clock className="w-5 h-5 text-amber-600" />,
       bg: 'bg-amber-100/70',
+      route: '/admin/editors',
     },
     {
       label: 'Active Editors',
-      value: '14',
+      value: String(activeEditors),
       trend: '↑ 16%',
       trendUp: true,
       subtext: 'vs last 7 days',
       icon: <UserCheck className="w-5 h-5 text-violet-600" />,
       bg: 'bg-violet-100/70',
+      route: '/admin/editors',
     },
     {
       label: 'Inactive Editors',
-      value: '1',
+      value: String(inactiveEditors),
       trend: '↓ 50%',
       trendUp: false,
       subtext: 'vs last 7 days',
       icon: <UserX className="w-5 h-5 text-red-500" />,
       bg: 'bg-red-100/70',
+      route: '/admin/editors',
     },
   ];
 
-  // Deadlines at risk list
-  const deadlinesAtRisk = [
-    {
-      id: 'd1',
-      title: 'Hero Brand Film (60s)',
-      client: 'Aurora Skincare — Q4 Launch Campaign',
-      subtasksCount: 3,
-      daysLeft: '4d left',
-      dueDate: 'Due May 22',
-      status: 'warning',
-      thumbnail:
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    },
-    {
-      id: 'd2',
-      title: 'Instagram Reel Series (5x)',
-      client: 'Aurora Skincare — Q4 Launch Campaign',
-      subtasksCount: 4,
-      daysLeft: '2d left',
-      dueDate: 'Due May 20',
-      status: 'warning',
-      thumbnail:
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    },
-    {
-      id: 'd3',
-      title: 'Thumbnail Design Package',
-      client: 'Aurora Skincare — Q4 Launch Campaign',
-      subtasksCount: 2,
-      daysLeft: '1d left',
-      dueDate: 'Due May 19',
-      status: 'danger',
-      thumbnail:
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    },
-    {
-      id: 'd4',
-      title: 'Social Teasers (4x)',
-      client: 'TechFlow SaaS — Product Demo Series',
-      subtasksCount: 4,
-      daysLeft: '3d left',
-      dueDate: 'Due May 21',
-      status: 'warning',
-      thumbnail:
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    },
-    {
-      id: 'd5',
-      title: 'Promo Reels (3x)',
-      client: "The Founder's Journey — Podcast S2",
-      subtasksCount: 3,
-      daysLeft: '5d left',
-      dueDate: 'Due May 23',
-      status: 'warning',
-      thumbnail:
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    },
-  ];
+  const now = new Date();
 
-  // Recent activity list
-  const recentActivities = [
-    {
-      id: 'a1',
-      user: 'Elena Rodriguez',
-      avatar: 'https://i.pravatar.cc/150?u=elena',
-      action: 'submitted "Instagram Reel Series" for review',
-      time: '1h ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a2',
-      user: 'Noah Kim',
-      avatar: 'https://i.pravatar.cc/150?u=noah',
-      action: 'registered and submitted for verification',
-      time: '3h ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a3',
-      user: 'You approved',
-      avatar: 'https://i.pravatar.cc/150?u=admin',
-      action: '"Brand Commercial" by Marcus Chen',
-      time: '5h ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a4',
-      user: 'Zara Ahmed',
-      avatar: 'https://i.pravatar.cc/150?u=zara',
-      action: 'assigned to "Cinematic Hero Film"',
-      time: '6h ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a5',
-      user: 'Project',
-      action: '"Discover Dubai — Tourism Campaign" created',
-      time: '1d ago',
-      type: 'project_created',
-    },
-    {
-      id: 'a6',
-      user: 'James Wilson',
-      avatar: 'https://i.pravatar.cc/150?u=james',
-      action: 'verified as an editor',
-      time: '2d ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a7',
-      user: "Aria Patel's",
-      avatar: 'https://i.pravatar.cc/150?u=aria',
-      action: 'verification sent back with feedback',
-      time: '2d ago',
-      type: 'avatar',
-    },
-    {
-      id: 'a8',
-      user: 'Maya Singh',
-      avatar: 'https://i.pravatar.cc/150?u=maya',
-      action: 'updated her portfolio',
-      time: '3d ago',
-      type: 'avatar',
-    },
-  ];
+  // Deadlines at risk list dynamically extracted from active projects
+  const deadlinesAtRisk = useMemo(() => {
+    const list: Array<{
+      id: string;
+      title: string;
+      client: string;
+      projectId: string;
+      subtasksCount: number;
+      daysLeft: string;
+      dueDate: string;
+      status: 'warning' | 'danger';
+      thumbnail: string;
+    }> = [];
 
-  // Top skills in demand data
-  const topSkills = [
-    { name: 'Video Editing', count: 12, width: '88%', color: 'bg-violet-600' },
-    { name: 'Motion Graphics', count: 9, width: '70%', color: 'bg-violet-400' },
-    { name: 'Color Grading', count: 7, width: '55%', color: 'bg-violet-300' },
-    { name: 'Reels Editing', count: 6, width: '42%', color: 'bg-violet-200' },
-    { name: 'Thumbnail Design', count: 5, width: '32%', color: 'bg-violet-100' },
-  ];
+    projects.forEach((p) => {
+      p.subtasks.forEach((st) => {
+        if (st.status !== 'Approved') {
+          let days = 3;
+          let label = 'Due in 3d';
+          let isDanger = false;
+
+          if (st.deadline) {
+            const d = new Date(st.deadline);
+            if (!isNaN(d.getTime())) {
+              days = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              isDanger = days <= 1;
+              label = days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Due today' : `${days}d left`;
+            }
+          }
+
+          list.push({
+            id: st.id,
+            title: st.title,
+            client: p.title,
+            projectId: p.id,
+            subtasksCount: p.subtasks.length,
+            daysLeft: label,
+            dueDate: st.deadline ? new Date(st.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Aug 30',
+            status: isDanger ? 'danger' : 'warning',
+            thumbnail: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
+          });
+        }
+      });
+    });
+
+    return list.slice(0, 5);
+  }, [projects]);
+
+  // Top skills count dynamically computed from editors
+  const topSkills = useMemo(() => {
+    const skillCounts: Record<string, number> = {};
+    editors.forEach((e) => {
+      e.skills.forEach((s) => {
+        skillCounts[s] = (skillCounts[s] || 0) + 1;
+      });
+    });
+
+    const entries = Object.entries(skillCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const maxVal = entries[0]?.[1] || 1;
+
+    return entries.map(([name, count], i) => ({
+      name,
+      count,
+      width: `${Math.round((count / maxVal) * 100)}%`,
+      color: i === 0 ? 'bg-violet-600' : i === 1 ? 'bg-violet-500' : i === 2 ? 'bg-violet-400' : 'bg-violet-300',
+    }));
+  }, [editors]);
 
   return (
-    <div className="max-w-[1360px] mx-auto px-4 lg:px-6 py-6 space-y-6">
+    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6">
       {/* Header with Date Range Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Overview of your editor community and projects
+            Real-time overview of your editor community, client projects, and active deliverables
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 shadow-2xs hover:bg-gray-50 transition-colors">
+          <button className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 shadow-2xs hover:bg-gray-50 transition-colors">
             <Calendar className="w-3.5 h-3.5 text-gray-500" />
             <span>{selectedRange}</span>
             <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
@@ -224,13 +174,17 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         </div>
       </div>
 
-      {/* 5 Top Stat Cards Grid (Compact & Sleek) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* 5 Top Stat Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {metrics.map((m, idx) => (
-          <Card key={idx} className="p-3.5 relative bg-white border border-gray-100 rounded-xl shadow-2xs">
+          <Card
+            key={idx}
+            onClick={() => onNavigate(m.route)}
+            className="p-4 relative bg-white border border-gray-100 rounded-2xl shadow-2xs hover:shadow-xs cursor-pointer transition-all"
+          >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-gray-500 truncate pr-4">{m.label}</span>
-              <div className={`w-7 h-7 rounded-lg ${m.bg} flex items-center justify-center shrink-0`}>
+              <span className="text-xs font-semibold text-gray-500 truncate pr-2">{m.label}</span>
+              <div className={`w-8 h-8 rounded-xl ${m.bg} flex items-center justify-center shrink-0`}>
                 {m.icon}
               </div>
             </div>
@@ -238,8 +192,8 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
                 {m.value}
               </h2>
-              <div className="flex items-center gap-1 text-[10.5px]">
-                <span className={`font-bold ${m.trendUp ? 'text-emerald-600' : 'text-red-500'}`}>
+              <div className="flex items-center gap-1 text-[11px]">
+                <span className={`font-bold ${m.trendUp ? 'text-emerald-600' : 'text-amber-500'}`}>
                   {m.trend}
                 </span>
                 <span className="text-gray-400 font-medium hidden xl:inline">{m.subtext}</span>
@@ -252,12 +206,12 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       {/* Middle Grid: Deadlines at risk & Recent activity */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Deadlines at risk (Left) */}
-        <Card className="lg:col-span-7 p-5 bg-white border border-gray-100 rounded-xl shadow-2xs flex flex-col justify-between">
+        <Card className="lg:col-span-7 p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <h3 className="font-bold text-gray-900 text-base">Deadlines at risk</h3>
+                <h3 className="font-bold text-gray-900 text-base">Deadlines at Risk</h3>
               </div>
               <button
                 onClick={() => onNavigate('/admin/projects')}
@@ -267,17 +221,18 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {deadlinesAtRisk.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between gap-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0"
+                  onClick={() => onNavigate(`/admin/projects/${item.projectId}`)}
+                  className="flex items-center justify-between gap-3 p-2.5 rounded-xl hover:bg-gray-50 cursor-pointer border border-transparent hover:border-gray-100 transition-all"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={item.thumbnail}
                       alt={item.title}
-                      className="w-16 h-10 rounded-lg object-cover bg-gray-100 shrink-0 border border-gray-100"
+                      className="w-14 h-10 rounded-lg object-cover bg-gray-100 shrink-0 border border-gray-100"
                     />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -285,7 +240,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                           {item.title}
                         </h4>
                         <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold text-violet-700 bg-violet-50 rounded-full border border-violet-100">
-                          Subtasks: {item.subtasksCount}
+                          {item.subtasksCount} subtasks
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-500 truncate mt-0.5">
@@ -297,65 +252,65 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                   <div className="text-right shrink-0 flex flex-col items-end">
                     <span
                       className={`text-xs font-bold ${
-                        item.status === 'danger' ? 'text-red-500' : 'text-amber-500'
+                        item.status === 'danger' ? 'text-red-600' : 'text-amber-600'
                       }`}
                     >
                       {item.daysLeft}
                     </span>
-                    <span className="text-[10px] text-gray-400">{item.dueDate}</span>
-                    <div className="w-16 bg-gray-100 h-1 rounded-full mt-1.5 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          item.status === 'danger' ? 'bg-red-500' : 'bg-amber-400'
-                        }`}
-                        style={{ width: item.status === 'danger' ? '85%' : '60%' }}
-                      />
-                    </div>
+                    <span className="text-[10px] text-gray-400">Due {item.dueDate}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-gray-100 text-[11px] text-gray-400">
-            Showing 5 of 8 projects
+          <div className="pt-3 mt-3 border-t border-gray-100 text-[11px] text-gray-400 flex items-center justify-between">
+            <span>Showing priority upcoming deadlines</span>
+            <button
+              onClick={() => onNavigate('/admin/projects')}
+              className="font-bold text-violet-600 hover:underline"
+            >
+              Open projects →
+            </button>
           </div>
         </Card>
 
         {/* Recent activity (Right) */}
-        <Card className="lg:col-span-5 p-5 bg-white border border-gray-100 rounded-xl shadow-2xs flex flex-col justify-between">
+        <Card className="lg:col-span-5 p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900 text-base">Recent activity</h3>
-              <button className="text-xs font-semibold text-violet-700 hover:text-violet-800 transition-colors">
-                View all
-              </button>
+              <h3 className="font-bold text-gray-900 text-base">Recent Activity</h3>
+              <span className="text-xs font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">
+                Live Feed
+              </span>
             </div>
 
-            <div className="space-y-3.5">
-              {recentActivities.map((act) => (
-                <div key={act.id} className="flex items-center justify-between text-xs gap-3">
+            <div className="space-y-3">
+              {activity.slice(0, 7).map((act) => (
+                <div key={act.id} className="flex items-center justify-between text-xs gap-3 p-1.5 rounded-lg hover:bg-gray-50">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    {act.type === 'project_created' ? (
-                      <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
-                        <Briefcase className="w-3 h-3 text-white" />
-                      </div>
-                    ) : (
-                      <img
-                        src={act.avatar}
-                        alt={act.user}
-                        className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-200"
-                      />
-                    )}
+                    <div className="w-7 h-7 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                      <Briefcase className="w-3.5 h-3.5" />
+                    </div>
                     <p className="text-gray-800 text-[11.5px] truncate">
-                      <span className="font-semibold text-gray-900">{act.user}</span>{' '}
-                      {act.action}
+                      {act.message}
                     </p>
                   </div>
-                  <span className="text-[10.5px] text-gray-400 shrink-0">{act.time}</span>
+                  <span className="text-[10px] text-gray-400 shrink-0">
+                    {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="pt-3 border-t border-gray-100 text-center">
+            <button
+              onClick={() => onNavigate('/admin/review')}
+              className="text-xs font-bold text-violet-700 hover:text-violet-800 transition-colors"
+            >
+              Review all pending items →
+            </button>
           </div>
         </Card>
       </div>
@@ -363,201 +318,61 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       {/* Bottom Analytics 3-Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Editors by status */}
-        <Card className="p-5 bg-white border border-gray-100 rounded-xl shadow-2xs flex flex-col justify-between">
+        <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-gray-900 text-sm mb-4">Editors by status</h3>
-            <div className="flex items-center justify-between gap-4 py-2">
-              {/* Donut Chart */}
-              <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                  {/* Segment 1: Verified (Green) - 60% */}
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="14"
-                    fill="none"
-                    stroke="#10B981"
-                    strokeWidth="4"
-                    strokeDasharray="52.7 35.2"
-                    strokeDashoffset="0"
-                  />
-                  {/* Segment 2: Pending (Orange) - 33% */}
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="14"
-                    fill="none"
-                    stroke="#F59E0B"
-                    strokeWidth="4"
-                    strokeDasharray="29.0 58.9"
-                    strokeDashoffset="-52.7"
-                  />
-                  {/* Segment 3: Active (Purple) - 93% */}
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="14"
-                    fill="none"
-                    stroke="#8B5CF6"
-                    strokeWidth="4"
-                    strokeDasharray="81.8 6.1"
-                    strokeDashoffset="-81.7"
-                  />
-                  {/* Segment 4: Inactive (Red) - 7% */}
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="14"
-                    fill="none"
-                    stroke="#EF4444"
-                    strokeWidth="4"
-                    strokeDasharray="6.1 81.8"
-                    strokeDashoffset="-163.5"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-extrabold text-gray-900 leading-none">15</span>
-                  <span className="text-[10px] text-gray-400 font-medium mt-0.5">Total</span>
+            <h3 className="font-bold text-gray-900 text-sm mb-4">Editors by Verification</h3>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-gray-700 font-medium">Verified Editors</span>
                 </div>
+                <span className="font-bold text-gray-900">{verifiedEditors} ({Math.round((verifiedEditors / totalEditors) * 100)}%)</span>
               </div>
 
-              {/* Legend List */}
-              <div className="space-y-2.5 text-xs flex-1 pl-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-gray-600">Verified</span>
-                  </div>
-                  <span className="font-semibold text-gray-900">9 (60%)</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  <span className="text-gray-700 font-medium">Pending Verification</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500" />
-                    <span className="text-gray-600">Pending</span>
-                  </div>
-                  <span className="font-semibold text-gray-900">5 (33%)</span>
+                <span className="font-bold text-gray-900">{pendingEditors} ({Math.round((pendingEditors / totalEditors) * 100)}%)</span>
+              </div>
+
+              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-violet-600" />
+                  <span className="text-gray-700 font-medium">Active Accounts</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-violet-600" />
-                    <span className="text-gray-600">Active</span>
-                  </div>
-                  <span className="font-semibold text-gray-900">14 (93%)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500" />
-                    <span className="text-gray-600">Inactive</span>
-                  </div>
-                  <span className="font-semibold text-gray-900">1 (7%)</span>
-                </div>
+                <span className="font-bold text-gray-900">{activeEditors} ({Math.round((activeEditors / totalEditors) * 100)}%)</span>
               </div>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigate('/admin/reports')}
-            className="text-xs font-semibold text-violet-700 hover:text-violet-800 transition-colors flex items-center gap-1 pt-4"
+            onClick={() => onNavigate('/admin/editors')}
+            className="text-xs font-bold text-violet-700 hover:underline pt-4 flex items-center gap-1"
           >
-            View full report <ArrowRight className="w-3 h-3" />
+            Manage all editors <ArrowRight className="w-3 h-3" />
           </button>
         </Card>
 
-        {/* Card 2: New editors (last 7 days) */}
-        <Card className="p-5 bg-white border border-gray-100 rounded-xl shadow-2xs flex flex-col justify-between">
+        {/* Card 2: Top Skills in Demand */}
+        <Card className="p-5 bg-white border border-gray-100 rounded-2xl shadow-2xs flex flex-col justify-between md:col-span-2">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900 text-sm">New editors (last 7 days)</h3>
-              <span className="px-2 py-0.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 rounded-full">
-                ↑ 40% vs last 7 days
-              </span>
-            </div>
-
-            {/* Smooth SVG Area Line Chart */}
-            <div className="relative w-full h-36">
-              <svg className="w-full h-full overflow-visible" viewBox="0 0 280 100" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-
-                {/* Y Axis Grid Lines */}
-                <line x1="20" y1="10" x2="275" y2="10" stroke="#F3F4F6" strokeWidth="1" />
-                <line x1="20" y1="35" x2="275" y2="35" stroke="#F3F4F6" strokeWidth="1" />
-                <line x1="20" y1="60" x2="275" y2="60" stroke="#F3F4F6" strokeWidth="1" />
-                <line x1="20" y1="85" x2="275" y2="85" stroke="#F3F4F6" strokeWidth="1" />
-
-                {/* Y Axis Labels */}
-                <text x="5" y="14" fill="#9CA3AF" fontSize="8">6</text>
-                <text x="5" y="39" fill="#9CA3AF" fontSize="8">4</text>
-                <text x="5" y="64" fill="#9CA3AF" fontSize="8">2</text>
-                <text x="5" y="89" fill="#9CA3AF" fontSize="8">0</text>
-
-                {/* Gradient Area Fill */}
-                <path
-                  d="M 20,68 Q 60,40 90,55 T 160,25 T 220,50 T 275,20 L 275,85 L 20,85 Z"
-                  fill="url(#purpleGradient)"
-                />
-
-                {/* Smooth Curve Stroke */}
-                <path
-                  d="M 20,68 Q 60,40 90,55 T 160,25 T 220,50 T 275,20"
-                  fill="none"
-                  stroke="#8B5CF6"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-
-                {/* Data Points */}
-                <circle cx="20" cy="68" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="62" cy="48" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="104" cy="55" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="146" cy="28" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="188" cy="40" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="230" cy="24" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="275" cy="20" r="3" fill="#8B5CF6" stroke="#FFFFFF" strokeWidth="1.5" />
-              </svg>
-
-              {/* X Axis Labels */}
-              <div className="flex justify-between pl-5 text-[9px] text-gray-400 mt-1">
-                <span>May 12</span>
-                <span>May 13</span>
-                <span>May 14</span>
-                <span>May 15</span>
-                <span>May 16</span>
-                <span>May 17</span>
-                <span>May 18</span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={() => onNavigate('/admin/reports')}
-            className="text-xs font-semibold text-violet-700 hover:text-violet-800 transition-colors flex items-center gap-1 pt-4"
-          >
-            View full report <ArrowRight className="w-3 h-3" />
-          </button>
-        </Card>
-
-        {/* Card 3: Top skills in demand */}
-        <Card className="p-5 bg-white border border-gray-100 rounded-xl shadow-2xs flex flex-col justify-between">
-          <div>
-            <h3 className="font-bold text-gray-900 text-sm mb-4">Top skills in demand</h3>
+            <h3 className="font-bold text-gray-900 text-sm mb-4">Top Skills in Community</h3>
 
             <div className="space-y-3">
               {topSkills.map((skill, idx) => (
                 <div key={idx} className="flex items-center justify-between text-xs gap-3">
-                  <span className="text-gray-600 text-[11px] w-28 shrink-0">{skill.name}</span>
-                  <div className="flex-1 bg-gray-50 h-2 rounded-full overflow-hidden">
+                  <span className="text-gray-700 font-medium text-[11.5px] w-36 shrink-0">{skill.name}</span>
+                  <div className="flex-1 bg-gray-100 h-2.5 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${skill.color}`}
                       style={{ width: skill.width }}
                     />
                   </div>
-                  <span className="font-bold text-gray-900 text-[11px] w-4 text-right">
-                    {skill.count}
+                  <span className="font-bold text-gray-900 text-[11.5px] w-8 text-right">
+                    {skill.count} eds
                   </span>
                 </div>
               ))}
@@ -566,13 +381,12 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
 
           <button
             onClick={() => onNavigate('/admin/reports')}
-            className="text-xs font-semibold text-violet-700 hover:text-violet-800 transition-colors flex items-center gap-1 pt-4"
+            className="text-xs font-bold text-violet-700 hover:underline pt-4 flex items-center gap-1"
           >
-            View full report <ArrowRight className="w-3 h-3" />
+            View detailed skill reports <ArrowRight className="w-3 h-3" />
           </button>
         </Card>
       </div>
     </div>
   );
 }
-

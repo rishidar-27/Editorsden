@@ -10,6 +10,7 @@ import { EditorProfile } from '@/screens/EditorProfile';
 import { EditorPortfolio } from '@/screens/EditorPortfolio';
 import { EditorVerification } from '@/screens/EditorVerification';
 import { EditorProjects } from '@/screens/EditorProjects';
+import { EditorStorageManager } from '@/screens/EditorStorageManager';
 import { AdminDashboard } from '@/screens/AdminDashboard';
 import { EditorManagement } from '@/screens/EditorManagement';
 import { EditorDetail } from '@/screens/EditorDetail';
@@ -22,9 +23,10 @@ import { Reports } from '@/screens/Reports';
 
 const editorNavItems = [
   { label: 'Dashboard', route: '/editor/dashboard' },
-  { label: 'My Profile', route: '/editor/profile' },
-  { label: 'Portfolio', route: '/editor/portfolio' },
   { label: 'My Projects', route: '/editor/projects' },
+  { label: 'Storage & Assets', route: '/editor/storage' },
+  { label: 'Portfolio', route: '/editor/portfolio' },
+  { label: 'My Profile', route: '/editor/profile' },
   { label: 'Verification', route: '/editor/verification' },
 ];
 
@@ -57,7 +59,7 @@ function Router() {
   }, []);
 
   // Public routes
-  if (route === '/' || route === '') {
+  if (route === '/' || route === '' || route === '/onboarding') {
     return (
       <>
         <LandingPage onNavigate={navigate} />
@@ -77,7 +79,7 @@ function Router() {
 
   // Public portfolio
   const editorMatch = route.match(/^\/editor\/([^/]+)$/);
-  if (editorMatch && !['dashboard', 'profile', 'portfolio', 'verification', 'projects'].includes(editorMatch[1])) {
+  if (editorMatch && !['dashboard', 'profile', 'portfolio', 'verification', 'projects', 'storage'].includes(editorMatch[1])) {
     return (
       <>
         <PublicPortfolioPage editorId={editorMatch[1]} onNavigate={navigate} />
@@ -124,7 +126,7 @@ function Router() {
     if (content === null) content = <AdminDashboard onNavigate={navigate} />;
 
     return (
-      <div className="min-h-screen bg-surface-50">
+      <div className="min-h-screen bg-[#f4f6fb]">
         <TopNav items={navItems} currentRoute={route} onNavigate={navigate} showSearch showNotifications />
         <div className="pt-16">
           {content}
@@ -141,10 +143,11 @@ function Router() {
   else if (route === '/editor/portfolio') content = <EditorPortfolio />;
   else if (route === '/editor/verification') content = <EditorVerification />;
   else if (route === '/editor/projects') content = <EditorProjects />;
+  else if (route === '/editor/storage') content = <EditorStorageManager />;
   else content = <EditorDashboard onNavigate={navigate} />;
 
   return (
-    <div className="min-h-screen bg-surface-50">
+    <div className="min-h-screen bg-[#f4f6fb]">
       <TopNav items={navItems} currentRoute={route} onNavigate={navigate} showNotifications />
       <div className="pt-16">
         {content}

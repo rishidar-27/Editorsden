@@ -153,6 +153,7 @@ export const initialProjects = [
     title: 'Aurora Skincare — Q4 Launch Campaign',
     clientName: 'Aurora Cosmetics Inc.',
     description: 'Full video asset production for nationwide skincare launch across Instagram, TikTok, and YouTube.',
+    createdAt: '2026-08-10T10:00:00Z',
     status: 'In Progress',
     subtasks: [
       {
@@ -160,7 +161,7 @@ export const initialProjects = [
         title: 'Hero Brand Film (60s)',
         taskType: 'Commercial Ads',
         assignedEditorIds: ['e1', 'e2'],
-        deadline: '2025-05-19T23:59:59Z',
+        deadline: '2026-08-30T23:59:59Z',
         status: 'In Progress'
       },
       {
@@ -168,7 +169,7 @@ export const initialProjects = [
         title: 'Instagram Reel Series (5x)',
         taskType: 'Reels Editing',
         assignedEditorIds: ['e2'],
-        deadline: '2025-05-20T23:59:59Z',
+        deadline: '2026-08-29T23:59:59Z',
         status: 'Ready for Review',
         deliverableLink: 'https://drive.google.com/aurora-reels'
       },
@@ -177,7 +178,7 @@ export const initialProjects = [
         title: 'Product Tutorial Videos (3x)',
         taskType: 'YouTube Editing',
         assignedEditorIds: ['e1'],
-        deadline: '2025-05-25T23:59:59Z',
+        deadline: '2026-09-05T23:59:59Z',
         status: 'Assigned'
       },
       {
@@ -185,7 +186,7 @@ export const initialProjects = [
         title: 'Thumbnail Design Package',
         taskType: 'Thumbnail Design',
         assignedEditorIds: ['e3'],
-        deadline: '2025-05-20T23:59:59Z',
+        deadline: '2026-08-29T23:59:59Z',
         status: 'Ready for Review',
         deliverableLink: 'https://drive.google.com/aurora-thumbs'
       }
@@ -196,6 +197,7 @@ export const initialProjects = [
     title: 'TechFlow SaaS — Product Demo Series',
     clientName: 'TechFlow Inc.',
     description: 'SaaS product demo video series highlighting automated workflow features.',
+    createdAt: '2026-08-14T09:00:00Z',
     status: 'In Progress',
     subtasks: [
       {
@@ -203,7 +205,7 @@ export const initialProjects = [
         title: 'Motion Graphics Intro Package',
         taskType: 'Motion Graphics',
         assignedEditorIds: ['e1'],
-        deadline: '2025-05-21T23:59:59Z',
+        deadline: '2026-09-01T23:59:59Z',
         status: 'In Progress'
       },
       {
@@ -211,7 +213,7 @@ export const initialProjects = [
         title: 'Feature Walkthrough Video',
         taskType: 'YouTube Editing',
         assignedEditorIds: ['e3'],
-        deadline: '2025-05-22T23:59:59Z',
+        deadline: '2026-09-03T23:59:59Z',
         status: 'In Progress'
       },
       {
@@ -219,7 +221,7 @@ export const initialProjects = [
         title: 'Social Teasers (4x)',
         taskType: 'Reels Editing',
         assignedEditorIds: ['e2'],
-        deadline: '2025-05-21T23:59:59Z',
+        deadline: '2026-08-30T23:59:59Z',
         status: 'Ready for Review',
         deliverableLink: 'https://drive.google.com/techflow-teasers'
       }

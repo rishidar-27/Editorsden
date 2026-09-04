@@ -47,7 +47,7 @@ export interface PortfolioItem {
 export interface Editor {
   id: string;
   email: string;
-  password: string;
+  password?: string;
   fullName: string;
   phone: string;
   city: string;
@@ -78,6 +78,36 @@ export interface Editor {
   timeZone?: string;
   verifiedDate?: string;
   verifiedBy?: string;
+  storageUsedBytes?: number;
+  storageLimitBytes?: number;
+  storageTier?: 'Free' | 'Pro_50GB' | 'Studio_200GB';
+}
+
+export interface EditorAsset {
+  id: string;
+  editorId: string;
+  subtaskId?: string;
+  fileName: string;
+  fileSizeBytes: number;
+  mimeType: string;
+  r2Key: string;
+  publicUrl: string;
+  createdAt: string;
+}
+
+export interface DeliverableSubmission {
+  id: string;
+  version: number;
+  fileName: string;
+  fileSizeBytes: number;
+  fileUrl: string;
+  mimeType?: string;
+  notes?: string;
+  submittedAt: string;
+  submittedByEditorId: string;
+  status?: 'In Review' | 'Approved' | 'Sent Back';
+  feedback?: string;
+  feedbackGivenAt?: string;
 }
 
 export interface Subtask {
@@ -90,6 +120,7 @@ export interface Subtask {
   status: ProjectStatus;
   deliverableLink?: string;
   feedback?: string;
+  deliverablesQueue?: DeliverableSubmission[];
 }
 
 export interface Project {
