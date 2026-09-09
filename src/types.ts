@@ -81,6 +81,12 @@ export interface Editor {
   storageUsedBytes?: number;
   storageLimitBytes?: number;
   storageTier?: 'Free' | 'Pro_50GB' | 'Studio_200GB';
+  hourlyRate?: string;
+  rating?: number | string;
+  reviewsCount?: number;
+  completedProjects?: number;
+  hardware?: string;
+  turnaround?: string;
 }
 
 export interface EditorAsset {
@@ -121,6 +127,8 @@ export interface Subtask {
   deliverableLink?: string;
   feedback?: string;
   deliverablesQueue?: DeliverableSubmission[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Project {

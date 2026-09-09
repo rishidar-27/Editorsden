@@ -293,12 +293,19 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-xs text-gray-700">
-              {filtered.map((e) => (
-                <tr
-                  key={e.id}
-                  onClick={() => onNavigate(`/admin/editor/${e.id}`)}
-                  className="hover:bg-gray-50/70 transition-colors group cursor-pointer"
-                >
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-gray-400">
+                    No creators registered yet. When editors sign up via Supabase, they will appear here.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((e) => (
+                  <tr
+                    key={e.id}
+                    onClick={() => onNavigate(`/admin/editor/${e.id}`)}
+                    className="hover:bg-gray-50/70 transition-colors group cursor-pointer"
+                  >
                   {/* Checkbox */}
                   <td className="py-3.5 px-4" onClick={(ev) => ev.stopPropagation()}>
                     <Checkbox
@@ -413,8 +420,9 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                     />
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              ))
+            )}
+          </tbody>
           </table>
         </div>
       </Card>

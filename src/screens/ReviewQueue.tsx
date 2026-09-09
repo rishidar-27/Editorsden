@@ -90,82 +90,11 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
             thumbnail = 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800';
           }
 
-          let submittedDateLabel = 'Sep 6, 2026';
-          let submittedTimeLabel = '10:24 AM';
-          let commentsCount = 0;
-
-          // Default mock queue if none attached yet
+          let submittedDateLabel = new Date(st.updatedAt || st.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          let submittedTimeLabel = new Date(st.updatedAt || st.createdAt || Date.now()).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
           let defaultQueue = st.deliverablesQueue && st.deliverablesQueue.length > 0 ? st.deliverablesQueue : [];
+          let commentsCount = defaultQueue.reduce((acc, d) => acc + (d.feedback ? 1 : 0), st.feedback ? 1 : 0);
           let subtaskFeedback = st.feedback;
-
-          if (defaultQueue.length === 0) {
-            if (st.title.includes('Reel')) {
-              submittedDateLabel = 'Sep 6, 2026';
-              submittedTimeLabel = '10:24 AM';
-              commentsCount = 2;
-              subtaskFeedback = subtaskFeedback || 'Please adjust color grade on scene 2 to be warmer and lower the background music by -3dB during the voiceover.';
-              defaultQueue = [
-                {
-                  id: `del-${st.id}-2`,
-                  version: 2,
-                  fileName: `${st.title.replace(/\s+/g, '_')}_v2_final_cut.mp4`,
-                  fileSizeBytes: 154800000, // ~148 MB
-                  fileUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                  notes: 'Updated color grading on scene 2 and adjusted the background audio sync for the intro hook as requested!',
-                  submittedAt: '2026-09-06T10:24:00Z',
-                  submittedByEditorId: editor?.id || 'e1',
-                  status: 'In Review',
-                },
-                {
-                  id: `del-${st.id}-1`,
-                  version: 1,
-                  fileName: `${st.title.replace(/\s+/g, '_')}_v1_rough.mp4`,
-                  fileSizeBytes: 142000000,
-                  fileUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                  notes: 'Initial assembly cut with beat sync transitions.',
-                  submittedAt: '2026-09-04T15:30:00Z',
-                  submittedByEditorId: editor?.id || 'e1',
-                  status: 'Sent Back',
-                  feedback: 'Please adjust color grade on scene 2 to be warmer to match our brand palette, and please lower the background music by -3dB during the voiceover.',
-                  feedbackGivenAt: '2026-09-05T14:10:00Z',
-                },
-              ];
-            } else if (st.title.includes('Thumbnail')) {
-              submittedDateLabel = 'Sep 5, 2026';
-              submittedTimeLabel = '4:15 PM';
-              commentsCount = 2;
-              defaultQueue = [
-                {
-                  id: `del-${st.id}-1`,
-                  version: 1,
-                  fileName: `${st.title.replace(/\s+/g, '_')}_Design_Package.psd`,
-                  fileSizeBytes: 52400000, // ~50 MB
-                  fileUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200',
-                  notes: 'Includes 3 high-CTR cover variants with bold glowing typography and transparent cutouts.',
-                  submittedAt: '2026-09-05T16:15:00Z',
-                  submittedByEditorId: editor?.id || 'e2',
-                  status: 'In Review',
-                },
-              ];
-            } else {
-              submittedDateLabel = 'Sep 5, 2026';
-              submittedTimeLabel = '2:32 PM';
-              commentsCount = 1;
-              defaultQueue = [
-                {
-                  id: `del-${st.id}-1`,
-                  version: 1,
-                  fileName: `${st.title.replace(/\s+/g, '_')}_Master_Export.mp4`,
-                  fileSizeBytes: 325000000, // ~310 MB
-                  fileUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                  notes: 'Exported in ProRes 422 4K with dynamic kinetic motion titles and sound effects layered.',
-                  submittedAt: '2026-09-05T14:32:00Z',
-                  submittedByEditorId: editor?.id || 'e1',
-                  status: 'In Review',
-                },
-              ];
-            }
-          }
 
           const currentSubtask = {
             ...st,

@@ -411,7 +411,7 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
               <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Production Terms</span>
                 <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded">
-                  ESCROW PROTECTED
+                  SATISFACTION GUARANTEED
                 </span>
               </div>
 
@@ -702,7 +702,7 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
             </div>
           </div>
 
-          {/* Turnaround SLAs & Escrow Guarantees */}
+          {/* Turnaround SLAs & Quality Guarantees */}
           <div className="md:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/90 shadow-sm space-y-5">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
@@ -723,7 +723,7 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Milestone Payment Protection</span>
-                <span className="font-bold text-gray-900">Locked Escrow until Final Approval</span>
+                <span className="font-bold text-gray-900">Protected until Final Approval</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Deliverable Format</span>

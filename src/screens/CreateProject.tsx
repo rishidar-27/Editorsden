@@ -161,7 +161,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
             Create Campaign Project
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Configure campaign deliverables, automated Cloudflare R2 buckets, escrow locks, and editor deadlines
+            Configure campaign deliverables, automated Cloudflare R2 buckets, and editor deadlines
           </p>
         </div>
       </div>
@@ -245,16 +245,16 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
           </div>
         </div>
 
-        {/* Escrow & Storage Tier Details */}
+        {/* Budget & Storage Tier Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                 <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                Target Escrow Allocation
+                Target Budget Allocation
               </label>
               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                100% Guaranteed
+                100% Allocated
               </span>
             </div>
             <input
@@ -263,7 +263,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
               onChange={(e) => setBudgetEstimate(Number(e.target.value))}
               className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-bold text-gray-900"
             />
-            <p className="text-[10.5px] text-gray-400">Funds locked safely in escrow until final client approval.</p>
+            <p className="text-[10.5px] text-gray-400">Total project budget allocation for deliverables.</p>
           </div>
 
           <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">

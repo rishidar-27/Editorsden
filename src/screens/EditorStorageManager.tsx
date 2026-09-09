@@ -29,65 +29,6 @@ import {
 } from 'lucide-react';
 import type { EditorAsset } from '@/types';
 
-// Default enriched mock assets for Marcus / demo preview
-const demoMockAssets: EditorAsset[] = [
-  {
-    id: 'asset-demo-1',
-    editorId: 'e1',
-    subtaskId: 'st-1',
-    fileName: 'Aurora_Hero_Commercial_4K_FinalCut_v3.mp4',
-    fileSizeBytes: 320000000, // 320 MB
-    mimeType: 'video/mp4',
-    r2Key: 'editors/e1/subtasks/st-1/Aurora_Hero_Commercial_4K_FinalCut_v3.mp4',
-    publicUrl: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-    createdAt: '2026-08-25T14:30:00Z',
-  },
-  {
-    id: 'asset-demo-2',
-    editorId: 'e1',
-    subtaskId: 'st-2',
-    fileName: 'Instagram_Reels_Cutdown_Pack_5x_1080p.mp4',
-    fileSizeBytes: 185000000, // 185 MB
-    mimeType: 'video/mp4',
-    r2Key: 'editors/e1/subtasks/st-2/Instagram_Reels_Cutdown_Pack_5x_1080p.mp4',
-    publicUrl: 'https://images.unsplash.com/photo-1608248597263-0057e43a4524?w=800',
-    createdAt: '2026-08-24T11:15:00Z',
-  },
-  {
-    id: 'asset-demo-3',
-    editorId: 'e1',
-    subtaskId: 'st-3',
-    fileName: 'TechFlow_Motion_Graphics_Package_ProRes.mov',
-    fileSizeBytes: 125000000, // 125 MB
-    mimeType: 'video/quicktime',
-    r2Key: 'editors/e1/subtasks/st-3/TechFlow_Motion_Graphics_Package_ProRes.mov',
-    publicUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800',
-    createdAt: '2026-08-22T09:40:00Z',
-  },
-  {
-    id: 'asset-demo-4',
-    editorId: 'e1',
-    subtaskId: 'st-4',
-    fileName: 'Aurora_Draft_Rough_Cut_WorkInProgress.mp4',
-    fileSizeBytes: 85000000, // 85 MB
-    mimeType: 'video/mp4',
-    r2Key: 'editors/e1/subtasks/st-4/Aurora_Draft_Rough_Cut_WorkInProgress.mp4',
-    publicUrl: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800',
-    createdAt: '2026-08-15T18:20:00Z',
-  },
-  {
-    id: 'asset-demo-5',
-    editorId: 'e1',
-    subtaskId: 'st-5',
-    fileName: 'YouTube_Podcast_Episode_Teaser_AudioVisualizer.mp4',
-    fileSizeBytes: 42000000, // 42 MB
-    mimeType: 'video/mp4',
-    r2Key: 'editors/e1/subtasks/st-5/YouTube_Podcast_Episode_Teaser_AudioVisualizer.mp4',
-    publicUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800',
-    createdAt: '2026-08-12T16:00:00Z',
-  },
-];
-
 export function EditorStorageManager() {
   const { getCurrentEditor, assets, getEditorStorageStats, deleteEditorAssets, addEditorAsset, upgradeStorageTier, addToast } = useApp();
   const editor = getCurrentEditor();
@@ -103,7 +44,7 @@ export function EditorStorageManager() {
 
   const editorId = editor?.id || 'e1';
   const rawAssets = assets.filter((a) => a.editorId === editorId);
-  const displayAssetsList = rawAssets.length > 0 ? rawAssets : demoMockAssets;
+  const displayAssetsList = rawAssets;
 
   const storageStats = getEditorStorageStats(editorId);
   const calculatedUsedBytes = displayAssetsList.reduce((sum, a) => sum + a.fileSizeBytes, 0);

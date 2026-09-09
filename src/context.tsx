@@ -8,8 +8,13 @@ import {
   createProjectRecord,
   updateSubtaskRecord,
   deleteAssetsFromStorage,
+  fetchEditorAssets,
+  addDeliverableSubmissionRecord,
+  subscribeToDatabaseChanges,
   signInWithEmail,
+  signUpWithEmail,
   signOutUser,
+  isSupabaseConfigured,
 } from './lib/supabase';
 
 export interface Toast {
@@ -107,10 +112,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
-  const [editors, setEditors] = useState<Editor[]>(initialEditors);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
-  const [activity, setActivity] = useState<ActivityEvent[]>(initialActivity);
-  const [assets, setAssets] = useState<EditorAsset[]>(initialAssets);
+  const [editors, setEditors] = useState<Editor[]>(() => isSupabaseConfigured() ? [] : initialEditors);
+  const [projects, setProjects] = useState<Project[]>(() => isSupabaseConfigured() ? [] : initialProjects);
+  const [activity, setActivity] = useState<ActivityEvent[]>(() => isSupabaseConfigured() ? [] : initialActivity);
+  const [assets, setAssets] = useState<EditorAsset[]>(() => isSupabaseConfigured() ? [] : initialAssets);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     try {
@@ -148,7 +153,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [user]);
 
-  // Fetch real data from backend/database
+  // Fetch real data from Supabase / Backend with Realtime Sync
   useEffect(() => {
     async function loadRealData() {
       try {
@@ -156,13 +161,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
           fetchAllEditors(),
           fetchAllProjects(),
         ]);
-        if (liveEditors && liveEditors.length > 0) setEditors(liveEditors);
-        if (liveProjects && liveProjects.length > 0) setProjects(liveProjects);
-      } catch {}
+        if (isSupabaseConfigured()) {
+          setEditors(liveEditors || []);
+          setProjects(liveProjects || []);
+        } else {
+          if (liveEditors && liveEditors.length > 0) setEditors(liveEditors);
+          if (liveProjects && liveProjects.length > 0) setProjects(liveProjects);
+        }
+      } catch (err) {
+        console.warn('Real data load notice:', err);
+      }
     }
 
     loadRealData();
+
+    // Subscribe to live Realtime database broadcasts
+    const unsubscribe = subscribeToDatabaseChanges(() => {
+      loadRealData();
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
+  // Fetch live storage assets when editor is active
+  useEffect(() => {
+    if (user?.type === 'editor' && user.editorId) {
+      fetchEditorAssets(user.editorId).then((liveAssets) => {
+        if (liveAssets && liveAssets.length > 0) {
+          setAssets(liveAssets);
+        }
+      }).catch(() => null);
+    }
+  }, [user]);
 
   const addToast = useCallback((message: string, variant: Toast['variant'] = 'info') => {
     const id = `t-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
@@ -180,6 +212,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const email = emailInput.trim().toLowerCase();
     const password = passwordInput.trim();
 
+    // 1. FIXED DEMO CREDENTIALS FOR ADMIN (Instant bypass)
     if (
       email === adminCredentials.email.toLowerCase() &&
       (password === adminCredentials.password || password === 'admin123' || password === 'admin')
@@ -188,10 +221,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return { success: true, userType: 'admin' };
     }
 
-    try {
-      await signInWithEmail(email, password);
-    } catch {}
+    // 2. SUPABASE AUTH FOR EDITORS
+    if (isSupabaseConfigured()) {
+      try {
+        const authRes = await signInWithEmail(email, password);
+        if (authRes?.user) {
+          setUser({ type: 'editor', editorId: authRes.user.id });
+          return { success: true, userType: 'editor' };
+        }
+      } catch (authErr: any) {
+        return { success: false, error: authErr.message || 'Invalid email or password' };
+      }
+    }
 
+    // Fallback for local testing
     const editor = editors.find((e) => {
       const matchEmail = e.email.trim().toLowerCase() === email ||
         (email === 'marcus.chen@example.com' && e.id === 'e1');
@@ -204,19 +247,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setEditors((prev) => prev.map((e) => e.id === editor.id ? { ...e, lastLogin: new Date().toISOString() } : e));
       return { success: true, userType: 'editor' };
     }
+
     return { success: false, error: 'Invalid email or password' };
   }, [editors]);
 
   const register = useCallback(async (emailInput: string, passwordInput: string): Promise<{ success: boolean; error?: string }> => {
     const email = emailInput.trim().toLowerCase();
     const password = passwordInput.trim();
+    const displayName = email.split('@')[0] || 'New Editor';
+
+    // SUPABASE AUTH REGISTRATION FOR EDITORS
+    if (isSupabaseConfigured()) {
+      try {
+        const authRes = await signUpWithEmail(email, password, displayName, 'editor');
+        if (authRes?.user) {
+          setUser({ type: 'editor', editorId: authRes.user.id });
+          return { success: true };
+        }
+      } catch (authErr: any) {
+        return { success: false, error: authErr.message || 'Could not register user with Supabase' };
+      }
+    }
+
+    // Fallback for local testing
     const exists = editors.some((e) => e.email.trim().toLowerCase() === email);
     if (exists) return { success: false, error: 'An account with this email already exists' };
+
     const newEditor: Editor = {
       id: `e${Date.now()}`,
       email,
       password,
-      fullName: email.split('@')[0] || 'New Editor',
+      fullName: displayName,
       phone: '',
       city: '',
       experience: 0,
@@ -237,15 +298,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       storageLimitBytes: 1073741824,
       storageTier: 'Free',
     };
+
     setEditors((prev) => [...prev, newEditor]);
     setUser({ type: 'editor', editorId: newEditor.id });
-
-    // Sync to backend
-    fetch('http://localhost:5000/api/editors', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newEditor),
-    }).catch(() => null);
 
     return { success: true };
   }, [editors]);
@@ -320,6 +375,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } : p));
 
     updateSubtaskRecord(projectId, subtaskId, updates).catch(() => null);
+
+    if (updates.deliverablesQueue && updates.deliverablesQueue.length > 0) {
+      addDeliverableSubmissionRecord(subtaskId, updates.deliverablesQueue[0]).catch(() => null);
+    }
 
     if (updates.status === 'Ready for Review') {
       const project = projects.find((p) => p.id === projectId);

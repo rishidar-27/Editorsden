@@ -90,16 +90,6 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       bg: 'bg-gray-100',
       route: '/admin/projects',
     },
-    {
-      label: 'Active Escrow',
-      value: '$24,850',
-      trend: '100% secured',
-      trendUp: true,
-      subtext: 'R2 zero-egress',
-      icon: <DollarSign className="w-5 h-5 text-emerald-600" />,
-      bg: 'bg-emerald-100/70',
-      route: '/admin/projects',
-    },
   ];
 
   const now = new Date();
@@ -184,7 +174,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             </span>
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Real-time telemetry of creator capacity, client deliverables, Cloudflare R2 assets, and active escrow.
+            Real-time telemetry of creator capacity, client deliverables, and Cloudflare R2 assets.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -204,8 +194,8 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         </div>
       </div>
 
-      {/* 5 Top Stat Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      {/* 4 Top Stat Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {metrics.map((m, idx) => (
           <Card
             key={idx}
@@ -289,45 +279,51 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             </div>
 
             <div className="space-y-2.5">
-              {deadlinesAtRisk.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => onNavigate(`/admin/projects/${item.projectId}`)}
-                  className="flex items-center justify-between gap-3 p-2.5 rounded-xl hover:bg-gray-50 cursor-pointer border border-transparent hover:border-gray-100 transition-all"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={item.thumbnail}
-                      alt={item.title}
-                      className="w-14 h-10 rounded-lg object-cover bg-gray-100 shrink-0 border border-gray-100"
-                    />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-bold text-gray-900 truncate">
-                          {item.title}
-                        </h4>
-                        <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold text-gray-800 bg-gray-100 rounded-full border border-gray-200">
-                          {item.subtasksCount} subtasks
-                        </span>
+              {deadlinesAtRisk.length === 0 ? (
+                <div className="py-8 text-center text-xs text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                  No active deadlines at risk. All projects are on schedule.
+                </div>
+              ) : (
+                deadlinesAtRisk.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => onNavigate(`/admin/projects/${item.projectId}`)}
+                    className="flex items-center justify-between gap-3 p-2.5 rounded-xl hover:bg-gray-50 cursor-pointer border border-transparent hover:border-gray-100 transition-all"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title}
+                        className="w-14 h-10 rounded-lg object-cover bg-gray-100 shrink-0 border border-gray-100"
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs font-bold text-gray-900 truncate">
+                            {item.title}
+                          </h4>
+                          <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold text-gray-800 bg-gray-100 rounded-full border border-gray-200">
+                            {item.subtasksCount} subtasks
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                          {item.client}
+                        </p>
                       </div>
-                      <p className="text-[11px] text-gray-500 truncate mt-0.5">
-                        {item.client}
-                      </p>
+                    </div>
+
+                    <div className="text-right shrink-0 flex flex-col items-end">
+                      <span
+                        className={`text-xs font-bold ${
+                          item.status === 'danger' ? 'text-red-600' : 'text-amber-600'
+                        }`}
+                      >
+                        {item.daysLeft}
+                      </span>
+                      <span className="text-[10px] text-gray-400">Due {item.dueDate}</span>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0 flex flex-col items-end">
-                    <span
-                      className={`text-xs font-bold ${
-                        item.status === 'danger' ? 'text-red-600' : 'text-amber-600'
-                      }`}
-                    >
-                      {item.daysLeft}
-                    </span>
-                    <span className="text-[10px] text-gray-400">Due {item.dueDate}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -356,23 +352,29 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
             </div>
 
             <div className="space-y-3">
-              {activity.slice(0, 6).map((act) => (
-                <div key={act.id} className="flex items-start justify-between text-xs gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start gap-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center shrink-0 mt-0.5">
-                      <Briefcase className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-gray-800 text-[11.5px] font-medium leading-snug line-clamp-2">
-                        {act.message}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-gray-400 shrink-0 mt-0.5 whitespace-nowrap">
-                    {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+              {activity.length === 0 ? (
+                <div className="py-8 text-center text-xs text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                  No recent activity. Live system events will appear here in real time.
                 </div>
-              ))}
+              ) : (
+                activity.slice(0, 6).map((act) => (
+                  <div key={act.id} className="flex items-start justify-between text-xs gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center shrink-0 mt-0.5">
+                        <Briefcase className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-800 text-[11.5px] font-medium leading-snug line-clamp-2">
+                          {act.message}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-400 shrink-0 mt-0.5 whitespace-nowrap">
+                      {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

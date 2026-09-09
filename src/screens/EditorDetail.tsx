@@ -212,7 +212,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       status: 'Ready for Review',
       due: 'May 20, 2025 (18h remaining)',
       progress: 90,
-      escrowBudget: '$1,200',
+      allocatedBudget: '$1,200',
       statusColor: 'bg-amber-100 text-amber-900 border-amber-200',
     },
     {
@@ -222,7 +222,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       status: 'In Production',
       due: 'May 22, 2025',
       progress: 65,
-      escrowBudget: '$950',
+      allocatedBudget: '$950',
       statusColor: 'bg-gray-100 text-gray-900 border-gray-200',
     },
     {
@@ -232,7 +232,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       status: 'In Production',
       due: 'May 24, 2025',
       progress: 40,
-      escrowBudget: '$750',
+      allocatedBudget: '$750',
       statusColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
     },
   ];
@@ -261,7 +261,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       fileSize: '1.42 GB',
       resolution: '3840x2160 • 24fps',
       codec: 'ProRes 4444 XQ',
-      status: 'Approved & Escrow Released',
+      status: 'Approved & Completed',
       r2Path: 'r2://editor-e1-workspace/cuts/techflow_master_4k_v1.mov',
       reviewPinsCount: 0,
       approved: true,
@@ -337,7 +337,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
       event: 'Milestone "Commercial Ads Brand Master 4K" Approved by Admin ($1,200 Released)',
       timestamp: '1 day ago',
       user: 'Studio Admin',
-      tag: 'Escrow Release',
+      tag: 'Milestone Completed',
       color: 'bg-emerald-600',
     },
     {
@@ -433,7 +433,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                 <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-400 text-black shadow-2xs">
                   TOP 1% SPECIALIST
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Available for Projects
                 </span>
@@ -465,7 +465,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
             <div>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Hourly Rate</span>
               <span className="text-xl font-black text-gray-900 mt-0.5 block">{editor.hourlyRate}</span>
-              <span className="text-[10px] text-emerald-600 font-semibold">Fixed Escrow Eligible</span>
+              <span className="text-[10px] text-emerald-600 font-semibold">Fixed Rate Eligible</span>
             </div>
             <div className="w-px h-10 bg-gray-200" />
             <div>
@@ -714,8 +714,8 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
 
                       <div className="flex items-center gap-4 shrink-0">
                         <div className="text-right">
-                          <span className="text-[10px] text-gray-400 block font-bold">LOCKED ESCROW</span>
-                          <span className="text-sm font-black text-gray-900">{row.escrowBudget}</span>
+                          <span className="text-[10px] text-gray-400 block font-bold">PROJECT BUDGET</span>
+                          <span className="text-sm font-black text-gray-900">{row.allocatedBudget}</span>
                         </div>
                         <button
                           onClick={() => {
@@ -960,7 +960,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div>
                   <h3 className="text-base font-black text-gray-900 uppercase tracking-tight">Active Campaigns & Milestone Subtasks</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Live production milestones, locked escrow funds, and deliverable deadlines.</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Live production milestones, project budgets, and deliverable deadlines.</p>
                 </div>
                 <button
                   onClick={() => onNavigate('/admin/projects')}
@@ -987,8 +987,8 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
 
                       <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <span className="text-[10px] text-gray-400 uppercase font-bold block">Escrow Budget</span>
-                          <span className="text-base font-black text-gray-900">{row.escrowBudget}</span>
+                          <span className="text-[10px] text-gray-400 uppercase font-bold block">Target Budget</span>
+                          <span className="text-base font-black text-gray-900">{row.allocatedBudget}</span>
                         </div>
                         <button
                           onClick={() => {

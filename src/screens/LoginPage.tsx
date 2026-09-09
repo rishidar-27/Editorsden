@@ -396,7 +396,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold text-white text-[11px]">Frame-Accurate Approvals</div>
-                    <div className="text-[10px] text-gray-400 mt-0.5">Timestamped marker reviews with client escrow protection.</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">Timestamped marker reviews with client approval protection.</div>
                   </div>
                 </div>
 
