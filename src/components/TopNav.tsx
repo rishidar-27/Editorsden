@@ -15,6 +15,10 @@ import {
   FileText,
   Clock,
   ArrowRight,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '@/context';
@@ -34,7 +38,7 @@ interface TopNavProps {
 }
 
 export function TopNav({ items, currentRoute, onNavigate, showSearch = false, showNotifications = true }: TopNavProps) {
-  const { user, getCurrentEditor, editors, logout, projects, darkMode, toggleDarkMode } = useApp();
+  const { user, getCurrentEditor, editors, logout, projects, activity, darkMode, toggleDarkMode } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -85,6 +89,27 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     }
   });
 
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'deadline':
+        return <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />;
+      case 'review':
+        return <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />;
+      case 'approve':
+        return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
+      case 'feedback':
+        return <AlertTriangle className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />;
+      case 'in_progress':
+        return <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />;
+      case 'assign':
+        return <Briefcase className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />;
+      case 'verify':
+        return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
+      default:
+        return <Bell className="w-3.5 h-3.5 text-gray-600 dark:text-zinc-400" />;
+    }
+  };
+
   const notifications = useMemo(() => {
     const list: Array<{
       id: string;
@@ -96,31 +121,68 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
       type: string;
     }> = [];
 
+    const now = Date.now();
+
     if (user?.type === 'admin') {
       // 1. Pending reviews in projects
       projects.forEach((proj) => {
         proj.subtasks?.forEach((st) => {
           if (st.status === 'Ready for Review') {
             const assignedEditor = editors.find((e) => st.assignedEditorIds?.includes(e.id));
+            const count = st.deliverablesQueue?.length || 1;
             list.push({
-              id: `review-${st.id}`,
-              title: 'Review Needed',
-              message: `${assignedEditor?.fullName || 'Editor'} submitted deliverable for "${st.title}" in ${proj.title}.`,
+              id: `review-${st.id}-${count}`,
+              title: 'Deliverable Needs Review',
+              message: `${assignedEditor?.fullName || 'Editor'} submitted cut v${count} for "${st.title}" in ${proj.title}.`,
               time: 'In Queue',
-              unread: !readIds.includes(`review-${st.id}`),
+              unread: !readIds.includes(`review-${st.id}-${count}`),
               route: '/admin/reviews',
               type: 'review',
             });
           }
+
+          // 2. Editor Started Working (In Progress)
+          if (st.status === 'In Progress') {
+            const assignedEditor = editors.find((e) => st.assignedEditorIds?.includes(e.id));
+            list.push({
+              id: `started-${st.id}`,
+              title: 'Editor Working on Task',
+              message: `${assignedEditor?.fullName || 'Editor'} is actively working on "${st.title}" in ${proj.title}.`,
+              time: 'In Progress',
+              unread: !readIds.includes(`started-${st.id}`),
+              route: `/admin/projects/${proj.id}`,
+              type: 'in_progress',
+            });
+          }
+
+          // 3. Overdue Subtask alert for admin
+          if (st.status !== 'Approved' && st.deadline) {
+            const d = new Date(st.deadline);
+            if (!isNaN(d.getTime())) {
+              const days = Math.ceil((d.getTime() - now) / (1000 * 60 * 60 * 24));
+              if (days < 0) {
+                const assignedEditor = editors.find((e) => st.assignedEditorIds?.includes(e.id));
+                list.push({
+                  id: `admin-overdue-${st.id}`,
+                  title: 'Subtask Overdue',
+                  message: `"${st.title}" in ${proj.title} is ${Math.abs(days)}d past deadline (${assignedEditor?.fullName || 'Unassigned'}).`,
+                  time: 'Overdue',
+                  unread: !readIds.includes(`admin-overdue-${st.id}`),
+                  route: `/admin/projects/${proj.id}`,
+                  type: 'deadline',
+                });
+              }
+            }
+          }
         });
       });
 
-      // 2. Pending editor verifications
+      // 4. Pending editor verifications
       editors.forEach((ed) => {
         if (ed.verificationStatus === 'Pending') {
           list.push({
             id: `verify-${ed.id}`,
-            title: 'Verification Request',
+            title: 'Editor Verification Request',
             message: `${ed.fullName} registered and requested editor verification.`,
             time: 'Pending',
             unread: !readIds.includes(`verify-${ed.id}`),
@@ -129,11 +191,58 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
           });
         }
       });
+
+      // 5. Recent Activity Logs stream
+      (activity || []).slice(0, 5).forEach((act) => {
+        list.push({
+          id: `act-${act.id}`,
+          title: act.type === 'deadline' ? 'Deadline Updated' : act.type === 'submit_review' ? 'Submission' : act.type === 'approve' ? 'Approved' : 'Activity',
+          message: act.message,
+          time: 'Recent',
+          unread: !readIds.includes(`act-${act.id}`),
+          route: act.type === 'submit_review' ? '/admin/reviews' : '/admin/projects',
+          type: act.type,
+        });
+      });
     } else if (user?.type === 'editor' && currentEditor) {
       // Dynamic notifications for the logged in editor
       projects.forEach((proj) => {
         proj.subtasks?.forEach((st) => {
           if (st.assignedEditorIds?.includes(currentEditor.id)) {
+            // A. Deadline Notice (whenever deadline is updated or set)
+            if (st.deadline) {
+              const d = new Date(st.deadline);
+              if (!isNaN(d.getTime())) {
+                const days = Math.ceil((d.getTime() - now) / (1000 * 60 * 60 * 24));
+                const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const deadlineId = `deadline-${st.id}-${st.deadline.slice(0, 10)}`;
+                list.push({
+                  id: deadlineId,
+                  title: 'Deadline Updated',
+                  message: `The deadline for "${st.title}" in project "${proj.title}" is ${formatted}.`,
+                  time: days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Due Today' : `${days}d left`,
+                  unread: !readIds.includes(deadlineId),
+                  route: '/editor/projects',
+                  type: 'deadline',
+                });
+
+                // Urgent deadline notice if due within 2 days or overdue
+                if (st.status !== 'Approved' && days <= 2) {
+                  const urgentId = `urgent-${st.id}-${days < 0 ? 'overdue' : 'due'}`;
+                  list.push({
+                    id: urgentId,
+                    title: days < 0 ? 'Task Overdue' : 'Urgent: Due Soon',
+                    message: `"${st.title}" in project "${proj.title}" is ${days < 0 ? `${Math.abs(days)}d past deadline` : 'due soon'}. Please submit your deliverable cut.`,
+                    time: 'Urgent',
+                    unread: !readIds.includes(urgentId),
+                    route: '/editor/projects',
+                    type: 'deadline',
+                  });
+                }
+              }
+            }
+
+            // B. Revision Requested by Admin
             if (st.status === 'Sent Back') {
               list.push({
                 id: `feedback-${st.id}`,
@@ -145,6 +254,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                 type: 'feedback',
               });
             } else if (st.status === 'Approved') {
+              // C. Deliverable Approved
               list.push({
                 id: `approved-${st.id}`,
                 title: 'Deliverable Approved',
@@ -155,10 +265,11 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                 type: 'approve',
               });
             } else if (st.status === 'Assigned' || st.status === 'In Progress') {
+              // D. Assigned Task with Brief
               list.push({
                 id: `assign-${st.id}`,
-                title: 'Assigned Task',
-                message: `You are assigned to "${st.title}" in project "${proj.title}".`,
+                title: st.status === 'In Progress' ? 'In Progress Task' : 'New Assignment',
+                message: `Assigned to "${st.title}" in project "${proj.title}". ${st.description ? `Brief: ${st.description}` : ''}`,
                 time: 'Active',
                 unread: !readIds.includes(`assign-${st.id}`),
                 route: '/editor/projects',
@@ -193,7 +304,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     }
 
     return list;
-  }, [user, currentEditor, projects, editors, readIds]);
+  }, [user, currentEditor, projects, editors, activity, readIds]);
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
@@ -467,7 +578,9 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                               item.unread ? 'bg-gray-50/80 dark:bg-zinc-850/40' : 'bg-white dark:bg-zinc-900'
                             }`}
                           >
-                            <div className="w-2 h-2 rounded-full bg-gray-900 dark:bg-zinc-100 mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ opacity: item.unread ? 1 : 0 }} />
+                            <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 mt-0.5">
+                              {getNotificationIcon(item.type)}
+                            </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-1">
                                 <h4 className={`text-xs ${item.unread ? 'font-bold text-gray-900 dark:text-white' : 'font-semibold text-gray-700 dark:text-zinc-300'}`}>
@@ -479,6 +592,9 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                                 {item.message}
                               </p>
                             </div>
+                            {item.unread && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 shrink-0" />
+                            )}
                           </div>
                         ))
                       )}

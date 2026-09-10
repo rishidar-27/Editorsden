@@ -427,6 +427,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addDeliverableSubmissionRecord(subtaskId, updates.deliverablesQueue[0]).catch(() => null);
     }
 
+    if (updates.deadline) {
+      const project = projects.find((p) => p.id === projectId);
+      const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+      const taskName = updates.title || subtask?.title || 'subtask';
+      const formattedDate = new Date(updates.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const event: ActivityEvent = {
+        id: `a${Date.now()}`,
+        type: 'deadline',
+        message: `Deadline updated for "${taskName}" to ${formattedDate}`,
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((prev) => [event, ...prev]);
+      createActivityLogRecord({
+        type: 'deadline',
+        message: event.message,
+        metadata: {
+          projectId,
+          subtaskId,
+          newDeadline: updates.deadline,
+          assignedEditorIds: subtask?.assignedEditorIds || [],
+        },
+      }).catch(() => null);
+    }
+
     if (updates.status === 'In Progress') {
       const project = projects.find((p) => p.id === projectId);
       const subtask = project?.subtasks.find((st) => st.id === subtaskId);
@@ -456,6 +480,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setActivity((prev) => [event, ...prev]);
       createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId } }).catch(() => null);
     }
+
+    if (updates.status === 'Approved') {
+      const project = projects.find((p) => p.id === projectId);
+      const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+      const event: ActivityEvent = {
+        id: `a${Date.now()}`,
+        type: 'approve',
+        message: `"${subtask?.title || 'Deliverable'}" in "${project?.title}" was approved`,
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((prev) => [event, ...prev]);
+      createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId } }).catch(() => null);
+    }
+
+    if (updates.status === 'Sent Back') {
+      const project = projects.find((p) => p.id === projectId);
+      const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+      const event: ActivityEvent = {
+        id: `a${Date.now()}`,
+        type: 'send_back',
+        message: `Revisions requested for "${subtask?.title || 'task'}" in "${project?.title}"`,
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((prev) => [event, ...prev]);
+      createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId, feedback: updates.feedback } }).catch(() => null);
+    }
   }, [projects, editors]);
 
   const assignEditors = useCallback((projectId: string, subtaskId: string, editorIds: string[]) => {
@@ -465,7 +515,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } : p));
 
     updateSubtaskRecord(projectId, subtaskId, { assignedEditorIds: editorIds }).catch(() => null);
-  }, []);
+
+    const project = projects.find((p) => p.id === projectId);
+    const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+    const editorNames = editorIds.map((id) => editors.find((e) => e.id === id)?.fullName).filter(Boolean).join(', ') || 'Editor';
+    const event: ActivityEvent = {
+      id: `a${Date.now()}`,
+      type: 'assign',
+      message: `Assigned ${editorNames} to "${subtask?.title || 'task'}" in "${project?.title}"`,
+      timestamp: new Date().toISOString(),
+    };
+    setActivity((prev) => [event, ...prev]);
+    createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId, editorIds } }).catch(() => null);
+  }, [projects, editors]);
 
   const addSubtaskToProject = useCallback((projectId: string, subtask: Subtask) => {
     setProjects((prev) => prev.map((p) => p.id === projectId ? {
@@ -474,7 +536,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } : p));
 
     createSubtaskRecord(subtask).catch(() => null);
-  }, []);
+
+    const project = projects.find((p) => p.id === projectId);
+    const event: ActivityEvent = {
+      id: `a${Date.now()}`,
+      type: 'create_project',
+      message: `Added deliverable "${subtask.title}" to "${project?.title || 'project'}"`,
+      timestamp: new Date().toISOString(),
+    };
+    setActivity((prev) => [event, ...prev]);
+    createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId: subtask.id } }).catch(() => null);
+  }, [projects]);
 
   // Storage Quota Methods
   const getEditorStorageStats = useCallback((editorId: string) => {
