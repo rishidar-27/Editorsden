@@ -56,6 +56,15 @@ export function EditorStorageManager() {
   const isNearLimit = percentageUsed >= 80;
   const isOverLimit = percentageUsed >= 100;
 
+  const draftAssets = useMemo(() => {
+    return displayAssetsList.filter(
+      (a) => a.fileName.toLowerCase().includes('draft') || a.fileName.toLowerCase().includes('rough')
+    );
+  }, [displayAssetsList]);
+  const draftCount = draftAssets.length;
+  const draftBytes = draftAssets.reduce((sum, a) => sum + a.fileSizeBytes, 0);
+  const draftMB = Math.round(draftBytes / (1024 * 1024));
+
   // Filter and sort display assets
   const filteredAssets = useMemo(() => {
     let list = [...displayAssetsList];
@@ -256,25 +265,33 @@ export function EditorStorageManager() {
         </Card>
 
         {/* Card 4: Bucket Hygiene */}
-        <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+        <Card className="p-4 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-500">Bucket Hygiene</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-100/70 text-amber-700 flex items-center justify-center">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+              draftCount > 0
+                ? 'bg-amber-100/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                : 'bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+            }`}>
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Good</h2>
-            <span className="text-xs font-bold text-amber-600">2 Old Drafts</span>
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              {draftCount > 0 ? 'Review' : 'Clean'}
+            </h2>
+            <span className={`text-xs font-bold ${draftCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+              {draftCount} {draftCount === 1 ? 'Old Draft' : 'Old Drafts'}
+            </span>
           </div>
           <span className="text-[11px] text-gray-400 font-medium block mt-1">
-            Clean drafts to free 85 MB
+            {draftCount > 0 ? `Clean drafts to free ${draftMB} MB` : 'No redundant draft cuts'}
           </span>
         </Card>
       </div>
 
       {/* Main Quota Gauge Card */}
-      <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
+      <Card className="p-6 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
@@ -286,20 +303,22 @@ export function EditorStorageManager() {
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              You have <span className="font-bold text-gray-800">{limitMB - usedMB} MB</span> available before reaching the free cap.
+              You have <span className="font-bold text-gray-800 dark:text-white">{limitMB - usedMB} MB</span> available before reaching the free cap.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCleanOldDrafts}
-              className="text-xs font-semibold text-gray-700 hover:text-red-600 hover:border-red-200"
-            >
-              <Trash2 className="w-3.5 h-3.5 mr-1" />
-              Clean Draft Cuts (85 MB)
-            </Button>
+            {draftCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCleanOldDrafts}
+                className="text-xs font-semibold text-gray-700 hover:text-red-600 hover:border-red-200"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                Clean Draft Cuts ({draftMB} MB)
+              </Button>
+            )}
           </div>
         </div>
 
