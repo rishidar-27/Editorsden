@@ -45,40 +45,86 @@ export function Reports({ onNavigate }: ReportsProps) {
   const verifiedCount = actualEditors.filter((e) => e.verificationStatus === 'Verified').length;
   const inactiveCount = actualEditors.filter((e) => !e.active).length;
 
+  // Dynamic turnaround velocity calculation from actual project submissions
+  const turnaroundVelocity = useMemo(() => {
+    const deliveryTimes: number[] = [];
+    (projects || []).forEach((p) => {
+      (p.subtasks || []).forEach((st) => {
+        (st.deliverablesQueue || []).forEach((sub) => {
+          if (sub.submittedAt && p.createdAt) {
+            const start = new Date(p.createdAt).getTime();
+            const end = new Date(sub.submittedAt).getTime();
+            const diffHours = (end - start) / (1000 * 60 * 60);
+            if (diffHours > 0) {
+              deliveryTimes.push(diffHours);
+            }
+          }
+        });
+      });
+    });
+
+    if (deliveryTimes.length > 0) {
+      const avg = (deliveryTimes.reduce((sum, val) => sum + val, 0) / deliveryTimes.length).toFixed(1);
+      return {
+        value: `${avg} hrs`,
+        trend: `⚡ ${deliveryTimes.length} verified deliveries`,
+        trendUp: true,
+        subtext: `average v1 delivery across ${projects.length} projects`,
+      };
+    }
+
+    // Default SLA fallback when no submissions are in the database yet
+    return {
+      value: '24h - 48h',
+      trend: 'Standard SLA',
+      trendUp: true,
+      subtext: 'Awaiting first deliverable submission',
+    };
+  }, [projects]);
+
+  // Live storage usage from Supabase
+  const totalStorageBytes = useMemo(() => {
+    return actualEditors.reduce((acc, e) => acc + (e.storageUsedBytes || 0), 0);
+  }, [actualEditors]);
+  const totalStorageMB = (totalStorageBytes / (1024 * 1024)).toFixed(1);
+
+  const verifiedPercent = totalEditors > 0 ? Math.round((verifiedCount / totalEditors) * 100) : 0;
+  const activePercent = totalEditors > 0 ? Math.round((activeCount / totalEditors) * 100) : 0;
+
   const stats = [
     {
       label: 'Verified Creator Network',
       value: String(verifiedCount),
-      trend: '↑ 18%',
-      trendUp: true,
-      subtext: 'top 1% vetted talent',
+      trend: `${verifiedPercent}% verified`,
+      trendUp: verifiedPercent >= 50,
+      subtext: `${verifiedCount} of ${totalEditors} creators vetted`,
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />,
       bg: 'bg-emerald-100/70',
     },
     {
       label: 'Turnaround Velocity',
-      value: '22.4 hrs',
-      trend: '⚡ -35% faster',
-      trendUp: true,
-      subtext: 'average v1 delivery',
+      value: turnaroundVelocity.value,
+      trend: turnaroundVelocity.trend,
+      trendUp: turnaroundVelocity.trendUp,
+      subtext: turnaroundVelocity.subtext,
       icon: <Zap className="w-5 h-5 text-amber-600" />,
       bg: 'bg-amber-100/70',
     },
     {
-      label: 'R2 Zero-Egress Savings',
-      value: '$14,280',
+      label: 'R2 Zero-Egress Storage',
+      value: `${totalStorageMB} MB`,
       trend: '100% saved',
       trendUp: true,
-      subtext: 'vs legacy AWS S3 bandwidth',
-      icon: <DollarSign className="w-5 h-5 text-emerald-600" />,
+      subtext: 'Cloudflare R2 active assets',
+      icon: <HardDrive className="w-5 h-5 text-emerald-600" />,
       bg: 'bg-emerald-100/70',
     },
     {
       label: 'Active Community Capacity',
       value: String(activeCount),
-      trend: '92% utilization',
-      trendUp: true,
-      subtext: `${totalEditors} total accounts`,
+      trend: `${activePercent}% active`,
+      trendUp: activePercent >= 50,
+      subtext: `${activeCount} active of ${totalEditors} registered`,
       icon: <Activity className="w-5 h-5 text-gray-900" />,
       bg: 'bg-gray-100',
     },
