@@ -430,57 +430,42 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                     </Badge>
                   </td>
 
-                  {/* Actions: 2 icons alone (tick for approve, wrong for deactivate) */}
+                  {/* Actions: Context-aware buttons (Pending: both, Verified: wrong only, Rejected: tick only) */}
                   <td className="py-3.5 px-4 text-center align-middle" onClick={(ev) => ev.stopPropagation()}>
                     <div className="flex items-center justify-center gap-2" onClick={(ev) => ev.stopPropagation()}>
-                      {/* Approve / Verify (Tick) */}
-                      <button
-                        type="button"
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          if (e.verificationStatus === 'Verified') {
-                            setVerificationStatus(e.id, 'Pending');
-                            addToast(`${e.fullName} marked as Pending`, 'info');
-                          } else {
+                      {/* Approve / Verify (Tick) - shown when Pending or Rejected */}
+                      {(e.verificationStatus === 'Pending' || e.verificationStatus === 'Rejected') && (
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
                             setVerificationStatus(e.id, 'Verified');
                             if (!e.active) toggleEditorActive(e.id);
                             addToast(`${e.fullName} approved and verified!`, 'success');
-                          }
-                        }}
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                          e.verificationStatus === 'Verified'
-                            ? 'bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600'
-                            : 'text-gray-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-800'
-                        }`}
-                        title={e.verificationStatus === 'Verified' ? 'Approved (click to set Pending)' : 'Approve & Verify'}
-                      >
-                        <Check className="w-4 h-4 stroke-[2.5]" />
-                      </button>
+                          }}
+                          className="w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer text-emerald-600 dark:text-emerald-400 hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 shadow-2xs"
+                          title="Approve & Verify"
+                        >
+                          <Check className="w-4 h-4 stroke-[2.5]" />
+                        </button>
+                      )}
 
-                      {/* Deactivate / Reject (Wrong / Cross) */}
-                      <button
-                        type="button"
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          if (e.active) {
-                            toggleEditorActive(e.id);
+                      {/* Deactivate / Reject (Wrong / Cross) - shown when Pending or Verified */}
+                      {(e.verificationStatus === 'Pending' || e.verificationStatus === 'Verified') && (
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            if (e.active) toggleEditorActive(e.id);
                             setVerificationStatus(e.id, 'Rejected');
-                            addToast(`${e.fullName} account deactivated`, 'info');
-                          } else {
-                            toggleEditorActive(e.id);
-                            setVerificationStatus(e.id, 'Pending');
-                            addToast(`${e.fullName} account reactivated`, 'success');
-                          }
-                        }}
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                          !e.active || e.verificationStatus === 'Rejected'
-                            ? 'bg-red-500 text-white shadow-2xs hover:bg-red-600'
-                            : 'text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border border-gray-200 dark:border-zinc-700 hover:border-red-300 dark:hover:border-red-800'
-                        }`}
-                        title={e.active ? 'Deactivate account' : 'Reactivate account'}
-                      >
-                        <X className="w-4 h-4 stroke-[2.5]" />
-                      </button>
+                            addToast(`${e.fullName} rejected and deactivated`, 'info');
+                          }}
+                          className="w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer text-red-600 dark:text-red-400 hover:text-white hover:bg-red-500 dark:hover:bg-red-500 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 shadow-2xs"
+                          title="Deactivate & Reject"
+                        >
+                          <X className="w-4 h-4 stroke-[2.5]" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
