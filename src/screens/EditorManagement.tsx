@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import type { VerificationStatus, Editor } from '@/types';
 import { allSkills, allSoftware } from '@/data';
+import { formatLastActive, isRecentlyActive, formatDateTime, getEditorLastActiveDate } from '@/lib/dateUtils';
 
 interface EditorManagementProps {
   onNavigate: (route: string) => void;
@@ -146,7 +147,10 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
 
   const handleExport = () => {
     const csvContent = "data:text/csv;charset=utf-8," + 
-      ["Name,Email,City,Experience,Status,Availability", ...filtered.map(e => `"${e.fullName}","${e.email}","${e.city}",${e.experience},"${e.verificationStatus}","${e.availability}"`)].join("\n");
+      ["Name,Email,City,Experience,Status,Availability,LastActive", ...filtered.map(e => {
+        const lastActive = formatLastActive(getEditorLastActiveDate(e));
+        return `"${e.fullName}","${e.email}","${e.city}",${e.experience},"${e.verificationStatus}","${e.availability}","${lastActive}"`;
+      })].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -298,6 +302,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                 <th className="py-3 px-4">SOFTWARE</th>
                 <th className="py-3 px-4">EXPERIENCE</th>
                 <th className="py-3 px-4">AVAILABILITY</th>
+                <th className="py-3 px-4">LAST ACTIVE</th>
                 <th className="py-3 px-4">STATUS</th>
                 <th className="py-3 px-4 text-right">ACTIONS</th>
               </tr>
@@ -305,7 +310,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
             <tbody className="divide-y divide-gray-100 text-xs text-gray-700">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-gray-400">
+                  <td colSpan={9} className="py-12 text-center text-gray-400">
                     No creators registered yet. When editors sign up via Supabase, they will appear here.
                   </td>
                 </tr>
@@ -388,6 +393,26 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                       <p className="font-semibold text-gray-900">{e.availability}</p>
                       <p className="text-[10.5px] text-gray-400">{e.hoursPerWeek} hrs/week</p>
                     </div>
+                  </td>
+
+                  {/* Last Active */}
+                  <td className="py-3.5 px-4" title={`Exact time: ${formatDateTime(getEditorLastActiveDate(e))}`}>
+                    {(() => {
+                      const activeIso = getEditorLastActiveDate(e);
+                      const isRecent = isRecentlyActive(activeIso);
+                      const text = formatLastActive(activeIso);
+                      return (
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500/80' : 'bg-gray-300'}`} />
+                            <span className="font-bold text-gray-900 text-xs">{text}</span>
+                          </div>
+                          <span className="text-[10px] text-gray-400 block font-medium mt-0.5">
+                            {activeIso ? formatDateTime(activeIso) : 'Never'}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   {/* Status */}

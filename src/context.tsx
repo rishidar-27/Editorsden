@@ -265,7 +265,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       try {
         const authRes = await signInWithEmail(email, password);
         if (authRes?.user) {
+          const nowIso = new Date().toISOString();
           setUser({ type: 'editor', editorId: authRes.user.id });
+          updateEditorProfile(authRes.user.id, { lastLogin: nowIso }).catch(() => null);
+          setEditors((prev) => prev.map((e) => e.id === authRes.user.id ? { ...e, lastLogin: nowIso } : e));
           return { success: true, userType: 'editor' };
         }
       } catch (authErr: any) {
@@ -359,8 +362,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [user, editors]);
 
   const updateEditor = useCallback((id: string, updates: Partial<Editor>) => {
-    setEditors((prev) => prev.map((e) => e.id === id ? { ...e, ...updates, lastProfileUpdate: new Date().toISOString() } : e));
-    updateEditorProfile(id, updates).catch(() => null);
+    const nowIso = new Date().toISOString();
+    setEditors((prev) => prev.map((e) => e.id === id ? { ...e, ...updates, lastProfileUpdate: nowIso, lastLogin: nowIso } : e));
+    updateEditorProfile(id, { ...updates, lastLogin: nowIso }).catch(() => null);
   }, []);
 
   const setVerificationStatus = useCallback((editorId: string, status: VerificationStatus, feedback?: string) => {

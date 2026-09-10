@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { allSkills } from '@/data';
 import type { Editor } from '@/types';
+import { formatLastActive, isRecentlyActive, formatDateTime, getEditorLastActiveDate } from '@/lib/dateUtils';
 
 interface AssignEditorsProps {
   projectId: string;
@@ -356,6 +357,21 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                             <span className="text-gray-600 font-medium">
                               {activeTasks === 0 ? '🟢 Available now (0 tasks)' : `🟡 ${activeTasks} active task${activeTasks > 1 ? 's' : ''}`}
                             </span>
+                            <span className="text-gray-300">•</span>
+                            {(() => {
+                              const activeIso = getEditorLastActiveDate(e);
+                              const isRecent = isRecentlyActive(activeIso);
+                              const text = formatLastActive(activeIso);
+                              return (
+                                <span 
+                                  className="text-gray-600 font-medium inline-flex items-center gap-1 cursor-help"
+                                  title={`Last active timestamp: ${formatDateTime(activeIso)}`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                                  Active {text}
+                                </span>
+                              );
+                            })()}
                           </p>
 
                           {/* Skills badges */}

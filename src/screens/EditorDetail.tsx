@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/context';
+import { formatLastActive, isRecentlyActive, formatDateTime, getEditorLastActiveDate } from '@/lib/dateUtils';
 import {
   ArrowLeft,
   Mail,
@@ -166,6 +167,14 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
   const totalMB = Math.round(limitBytes / (1024 * 1024));
   const storagePercent = Math.min(100, Math.round((usedBytes / limitBytes) * 100));
 
+  // Dynamic Last Active calculations
+  const effectiveLastActive = useMemo(() => {
+    return getEditorLastActiveDate(editor);
+  }, [editor]);
+
+  const isRecent = isRecentlyActive(effectiveLastActive);
+  const lastActiveText = formatLastActive(effectiveLastActive);
+
   const navItems = [
     { name: 'Overview', icon: Layers, count: null },
     { name: 'Profile & Details', icon: Briefcase, count: null },
@@ -314,6 +323,13 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                   <Clock className="w-3.5 h-3.5 text-gray-400" />
                   {editor.hoursPerWeek ? `${editor.hoursPerWeek} hrs/week` : 'Flexible Capacity'}
                 </span>
+                <span 
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium cursor-help"
+                  title={`Last active timestamp: ${formatDateTime(effectiveLastActive)}`}
+                >
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                  <span>Last active: <strong className="text-gray-900 dark:text-white font-bold">{lastActiveText}</strong></span>
+                </span>
               </div>
             </div>
           </div>
@@ -324,6 +340,17 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Availability</span>
               <span className="text-sm font-black text-gray-900 dark:text-white mt-0.5 block">{editor.availability || 'Available'}</span>
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{editor.hoursPerWeek ? `${editor.hoursPerWeek} hrs/week` : 'Full Bandwidth'}</span>
+            </div>
+            <div className="w-px h-10 bg-gray-200 dark:bg-zinc-700" />
+            <div>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Last Active</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                <span className="text-sm font-black text-gray-900 dark:text-white">{lastActiveText}</span>
+              </div>
+              <span className="text-[10px] text-gray-400 font-medium truncate max-w-[130px] block" title={formatDateTime(effectiveLastActive)}>
+                {effectiveLastActive ? formatDateTime(effectiveLastActive) : 'Never'}
+              </span>
             </div>
             <div className="w-px h-10 bg-gray-200 dark:bg-zinc-700" />
             <div>
@@ -627,9 +654,22 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                       <span className="text-gray-400">Availability</span>
                       <span className="font-bold text-gray-900 dark:text-white">{editor.availability}</span>
                     </div>
-                    <div className="flex justify-between py-1">
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Experience</span>
                       <span className="font-bold text-gray-900 dark:text-white">{editor.experience ? `${editor.experience} years` : 'Entry to Mid'}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
+                      <span className="text-gray-400">Last Active</span>
+                      <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5" title={formatDateTime(effectiveLastActive)}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                        {lastActiveText} ({effectiveLastActive ? formatDateTime(effectiveLastActive) : 'Never'})
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-gray-400">Member Since</span>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {editor.createdAt ? formatDateTime(editor.createdAt) : 'Recently'}
+                      </span>
                     </div>
                   </div>
                 </div>

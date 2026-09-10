@@ -20,6 +20,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import { allSkills } from '@/data';
+import { formatLastActive, isRecentlyActive, formatDateTime, getEditorLastActiveDate } from '@/lib/dateUtils';
 
 interface ReportsProps {
   onNavigate: (route: string) => void;
@@ -285,6 +286,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                 <th className="py-3 px-4">PRIMARY DISCIPLINES</th>
                 <th className="py-3 px-4">EXPERIENCE</th>
                 <th className="py-3 px-4">AVAILABILITY</th>
+                <th className="py-3 px-4">LAST ACTIVE</th>
                 <th className="py-3 px-4">STATUS</th>
                 <th className="py-3 px-4 text-right">ACTION</th>
               </tr>
@@ -330,6 +332,25 @@ export function Reports({ onNavigate }: ReportsProps) {
                   <td className="py-3.5 px-4">
                     <span className="font-semibold text-gray-900">{e.availability}</span>
                     <span className="text-[10px] text-gray-400 block">{e.hoursPerWeek}h/wk</span>
+                  </td>
+
+                  <td className="py-3.5 px-4" title={`Exact time: ${formatDateTime(getEditorLastActiveDate(e))}`}>
+                    {(() => {
+                      const activeIso = getEditorLastActiveDate(e);
+                      const isRecent = isRecentlyActive(activeIso);
+                      const text = formatLastActive(activeIso);
+                      return (
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500/80' : 'bg-gray-300'}`} />
+                            <span className="font-bold text-gray-900 text-xs">{text}</span>
+                          </div>
+                          <span className="text-[10px] text-gray-400 block font-normal">
+                            {activeIso ? formatDateTime(activeIso) : 'Never'}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   <td className="py-3.5 px-4">

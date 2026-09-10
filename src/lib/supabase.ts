@@ -177,6 +177,7 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
   if (updates.storageTier !== undefined) dbUpdates.storage_tier = updates.storageTier;
   if (updates.storageLimitBytes !== undefined) dbUpdates.storage_limit_bytes = updates.storageLimitBytes;
   if (updates.hardware !== undefined) dbUpdates.hardware = updates.hardware;
+  if (updates.lastLogin !== undefined) dbUpdates.last_login = updates.lastLogin;
 
   if (isSupabaseConfigured()) {
     const { data, error } = await supabase.from('profiles').update(dbUpdates).eq('id', id).select().single();
