@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, Checkbox, KebabMenu, Button, Badge } from '@/components/ui';
+import { Card, Checkbox, Button, Badge } from '@/components/ui';
 import { useApp } from '@/context';
 import {
   Search,
@@ -16,8 +16,8 @@ import {
   RotateCcw,
   SlidersHorizontal,
   X,
+  Check,
   CheckCircle2,
-  ExternalLink,
 } from 'lucide-react';
 import type { VerificationStatus, Editor } from '@/types';
 import { allSkills, allSoftware } from '@/data';
@@ -430,44 +430,57 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                     </Badge>
                   </td>
 
-                  {/* Actions */}
+                  {/* Actions: 2 icons alone (tick for approve, wrong for deactivate) */}
                   <td className="py-3.5 px-4 text-right" onClick={(ev) => ev.stopPropagation()}>
-                    <div className="flex items-center justify-end gap-1.5" onClick={(ev) => ev.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-2" onClick={(ev) => ev.stopPropagation()}>
+                      {/* Approve / Verify (Tick) */}
                       <button
                         type="button"
                         onClick={(ev) => {
                           ev.stopPropagation();
-                          onNavigate(`/admin/editor/${e.id}`);
+                          if (e.verificationStatus === 'Verified') {
+                            setVerificationStatus(e.id, 'Pending');
+                            addToast(`${e.fullName} marked as Pending`, 'info');
+                          } else {
+                            setVerificationStatus(e.id, 'Verified');
+                            if (!e.active) toggleEditorActive(e.id);
+                            addToast(`${e.fullName} approved and verified!`, 'success');
+                          }
                         }}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                        title="View profile & details"
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                          e.verificationStatus === 'Verified'
+                            ? 'bg-emerald-500 text-white shadow-2xs hover:bg-emerald-600'
+                            : 'text-gray-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-800'
+                        }`}
+                        title={e.verificationStatus === 'Verified' ? 'Approved (click to set Pending)' : 'Approve & Verify'}
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <Check className="w-4 h-4 stroke-[2.5]" />
                       </button>
-                      <KebabMenu
-                        items={[
-                          {
-                            label: 'View details',
-                            onClick: () => onNavigate(`/admin/editor/${e.id}`),
-                          },
-                          {
-                            label: e.verificationStatus === 'Verified' ? 'Mark as Pending' : 'Verify Editor',
-                            onClick: () => {
-                              const next = e.verificationStatus === 'Verified' ? 'Pending' : 'Verified';
-                              setVerificationStatus(e.id, next);
-                              addToast(`${e.fullName} set to ${next}`, 'info');
-                            },
-                          },
-                          {
-                            label: e.active ? 'Deactivate account' : 'Activate account',
-                            onClick: () => {
-                              toggleEditorActive(e.id);
-                              addToast(`${e.fullName} account ${e.active ? 'deactivated' : 'activated'}`, 'info');
-                            },
-                            variant: e.active ? 'destructive' : 'default',
-                          },
-                        ]}
-                      />
+
+                      {/* Deactivate / Reject (Wrong / Cross) */}
+                      <button
+                        type="button"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          if (e.active) {
+                            toggleEditorActive(e.id);
+                            setVerificationStatus(e.id, 'Rejected');
+                            addToast(`${e.fullName} account deactivated`, 'info');
+                          } else {
+                            toggleEditorActive(e.id);
+                            setVerificationStatus(e.id, 'Pending');
+                            addToast(`${e.fullName} account reactivated`, 'success');
+                          }
+                        }}
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                          !e.active || e.verificationStatus === 'Rejected'
+                            ? 'bg-red-500 text-white shadow-2xs hover:bg-red-600'
+                            : 'text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border border-gray-200 dark:border-zinc-700 hover:border-red-300 dark:hover:border-red-800'
+                        }`}
+                        title={e.active ? 'Deactivate account' : 'Reactivate account'}
+                      >
+                        <X className="w-4 h-4 stroke-[2.5]" />
+                      </button>
                     </div>
                   </td>
                 </tr>
