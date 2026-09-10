@@ -82,7 +82,8 @@ interface AppState {
   assignEditors: (projectId: string, subtaskId: string, editorIds: string[]) => void;
   deleteEditorAssets: (editorId: string, assetIds: string[]) => Promise<{ success: boolean; freedBytes: number }>;
   addEditorAsset: (asset: EditorAsset) => void;
-  upgradeStorageTier: (editorId: string, tier: 'Free' | 'Pro_50GB' | 'Studio_200GB') => void;
+  upgradeStorageTier: (editorId: string, tier: 'Free' | 'Pro_50GB' | 'Studio_200GB' | 'Pro' | string) => void;
+  addPayAsYouGoStorage: (editorId: string, additionalGB: number) => void;
   getEditorStorageStats: (editorId: string) => {
     storageUsedBytes: number;
     storageLimitBytes: number;
@@ -484,24 +485,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return { success: true, freedBytes };
   }, [assets]);
 
-  const upgradeStorageTier = useCallback((editorId: string, tier: 'Free' | 'Pro_50GB' | 'Studio_200GB') => {
-    const limits = {
+  const upgradeStorageTier = useCallback((editorId: string, tier: 'Free' | 'Pro_50GB' | 'Studio_200GB' | 'Pro' | string) => {
+    const limits: Record<string, number> = {
       Free: 1073741824,
+      Pro: 53687091200,
       Pro_50GB: 53687091200,
       Studio_200GB: 214748364800,
     };
 
+    const newLimit = limits[tier] || 1073741824;
     setEditors((prev) =>
       prev.map((e) =>
         e.id === editorId
           ? {
               ...e,
-              storageTier: tier,
-              storageLimitBytes: limits[tier] || 1073741824,
+              storageTier: tier === 'Free' ? 'Free' : 'Pro',
+              storageLimitBytes: newLimit,
             }
           : e
       )
     );
+
+    updateEditorProfile(editorId, {
+      storageTier: tier === 'Free' ? 'Free' : 'Pro',
+      storageLimitBytes: newLimit,
+    }).catch(() => null);
 
     fetch('http://localhost:5000/api/storage/upgrade-tier', {
       method: 'POST',
@@ -510,13 +518,47 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }).catch(() => null);
   }, []);
 
+  const addPayAsYouGoStorage = useCallback((editorId: string, additionalGB: number) => {
+    const extraBytes = (Number(additionalGB) || 5) * 1024 * 1024 * 1024;
+
+    setEditors((prev) =>
+      prev.map((e) => {
+        if (e.id === editorId) {
+          const currentLimit = Number(e.storageLimitBytes) || 1073741824;
+          const newLimit = currentLimit + extraBytes;
+          return {
+            ...e,
+            storageTier: 'Pro',
+            storageLimitBytes: newLimit,
+          };
+        }
+        return e;
+      })
+    );
+
+    // Sync to Supabase
+    const current = editors.find((e) => e.id === editorId);
+    const newLimit = (Number(current?.storageLimitBytes) || 1073741824) + extraBytes;
+    updateEditorProfile(editorId, {
+      storageTier: 'Pro',
+      storageLimitBytes: newLimit,
+    }).catch(() => null);
+
+    // Sync to local Express backend if running
+    fetch('http://localhost:5000/api/storage/add-extra', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ editorId, additionalGB }),
+    }).catch(() => null);
+  }, [editors]);
+
   return (
     <AppContext.Provider value={{
       user, editors, projects, activity, assets, toasts,
       login, register, logout, getEditor, getCurrentEditor,
       updateEditor, setVerificationStatus, toggleEditorActive,
       addProject, updateSubtask, assignEditors,
-      getEditorStorageStats, addEditorAsset, deleteEditorAssets, upgradeStorageTier,
+      getEditorStorageStats, addEditorAsset, deleteEditorAssets, upgradeStorageTier, addPayAsYouGoStorage,
       addToast, removeToast,
       darkMode, toggleDarkMode,
     }}>

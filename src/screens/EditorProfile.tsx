@@ -59,6 +59,7 @@ const parseHardware = (raw?: string): HardwareConfig => {
 export function EditorProfile() {
   const { getCurrentEditor, updateEditor, addToast } = useApp();
   const editor = getCurrentEditor();
+  const isPro = editor?.storageTier === 'Pro' || (editor?.storageLimitBytes && editor.storageLimitBytes > 1073741824);
   const [saved, setSaved] = useState(false);
 
   const [avatarUrl, setAvatarUrl] = useState(editor?.avatarUrl || '');
@@ -232,6 +233,12 @@ export function EditorProfile() {
                   {currentVerification.icon}
                   {currentVerification.badgeText}
                 </span>
+                {isPro && (
+                  <span className="px-2.5 py-0.5 text-xs font-black rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-1 shadow-xs">
+                    <Sparkles className="w-3 h-3 fill-white" />
+                    PRO
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <button

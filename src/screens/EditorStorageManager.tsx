@@ -26,11 +26,13 @@ import {
   Check,
   X,
   FileText,
+  Plus,
+  AlertCircle,
 } from 'lucide-react';
 import type { EditorAsset } from '@/types';
 
 export function EditorStorageManager() {
-  const { getCurrentEditor, assets, getEditorStorageStats, deleteEditorAssets, addEditorAsset, upgradeStorageTier, addToast } = useApp();
+  const { getCurrentEditor, assets, getEditorStorageStats, deleteEditorAssets, addEditorAsset, addPayAsYouGoStorage, addToast } = useApp();
   const editor = getCurrentEditor();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -51,10 +53,18 @@ export function EditorStorageManager() {
   const storageLimitBytes = storageStats.storageLimitBytes || 1073741824; // 1 GB
   const usedMB = Math.round(calculatedUsedBytes / (1024 * 1024));
   const limitMB = Math.round(storageLimitBytes / (1024 * 1024));
+  const limitGB = (storageLimitBytes / (1024 * 1024 * 1024)).toFixed(1).replace(/\.0$/, '');
+  const isPro = editor?.storageTier === 'Pro' || storageLimitBytes > 1073741824;
   const percentageUsed = Math.min(100, Math.round((calculatedUsedBytes / storageLimitBytes) * 100));
 
   const isNearLimit = percentageUsed >= 80;
   const isOverLimit = percentageUsed >= 100;
+
+  const handleAddExtraStorage = async (additionalGB: number) => {
+    await addPayAsYouGoStorage(editorId, additionalGB);
+    setIsUpgradeModalOpen(false);
+    addToast(`Successfully added +${additionalGB} GB extra storage! You are now a PRO Creator.`, 'success');
+  };
 
   const draftAssets = useMemo(() => {
     return displayAssetsList.filter(
@@ -170,35 +180,45 @@ export function EditorStorageManager() {
     }, 200);
   };
 
-  const handleSelectTier = (tier: 'Free' | 'Pro_50GB' | 'Studio_200GB') => {
-    upgradeStorageTier(editorId, tier);
-    setIsUpgradeModalOpen(false);
-    addToast(`Storage upgraded to ${tier === 'Pro_50GB' ? '50 GB' : '200 GB'} plan!`, 'success');
-  };
-
   return (
-    <div className="max-w-[1360px] mx-auto px-4 lg:px-8 py-6 space-y-6">
+    <div className="max-w-[1440px] w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <HardDrive className="w-7 h-7 text-gray-900 dark:text-zinc-100" />
-            Storage & Cloud Assets
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center gap-2.5">
+              <HardDrive className="w-7 h-7 text-gray-900 dark:text-zinc-100" />
+              Storage & Cloud Assets
+            </h1>
+            {isPro ? (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-1 shadow-xs">
+                <Sparkles className="w-3 h-3 fill-white" />
+                PRO CREATOR
+              </span>
+            ) : (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400">
+                1 GB Free Starter
+              </span>
+            )}
+          </div>
           <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
-            Manage your Cloudflare R2 video storage bucket, monitor your 1 GB limit, and organize deliverables.
+            Manage your Cloudflare R2 video storage bucket, monitor your 1 GB free quota, and add extra storage as you go.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <Button
-            variant="outline"
+            variant={isOverLimit ? 'primary' : 'outline'}
             size="sm"
             onClick={() => setIsUpgradeModalOpen(true)}
-            className="border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 font-bold text-xs shadow-2xs"
+            className={`font-bold text-xs shadow-2xs cursor-pointer ${
+              isOverLimit
+                ? 'bg-amber-500 hover:bg-amber-600 text-white border-0'
+                : 'border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700'
+            }`}
           >
-            <Sparkles className="w-3.5 h-3.5 mr-1 text-gray-900 dark:text-white" />
-            Upgrade Storage Plan
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Add Extra Storage (Pay As You Go)
           </Button>
         </div>
       </div>
@@ -298,12 +318,28 @@ export function EditorStorageManager() {
               <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
                 Current Storage Tier:
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-gray-900 text-white">
-                1 GB Free Creator Tier
-              </span>
+              {isPro ? (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3 h-3 fill-white" />
+                  PRO CREATOR ({limitGB} GB)
+                </span>
+              ) : (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-gray-900 dark:bg-zinc-800 text-white dark:text-zinc-200">
+                  1 GB Free Starter Tier
+                </span>
+              )}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              You have <span className="font-bold text-gray-800 dark:text-white">{limitMB - usedMB} MB</span> available before reaching the free cap.
+            <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+              {isOverLimit ? (
+                <span className="font-bold text-red-600 dark:text-red-400 flex items-center gap-1 inline-flex">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  Storage limit reached! Add pay-as-you-go extra storage to resume uploading deliverables.
+                </span>
+              ) : (
+                <>
+                  You have <span className="font-bold text-gray-800 dark:text-white">{Math.max(0, limitMB - usedMB)} MB</span> available before reaching your {limitGB} GB bucket limit.
+                </>
+              )}
             </p>
           </div>
 
@@ -313,33 +349,42 @@ export function EditorStorageManager() {
                 variant="outline"
                 size="sm"
                 onClick={handleCleanOldDrafts}
-                className="text-xs font-semibold text-gray-700 hover:text-red-600 hover:border-red-200"
+                className="text-xs font-semibold text-gray-700 dark:text-zinc-300 hover:text-red-600 hover:border-red-200"
               >
                 <Trash2 className="w-3.5 h-3.5 mr-1" />
                 Clean Draft Cuts ({draftMB} MB)
               </Button>
             )}
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsUpgradeModalOpen(true)}
+              className="text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white border-0 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" />
+              Add Extra Storage
+            </Button>
           </div>
         </div>
 
         {/* Dynamic Storage Bar */}
         <div className="space-y-1.5 pt-1">
-          <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden p-0.5">
+          <div className="w-full bg-gray-100 dark:bg-zinc-800 h-3.5 rounded-full overflow-hidden p-0.5">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 isOverLimit
                   ? 'bg-red-500'
                   : isNearLimit
                   ? 'bg-amber-500'
-                  : 'bg-gray-900'
+                  : 'bg-gray-900 dark:bg-zinc-100'
               }`}
               style={{ width: `${percentageUsed}%` }}
             />
           </div>
           <div className="flex justify-between text-[11px] text-gray-400 font-medium">
             <span>0 MB</span>
-            <span className="text-gray-500 font-semibold">{percentageUsed}% used of 1,024 MB</span>
-            <span>1,024 MB</span>
+            <span className="text-gray-500 dark:text-zinc-400 font-semibold">{percentageUsed}% used of {limitMB.toLocaleString()} MB ({limitGB} GB)</span>
+            <span>{limitGB} GB</span>
           </div>
         </div>
       </Card>
@@ -657,70 +702,130 @@ export function EditorStorageManager() {
         </Modal>
       )}
 
-      {/* Upgrade Storage Tier Modal */}
+      {/* Pay-As-You-Go Extra Storage Modal */}
       {isUpgradeModalOpen && (
         <Modal
           open={isUpgradeModalOpen}
           onClose={() => setIsUpgradeModalOpen(false)}
-          title="Upgrade Video Storage Bucket"
+          title="Add Extra Video Storage (Pay As You Go)"
         >
           <div className="space-y-4 pt-2">
-            <p className="text-xs text-gray-500">
-              Need more than 1 GB for high-bitrate 4K edits and large asset archives? Choose a dedicated Cloudflare R2 creator plan:
-            </p>
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3 text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">1 GB is permanently Free for every editor!</p>
+                <p className="text-[11px] opacity-90 mt-0.5">
+                  Need more space for 4K edits and large deliverables? Pay as you go on-demand with zero recurring subscriptions. Any top-up permanently upgrades your account to <span className="font-bold">PRO Creator</span> status.
+                </p>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              {/* Plan 1: Pro 50GB */}
-              <div className="p-4 rounded-2xl border-2 border-gray-900 bg-gray-50 space-y-3 relative">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-900 text-white uppercase tracking-wider">
-                  Popular
+              {/* Option 1: +5 GB */}
+              <div className="p-4 rounded-2xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-600 space-y-3">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 uppercase tracking-wider">
+                  Quick Top-Up
                 </span>
                 <div>
-                  <h4 className="font-extrabold text-gray-900 text-base">Pro Editor</h4>
-                  <p className="text-xs text-gray-500">50 GB High-Speed Storage</p>
+                  <h4 className="font-extrabold text-gray-900 dark:text-white text-base">+5 GB Storage</h4>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">Expand bucket instantly</p>
                 </div>
-                <div className="text-2xl font-black text-gray-900">
-                  $9 <span className="text-xs text-gray-400 font-normal">/ month</span>
+                <div className="text-2xl font-black text-gray-900 dark:text-white">
+                  $2.50 <span className="text-xs text-gray-400 font-normal">one-time</span>
                 </div>
-                <ul className="text-[11px] text-gray-600 space-y-1">
-                  <li>✓ Store up to 100+ full HD videos</li>
-                  <li>✓ Zero egress bandwidth costs</li>
-                  <li>✓ ProRes & 4K file support</li>
-                </ul>
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() => handleSelectTier('Pro_50GB')}
-                  className="w-full text-xs font-bold"
-                >
-                  Upgrade to 50 GB
-                </Button>
-              </div>
-
-              {/* Plan 2: Studio 200GB */}
-              <div className="p-4 rounded-2xl border border-gray-200 bg-white hover:border-gray-300 space-y-3">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-700 uppercase tracking-wider">
-                  Heavy 4K
-                </span>
-                <div>
-                  <h4 className="font-extrabold text-gray-900 text-base">Studio Pro</h4>
-                  <p className="text-xs text-gray-500">200 GB High-Speed Storage</p>
-                </div>
-                <div className="text-2xl font-black text-gray-900">
-                  $24 <span className="text-xs text-gray-400 font-normal">/ month</span>
-                </div>
-                <ul className="text-[11px] text-gray-600 space-y-1">
-                  <li>✓ 400+ hours of video storage</li>
-                  <li>✓ Dedicated CDN edge caching</li>
-                  <li>✓ Priority deliverable streams</li>
+                <ul className="text-[11px] text-gray-600 dark:text-zinc-400 space-y-1">
+                  <li>✓ 10–15 full HD video cuts</li>
+                  <li>✓ Permanent PRO Creator badge</li>
+                  <li>✓ Zero monthly commitments</li>
                 </ul>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleSelectTier('Studio_200GB')}
-                  className="w-full text-xs font-bold"
+                  onClick={() => handleAddExtraStorage(5)}
+                  className="w-full text-xs font-bold cursor-pointer"
                 >
-                  Upgrade to 200 GB
+                  Add +5 GB ($2.50)
+                </Button>
+              </div>
+
+              {/* Option 2: +15 GB (Popular) */}
+              <div className="p-4 rounded-2xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 space-y-3 relative">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white uppercase tracking-wider">
+                  Most Popular
+                </span>
+                <div>
+                  <h4 className="font-extrabold text-gray-900 dark:text-white text-base">+15 GB Storage</h4>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">High bitrate & 4K cuts</p>
+                </div>
+                <div className="text-2xl font-black text-gray-900 dark:text-white">
+                  $6.00 <span className="text-xs text-gray-400 font-normal">one-time</span>
+                </div>
+                <ul className="text-[11px] text-gray-600 dark:text-zinc-400 space-y-1">
+                  <li>✓ 35+ client deliverables</li>
+                  <li>✓ Permanent PRO Creator badge</li>
+                  <li>✓ Direct CDN fast playback</li>
+                </ul>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => handleAddExtraStorage(15)}
+                  className="w-full text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white border-0 cursor-pointer"
+                >
+                  Add +15 GB ($6.00)
+                </Button>
+              </div>
+
+              {/* Option 3: +50 GB */}
+              <div className="p-4 rounded-2xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-600 space-y-3">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 uppercase tracking-wider">
+                  Power Creator
+                </span>
+                <div>
+                  <h4 className="font-extrabold text-gray-900 dark:text-white text-base">+50 GB Storage</h4>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">Heavy multi-project archive</p>
+                </div>
+                <div className="text-2xl font-black text-gray-900 dark:text-white">
+                  $15.00 <span className="text-xs text-gray-400 font-normal">one-time</span>
+                </div>
+                <ul className="text-[11px] text-gray-600 dark:text-zinc-400 space-y-1">
+                  <li>✓ 120+ video versions & drafts</li>
+                  <li>✓ Permanent PRO Creator badge</li>
+                  <li>✓ High concurrency downloads</li>
+                </ul>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleAddExtraStorage(50)}
+                  className="w-full text-xs font-bold cursor-pointer"
+                >
+                  Add +50 GB ($15.00)
+                </Button>
+              </div>
+
+              {/* Option 4: +100 GB */}
+              <div className="p-4 rounded-2xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-600 space-y-3">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-900 text-white dark:bg-zinc-100 dark:text-zinc-900 uppercase tracking-wider">
+                  Studio Scale
+                </span>
+                <div>
+                  <h4 className="font-extrabold text-gray-900 dark:text-white text-base">+100 GB Storage</h4>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">Maximum speed & headroom</p>
+                </div>
+                <div className="text-2xl font-black text-gray-900 dark:text-white">
+                  $25.00 <span className="text-xs text-gray-400 font-normal">one-time</span>
+                </div>
+                <ul className="text-[11px] text-gray-600 dark:text-zinc-400 space-y-1">
+                  <li>✓ 250+ full productions</li>
+                  <li>✓ Permanent PRO Creator badge</li>
+                  <li>✓ Zero egress or bandwidth caps</li>
+                </ul>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleAddExtraStorage(100)}
+                  className="w-full text-xs font-bold cursor-pointer"
+                >
+                  Add +100 GB ($25.00)
                 </Button>
               </div>
             </div>

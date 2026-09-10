@@ -221,12 +221,31 @@ app.post('/api/storage/upgrade-tier', (req, res) => {
 
   const tiers = {
     Free: 1073741824, // 1 GB
+    Pro: 53687091200, // 50 GB
     Pro_50GB: 53687091200, // 50 GB
     Studio_200GB: 214748364800, // 200 GB
   };
 
-  editor.storageTier = planTier;
+  editor.storageTier = planTier === 'Free' ? 'Free' : 'Pro';
   editor.storageLimitBytes = tiers[planTier] || 1073741824;
+
+  res.json({
+    success: true,
+    editorId,
+    storageTier: editor.storageTier,
+    storageLimitBytes: editor.storageLimitBytes,
+  });
+});
+
+// POST /api/storage/add-extra - Add pay-as-you-go storage
+app.post('/api/storage/add-extra', (req, res) => {
+  const { editorId, additionalGB } = req.body;
+  const editor = editors.find((e) => e.id === editorId);
+  if (!editor) return res.status(404).json({ error: 'Editor not found' });
+
+  const extraBytes = (Number(additionalGB) || 5) * 1024 * 1024 * 1024;
+  editor.storageLimitBytes = (editor.storageLimitBytes || 1073741824) + extraBytes;
+  editor.storageTier = 'Pro';
 
   res.json({
     success: true,

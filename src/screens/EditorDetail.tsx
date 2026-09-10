@@ -16,6 +16,7 @@ import {
   ShieldX,
   Play,
   Star,
+  Sparkles,
   Zap,
   CheckCircle2,
   ExternalLink,
@@ -73,6 +74,8 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
     lastPortfolioUpdate: new Date().toISOString(),
     createdAt: new Date().toISOString(),
   };
+
+  const isPro = editor.storageTier === 'Pro' || (editor.storageLimitBytes && editor.storageLimitBytes > 1073741824);
 
   // Real projects & subtasks assigned to this editor
   const editorSubtasks = useMemo(() => {
@@ -296,6 +299,12 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                 } shadow-2xs`}>
                   {editor.verificationStatus.toUpperCase()}
                 </span>
+                {isPro && (
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center gap-1 shadow-2xs">
+                    <Sparkles className="w-2.5 h-2.5 fill-white" />
+                    PRO CREATOR
+                  </span>
+                )}
                 <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   {editor.availability || 'Available for Projects'}

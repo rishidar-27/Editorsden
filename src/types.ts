@@ -80,7 +80,7 @@ export interface Editor {
   verifiedBy?: string;
   storageUsedBytes?: number;
   storageLimitBytes?: number;
-  storageTier?: 'Free' | 'Pro_50GB' | 'Studio_200GB';
+  storageTier?: 'Free' | 'Pro' | 'Pro_50GB' | 'Studio_200GB' | string;
   hourlyRate?: string;
   rating?: number | string;
   reviewsCount?: number;
