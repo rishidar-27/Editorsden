@@ -1,4 +1,4 @@
-import { useState, useEffect, type ButtonHTMLAttributes, type ReactNode, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { useState, useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { Check, X, ChevronDown } from 'lucide-react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
@@ -264,8 +264,12 @@ interface CheckboxProps {
 export function Checkbox({ checked, onChange, className = '' }: CheckboxProps) {
   return (
     <button
-      onClick={onChange}
-      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 focus-ring ${
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange();
+      }}
+      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors duration-150 focus-ring cursor-pointer ${
         checked ? 'bg-gray-900 border-gray-900 dark:bg-white dark:border-white' : 'border-gray-300 dark:border-zinc-600 bg-surface-0 dark:bg-zinc-900 hover:border-gray-400 dark:hover:border-zinc-500'
       } ${className}`}
     >
@@ -276,16 +280,43 @@ export function Checkbox({ checked, onChange, className = '' }: CheckboxProps) {
 
 interface KebabMenuProps {
   items: { label: string; onClick: () => void; variant?: 'default' | 'destructive' }[];
+  align?: 'left' | 'right';
 }
 
-export function KebabMenu({ items }: KebabMenuProps) {
+export function KebabMenu({ items, align = 'right' }: KebabMenuProps) {
   const [open, setOpen] = useState(false);
+  const [opensUpward, setOpensUpward] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpensUpward(spaceBelow < 200);
+    }
+    setOpen((prev) => !prev);
+  };
+
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
       <button
-        onClick={() => setOpen(!open)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-ring"
+        type="button"
+        onClick={handleToggle}
+        className="p-1.5 rounded-lg text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none cursor-pointer"
+        title="More actions"
       >
         <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
           <circle cx="8" cy="3" r="1.5" />
@@ -294,13 +325,25 @@ export function KebabMenu({ items }: KebabMenuProps) {
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-44 bg-surface-0 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg shadow-lg py-1 z-50 animate-scale-in">
+        <div
+          className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} ${
+            opensUpward ? 'bottom-full mb-1' : 'top-full mt-1'
+          } w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100`}
+        >
           {items.map((item, i) => (
             <button
               key={i}
-              onMouseDown={item.onClick}
-              className={`w-full text-left px-3 py-1.5 text-sm transition-colors ${
-                item.variant === 'destructive' ? 'text-red-500 hover:bg-red-050 dark:hover:bg-red-950/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(false);
+                item.onClick();
+              }}
+              className={`w-full text-left px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                item.variant === 'destructive'
+                  ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
+                  : 'text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {item.label}
