@@ -22,8 +22,11 @@ import {
   ExternalLink,
   Layers,
   HardDrive,
+  XCircle,
+  AlertCircle,
+  X,
 } from 'lucide-react';
-import type { AvailabilityStatus, Skill, Software } from '@/types';
+import type { AvailabilityStatus, Skill, Software, VerificationStatus } from '@/types';
 
 const availabilityOptions: AvailabilityStatus[] = ['Full-Time', 'Part-Time', 'Weekends', 'Not Available'];
 
@@ -114,6 +117,42 @@ export function EditorProfile() {
     (s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s as Skill)
   );
 
+  const verificationStatus: VerificationStatus = editor.verificationStatus || 'Pending';
+  const verificationConfig: Record<
+    VerificationStatus,
+    {
+      badgeText: string;
+      badgeClass: string;
+      icon: React.ReactNode;
+      avatarBadgeClass: string;
+      avatarIcon: React.ReactNode;
+    }
+  > = {
+    Verified: {
+      badgeText: 'Verified',
+      badgeClass: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+      icon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
+      avatarBadgeClass: 'bg-emerald-500',
+      avatarIcon: <Check className="w-3 h-3 stroke-[3]" />,
+    },
+    Pending: {
+      badgeText: 'Pending Verification',
+      badgeClass: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+      icon: <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />,
+      avatarBadgeClass: 'bg-amber-500',
+      avatarIcon: <Clock className="w-3 h-3 stroke-[2.5]" />,
+    },
+    Rejected: {
+      badgeText: 'Action Needed',
+      badgeClass: 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+      icon: <XCircle className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />,
+      avatarBadgeClass: 'bg-red-500',
+      avatarIcon: <X className="w-3 h-3 stroke-[2.5]" />,
+    },
+  };
+
+  const currentVerification = verificationConfig[verificationStatus] || verificationConfig.Pending;
+
   return (
     <div className="bg-[#f4f6fb] dark:bg-[#09090B] min-h-screen py-6 px-4 lg:px-8 font-sans text-gray-900 dark:text-zinc-100 transition-colors">
       <div className="max-w-[1140px] mx-auto space-y-6">
@@ -127,20 +166,23 @@ export function EditorProfile() {
                 alt={editor.fullName} 
                 className="w-14 h-14 rounded-2xl object-cover border-2 border-white dark:border-zinc-700 shadow-2xs" 
               />
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-2xs">
-                <Check className="w-3 h-3 stroke-[3]" />
+              <span 
+                title={`Status: ${currentVerification.badgeText}`}
+                className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${currentVerification.avatarBadgeClass} border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-2xs`}
+              >
+                {currentVerification.avatarIcon}
               </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{editor.fullName || 'Creator Profile'}</h1>
-                <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Verified Top 1%
+                <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full border flex items-center gap-1 ${currentVerification.badgeClass}`}>
+                  {currentVerification.icon}
+                  {currentVerification.badgeText}
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
-                Manage your creator studio credentials, hardware benchmarking, and public portfolio.
+                Manage your creator studio profile, hardware specifications, and public portfolio.
               </p>
             </div>
           </div>
@@ -169,6 +211,19 @@ export function EditorProfile() {
             </Button>
           </div>
         </div>
+
+        {/* Verification Alert / Feedback (if rejected or revisions needed) */}
+        {verificationStatus === 'Rejected' && editor.verificationFeedback && (
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-red-800 dark:text-red-300">Verification Review Feedback</h4>
+              <p className="text-xs text-red-700 dark:text-red-400 mt-0.5 leading-relaxed">{editor.verificationFeedback}</p>
+            </div>
+          </div>
+        )}
 
         {/* 2-Column Grid Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

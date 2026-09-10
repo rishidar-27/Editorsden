@@ -8,7 +8,6 @@ import { PublicPortfolioPage } from '@/screens/PublicPortfolioPage';
 import { EditorDashboard } from '@/screens/EditorDashboard';
 import { EditorProfile } from '@/screens/EditorProfile';
 import { EditorPortfolio } from '@/screens/EditorPortfolio';
-import { EditorVerification } from '@/screens/EditorVerification';
 import { EditorProjects } from '@/screens/EditorProjects';
 import { EditorStorageManager } from '@/screens/EditorStorageManager';
 import { AdminDashboard } from '@/screens/AdminDashboard';
@@ -27,7 +26,6 @@ const editorNavItems = [
   { label: 'Storage & Assets', route: '/editor/storage' },
   { label: 'Portfolio', route: '/editor/portfolio' },
   { label: 'My Profile', route: '/editor/profile' },
-  { label: 'Verification', route: '/editor/verification' },
 ];
 
 const adminNavItems = [
@@ -139,9 +137,8 @@ function Router() {
   // Editor routes
   let content: React.ReactNode = null;
   if (route === '/editor/dashboard') content = <EditorDashboard onNavigate={navigate} />;
-  else if (route === '/editor/profile') content = <EditorProfile />;
+  else if (route === '/editor/profile' || route === '/editor/verification') content = <EditorProfile />;
   else if (route === '/editor/portfolio') content = <EditorPortfolio />;
-  else if (route === '/editor/verification') content = <EditorVerification />;
   else if (route === '/editor/projects') content = <EditorProjects />;
   else if (route === '/editor/storage') content = <EditorStorageManager />;
   else content = <EditorDashboard onNavigate={navigate} />;
