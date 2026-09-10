@@ -221,16 +221,7 @@ export function generateUuid(): string {
 }
 
 export async function fetchAllProjects(): Promise<Project[]> {
-  // 1. Guaranteed server-side Supabase query (uses Service Role Key to bypass RLS)
-  try {
-    const res = await fetch('http://localhost:5000/api/projects');
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
-    }
-  } catch {}
-
-  // 2. Direct browser Supabase query
+  // 1. Direct browser Supabase query (fastest, live realtime)
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase
@@ -271,7 +262,7 @@ export async function fetchAllProjects(): Promise<Project[]> {
         `)
         .order('created_at', { ascending: false });
 
-      if (!error && data && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         return data.map((p) => ({
           id: p.id,
           title: p.title,
@@ -321,9 +312,18 @@ export async function fetchAllProjects(): Promise<Project[]> {
         }));
       }
     } catch (err) {
-      console.warn('Supabase fetchAllProjects notice:', err);
+      console.warn('Supabase fetchAllProjects direct query notice:', err);
     }
   }
+
+  // 2. Guaranteed server-side Supabase query fallback (uses Service Role Key to bypass RLS)
+  try {
+    const res = await fetch('http://localhost:5000/api/projects');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
+    }
+  } catch {}
 
   return [];
 }
@@ -603,21 +603,63 @@ export async function createActivityLogRecord(event: {
  * 6. REALTIME SYNC LISTENER
  * ============================================================
  */
-export function subscribeToDatabaseChanges(onPayload: () => void) {
+export function notifyRealtimeChange() {
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const bc = new BroadcastChannel('gogangs-realtime-bus');
+      bc.postMessage({ timestamp: Date.now() });
+      bc.close();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gogangs-local-sync'));
+    }
+  } catch {}
+}
+
+export function subscribeToDatabaseChanges(onPayload: (table?: string, eventType?: string, payload?: any) => void) {
   if (!isSupabaseConfigured()) return () => {};
 
+  const channelId = `realtime-sync-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
   const channel = supabase
-    .channel('realtime-all-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => onPayload())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => onPayload())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'subtasks' }, () => onPayload())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'deliverable_submissions' }, () => onPayload())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'editor_assets' }, () => onPayload())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, () => onPayload())
-    .subscribe();
+    .channel(channelId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, (p) => onPayload('profiles', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (p) => onPayload('projects', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'subtasks' }, (p) => onPayload('subtasks', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'deliverable_submissions' }, (p) => onPayload('deliverable_submissions', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'editor_assets' }, (p) => onPayload('editor_assets', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, (p) => onPayload('activity_logs', p.eventType, p))
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[Supabase Realtime] Connected to live database stream');
+      }
+    });
+
+  // Cross-tab broadcast listener for instant 0ms sync
+  let bc: BroadcastChannel | null = null;
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      bc = new BroadcastChannel('gogangs-realtime-bus');
+      bc.onmessage = () => {
+        onPayload('broadcast', 'sync');
+      };
+    }
+  } catch {}
+
+  const handleLocalSync = () => {
+    onPayload('local', 'sync');
+  };
+  if (typeof window !== 'undefined') {
+    window.addEventListener('gogangs-local-sync', handleLocalSync);
+  }
 
   return () => {
     supabase.removeChannel(channel);
+    try {
+      bc?.close();
+    } catch {}
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('gogangs-local-sync', handleLocalSync);
+    }
   };
 }
 

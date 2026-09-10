@@ -14,6 +14,7 @@ import {
   fetchAllActivityLogs,
   createActivityLogRecord,
   subscribeToDatabaseChanges,
+  notifyRealtimeChange,
   signInWithEmail,
   signUpWithEmail,
   signOutUser,
@@ -194,6 +195,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Fetch real data from Supabase / Backend with Realtime Sync
   useEffect(() => {
+    let isMounted = true;
+
     async function loadRealData() {
       try {
         const [liveEditors, liveProjects, liveActivity] = await Promise.all([
@@ -201,6 +204,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           fetchAllProjects(),
           fetchAllActivityLogs(),
         ]);
+        if (!isMounted) return;
         if (isSupabaseConfigured()) {
           setEditors(liveEditors || []);
           setProjects(liveProjects || []);
@@ -215,15 +219,48 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    // Initial load
     loadRealData();
 
-    // Subscribe to live Realtime database broadcasts
-    const unsubscribe = subscribeToDatabaseChanges(() => {
+    // 1. Subscribe to live Supabase Realtime WebSocket channel & cross-tab events
+    const unsubscribe = subscribeToDatabaseChanges((table, eventType) => {
       loadRealData();
     });
 
+    // 2. Window focus & tab visibility change listener
+    const handleFocus = () => {
+      loadRealData();
+    };
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        loadRealData();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleFocus);
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    // 3. Fast real-time polling heartbeat (every 2.5 seconds when tab is active)
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        loadRealData();
+      }
+    }, 2500);
+
     return () => {
+      isMounted = false;
       unsubscribe();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleFocus);
+      }
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+      clearInterval(interval);
     };
   }, []);
 
@@ -368,6 +405,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const nowIso = new Date().toISOString();
     setEditors((prev) => prev.map((e) => e.id === id ? { ...e, ...updates, lastProfileUpdate: nowIso, lastLogin: nowIso } : e));
     updateEditorProfile(id, { ...updates, lastLogin: nowIso }).catch(() => null);
+    notifyRealtimeChange();
   }, []);
 
   const setVerificationStatus = useCallback((editorId: string, status: VerificationStatus, feedback?: string) => {
@@ -391,6 +429,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       timestamp: new Date().toISOString(),
     };
     setActivity((prev) => [event, ...prev]);
+    notifyRealtimeChange();
   }, [editors]);
 
   const toggleEditorActive = useCallback((editorId: string) => {
@@ -399,6 +438,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (current) {
       updateEditorProfile(editorId, { active: !current.active }).catch(() => null);
     }
+    notifyRealtimeChange();
   }, [editors]);
 
   const addProject = useCallback((project: Project) => {
@@ -413,6 +453,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setActivity((prev) => [event, ...prev]);
     createActivityLogRecord({ type: event.type, message: event.message }).catch(() => null);
+    notifyRealtimeChange();
   }, []);
 
   const updateSubtask = useCallback((projectId: string, subtaskId: string, updates: Partial<import('./types').Subtask>) => {
@@ -506,6 +547,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setActivity((prev) => [event, ...prev]);
       createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId, feedback: updates.feedback } }).catch(() => null);
     }
+    notifyRealtimeChange();
   }, [projects, editors]);
 
   const assignEditors = useCallback((projectId: string, subtaskId: string, editorIds: string[]) => {
@@ -527,6 +569,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setActivity((prev) => [event, ...prev]);
     createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId, editorIds } }).catch(() => null);
+    notifyRealtimeChange();
   }, [projects, editors]);
 
   const addSubtaskToProject = useCallback((projectId: string, subtask: Subtask) => {
@@ -546,6 +589,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setActivity((prev) => [event, ...prev]);
     createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId: subtask.id } }).catch(() => null);
+    notifyRealtimeChange();
   }, [projects]);
 
   // Storage Quota Methods
