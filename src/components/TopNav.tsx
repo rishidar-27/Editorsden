@@ -1,5 +1,21 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Bell, Menu, X, Search, ChevronDown, LogOut, User as UserIcon, ExternalLink, Sun, Moon } from 'lucide-react';
+import {
+  Bell,
+  Menu,
+  X,
+  Search,
+  ChevronDown,
+  LogOut,
+  User as UserIcon,
+  ExternalLink,
+  Sun,
+  Moon,
+  Briefcase,
+  Layers,
+  FileText,
+  Clock,
+  ArrowRight,
+} from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '@/context';
 import { Avatar } from './ui';
@@ -23,9 +39,41 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const currentEditor = getCurrentEditor();
+
+  const isMac = useMemo(() => {
+    return (
+      typeof navigator !== 'undefined' &&
+      /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform || navigator.userAgent)
+    );
+  }, []);
+
+  // Global keyboard shortcut to open/close search (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 60);
+    } else {
+      setSearchQuery('');
+    }
+  }, [searchOpen]);
 
   const storageKey = `gogangs_read_notifs_${user?.type === 'admin' ? 'admin' : (user?.editorId || 'guest')}`;
   const [readIds, setReadIds] = useState<string[]>(() => {
@@ -174,6 +222,104 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     return projects.flatMap((p) => p.subtasks).filter((st) => st.status === 'Ready for Review').length;
   }, [projects]);
 
+  // Quick navigation recommendations when search query is empty
+  const quickLinks = useMemo(() => {
+    if (user?.type === 'admin') {
+      return [
+        { label: 'Editor Directory', route: '/admin/editors', category: 'Directory', icon: UserIcon },
+        { label: 'Review Queue', route: '/admin/review', category: 'Approvals', icon: Clock },
+        { label: 'Client Projects', route: '/admin/projects', category: 'Pipeline', icon: Briefcase },
+        { label: 'Production Reports', route: '/admin/reports', category: 'Analytics', icon: FileText },
+      ];
+    }
+    return [
+      { label: 'Active Projects', route: '/editor/projects', category: 'Tasks', icon: Briefcase },
+      { label: 'Cloud Storage', route: '/editor/storage', category: 'Assets', icon: Layers },
+      { label: 'Master Portfolio', route: '/editor/portfolio', category: 'Showcase', icon: FileText },
+      { label: 'Studio Profile', route: '/editor/profile', category: 'Profile', icon: UserIcon },
+    ];
+  }, [user]);
+
+  // Live real-time search results matching editors, projects, tasks, and routes
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return null;
+
+    // 1. Editors search (excluding admin)
+    const matchedEditors = editors
+      .filter((e) => (e as any).role !== 'admin' && e.email !== 'admin@gogangs.com')
+      .filter(
+        (e) =>
+          e.fullName.toLowerCase().includes(q) ||
+          e.email.toLowerCase().includes(q) ||
+          e.city.toLowerCase().includes(q) ||
+          (e.skills || []).some((s) => s.toLowerCase().includes(q))
+      )
+      .slice(0, 5)
+      .map((e) => ({
+        id: `editor-${e.id}`,
+        title: e.fullName,
+        subtitle: `${e.city || 'Remote'} • ${e.skills?.[0] || 'Editor'}`,
+        category: 'Editor' as const,
+        route: user?.type === 'admin' ? `/admin/editor/${e.id}` : `/editor/${e.id}`,
+        badge: e.verificationStatus,
+      }));
+
+    // 2. Projects search
+    const matchedProjects = (projects || [])
+      .filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          (p.clientName && p.clientName.toLowerCase().includes(q))
+      )
+      .slice(0, 5)
+      .map((p) => ({
+        id: `proj-${p.id}`,
+        title: p.title,
+        subtitle: p.clientName ? `Client: ${p.clientName}` : 'Project',
+        category: 'Project' as const,
+        route: user?.type === 'admin' ? `/admin/projects/${p.id}` : `/editor/projects`,
+        badge: `${p.subtasks?.length || 0} subtasks`,
+      }));
+
+    // 3. Subtasks search
+    const matchedTasks = (projects || [])
+      .flatMap((p) =>
+        (p.subtasks || []).map((st) => ({
+          ...st,
+          projectTitle: p.title,
+        }))
+      )
+      .filter(
+        (st) =>
+          st.title.toLowerCase().includes(q) ||
+          (st.taskType && st.taskType.toLowerCase().includes(q))
+      )
+      .slice(0, 5)
+      .map((st) => ({
+        id: `task-${st.id}`,
+        title: st.title,
+        subtitle: `${st.projectTitle} • ${st.taskType || 'Milestone'}`,
+        category: 'Task' as const,
+        route: user?.type === 'admin' ? `/admin/review` : `/editor/projects`,
+        badge: st.status,
+      }));
+
+    // 4. Navigation route matches
+    const matchedPages = items
+      .filter((item) => item.label.toLowerCase().includes(q))
+      .map((item) => ({
+        id: `nav-${item.route}`,
+        title: item.label,
+        subtitle: 'Navigation Page',
+        category: 'Page' as const,
+        route: item.route,
+        badge: 'Page',
+      }));
+
+    return [...matchedEditors, ...matchedProjects, ...matchedTasks, ...matchedPages];
+  }, [searchQuery, editors, projects, items, user]);
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
@@ -233,19 +379,21 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
           {/* Right: Search, Dark Mode Toggle, Notifications, Avatar */}
           <div className="flex items-center gap-2 sm:gap-3">
             {showSearch && (
-              <div className="hidden md:flex items-center relative">
-                <Search className="w-4 h-4 text-gray-400 dark:text-zinc-500 absolute left-3 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search editors, projects..."
-                  onClick={() => setSearchOpen(true)}
-                  readOnly
-                  className="w-60 pl-9 pr-9 py-1.5 text-xs bg-gray-100/90 dark:bg-zinc-900 border border-transparent dark:border-zinc-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-850 focus:outline-none focus:bg-white dark:focus:bg-zinc-900 focus:border-gray-300 dark:focus:border-zinc-700 transition-all placeholder:text-gray-400 dark:placeholder:text-zinc-500 text-gray-800 dark:text-zinc-200"
-                />
-                <span className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-semibold text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded shadow-2xs pointer-events-none">
-                  ⌘K
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="hidden md:flex items-center justify-between w-64 px-3.5 py-1.5 text-xs bg-gray-100/90 dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-850 hover:border-gray-300 dark:hover:border-zinc-700 focus:outline-none transition-all text-gray-500 dark:text-zinc-400 group shadow-2xs"
+              >
+                <span className="flex items-center gap-2 overflow-hidden">
+                  <Search className="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors shrink-0" />
+                  <span className="text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors truncate">
+                    Search editors, projects...
+                  </span>
                 </span>
-              </div>
+                <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded shadow-2xs shrink-0 select-none">
+                  {isMac ? '⌘ K' : 'Ctrl K'}
+                </kbd>
+              </button>
             )}
 
             {/* Dark Mode Toggle Button */}
@@ -440,36 +588,137 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
         )}
       </nav>
 
-      {/* Search overlay */}
+      {/* Search overlay / Live Command Palette */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 animate-fade-in" onClick={() => setSearchOpen(false)}>
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
-          <div className="relative w-full max-w-xl bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl animate-scale-in overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-200 dark:border-zinc-800">
-              <Search className="w-5 h-5 text-gray-400 dark:text-zinc-500" />
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 px-4 animate-fade-in"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" />
+          <div
+            className="relative w-full max-w-xl bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl animate-scale-in overflow-hidden flex flex-col max-h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Input Header */}
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60">
+              <Search className="w-5 h-5 text-gray-400 dark:text-zinc-500 shrink-0" />
               <input
-                autoFocus
-                placeholder="Search editors, projects, tasks..."
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search editors by name or skill, projects, tasks..."
                 className="flex-1 text-sm bg-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-zinc-500 text-gray-900 dark:text-white"
               />
-              <button onClick={() => setSearchOpen(false)} className="text-xs text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
-                ESC
-              </button>
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              ) : (
+                <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-400 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded">
+                  ESC
+                </kbd>
+              )}
             </div>
-            <div className="py-2">
-              <div className="px-4 py-2 text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Recent</div>
-              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-                Marcus Chen — Verified Editor
-              </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-                Aurora Skincare — Q4 Launch Campaign
-              </button>
-              <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-left">
-                <ExternalLink className="w-4 h-4 text-gray-400 dark:text-zinc-500" />
-                Review Queue — 3 pending
-              </button>
+
+            {/* Results or Quick Links */}
+            <div className="overflow-y-auto py-2 divide-y divide-gray-100 dark:divide-zinc-800/60">
+              {searchQuery ? (
+                searchResults && searchResults.length > 0 ? (
+                  <div className="p-2 space-y-1">
+                    <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-zinc-500">
+                      Matches ({searchResults.length})
+                    </div>
+                    {searchResults.map((res) => (
+                      <button
+                        key={res.id}
+                        onClick={() => {
+                          onNavigate(res.route);
+                          setSearchOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left hover:bg-gray-100 dark:hover:bg-zinc-800/70 transition-colors group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-600 dark:text-zinc-400 shrink-0 group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 transition-colors">
+                            {res.category === 'Editor' && <UserIcon className="w-4 h-4" />}
+                            {res.category === 'Project' && <Briefcase className="w-4 h-4" />}
+                            {res.category === 'Task' && <FileText className="w-4 h-4" />}
+                            {res.category === 'Page' && <Layers className="w-4 h-4" />}
+                          </div>
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                              {res.title}
+                            </div>
+                            <div className="text-[11px] text-gray-500 dark:text-zinc-400 truncate">
+                              {res.subtitle}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200/80 dark:border-zinc-700">
+                            {res.badge}
+                          </span>
+                          <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-12 text-center text-xs text-gray-500 dark:text-zinc-400 space-y-1">
+                    <p className="font-semibold text-gray-700 dark:text-zinc-300">No results found for "{searchQuery}"</p>
+                    <p className="text-[11px] text-gray-400">Try searching for an editor name, city, skill, or project title.</p>
+                  </div>
+                )
+              ) : (
+                <div className="p-2 space-y-2">
+                  <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-zinc-500">
+                    Quick Navigation
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    {quickLinks.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <button
+                          key={item.route}
+                          onClick={() => {
+                            onNavigate(item.route);
+                            setSearchOpen(false);
+                          }}
+                          className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800/70 transition-colors text-left group cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-600 dark:text-zinc-400 shrink-0 group-hover:bg-gray-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 transition-colors">
+                            <Icon className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">
+                              {item.label}
+                            </div>
+                            <div className="text-[10px] text-gray-400">
+                              {item.category}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer hints */}
+            <div className="px-4 py-2 bg-gray-50 dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 text-[11px] text-gray-400 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <span className="font-semibold text-gray-600 dark:text-zinc-300">Shortcut:</span> Press{' '}
+                <kbd className="px-1.5 py-0.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded text-[9px] font-mono">
+                  {isMac ? '⌘ K' : 'Ctrl K'}
+                </kbd>{' '}
+                anytime
+              </span>
+              <span>Press ESC to close</span>
             </div>
           </div>
         </div>

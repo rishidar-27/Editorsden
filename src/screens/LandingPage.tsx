@@ -664,18 +664,6 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-[#f4f6fb] dark:bg-[#09090B] text-gray-900 dark:text-zinc-100 font-sans selection:bg-gray-900 selection:text-white overflow-x-hidden transition-colors">
       
-      {/* 1. TOP ANNOUNCEMENT & LIVE STATUS TICKER */}
-      <div className="bg-gray-900 dark:bg-black text-white text-[11px] font-medium py-1.5 px-4 text-center border-b border-gray-800 dark:border-zinc-800 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          LIVE PIPELINE
-        </span>
-        <span className="hidden sm:inline text-gray-300">
-          Over 1,420+ 4K master deliverables completed this month.
-        </span>
-        <span className="text-gray-400">• Average editor turnaround: <strong className="text-white">18.4 Hours</strong></span>
-      </div>
-
       {/* 2. STICKY TOP NAVIGATION BAR */}
       <header className="sticky top-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-gray-200/80 dark:border-zinc-800 px-4 sm:px-8 py-3 transition-all shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">

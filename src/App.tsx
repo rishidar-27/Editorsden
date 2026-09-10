@@ -148,7 +148,7 @@ function Router() {
 
   return (
     <div className="min-h-screen bg-[#f4f6fb] dark:bg-[#09090B] text-gray-900 dark:text-zinc-100 transition-colors">
-      <TopNav items={navItems} currentRoute={route} onNavigate={navigate} showNotifications />
+      <TopNav items={navItems} currentRoute={route} onNavigate={navigate} showSearch showNotifications />
       <div className="pt-16">
         {content}
       </div>
