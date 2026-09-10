@@ -14,8 +14,6 @@ import {
   Film,
   Video,
   Clock,
-  HardDrive,
-  DollarSign,
   ShieldCheck,
 } from 'lucide-react';
 import type { TaskType, Project } from '@/types';
@@ -29,8 +27,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
   const { addProject, addToast } = useApp();
   const [title, setTitle] = useState('');
   const [clientName, setClientName] = useState('');
-  const [budgetEstimate, setBudgetEstimate] = useState(4800);
-  const [storagePreset, setStoragePreset] = useState<'Standard_1GB' | 'Pro_50GB' | 'Studio_200GB'>('Standard_1GB');
   const [subtasks, setSubtasks] = useState<
     { id: string; title: string; taskType: TaskType; deadline: string }[]
   >([
@@ -77,7 +73,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
     if (preset === 'social') {
       setTitle('Summer Viral Social Media Campaign');
       setClientName('Aurora Skincare');
-      setBudgetEstimate(3200);
       setSubtasks([
         { id: `st-${Date.now()}-1`, title: 'Viral Instagram Reels (5x Hook Variations)', taskType: 'Reels Editing', deadline: '2026-09-08' },
         { id: `st-${Date.now()}-2`, title: 'High-CTR Thumbnail Graphic Package', taskType: 'Thumbnail Design', deadline: '2026-09-05' },
@@ -86,7 +81,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
     } else if (preset === 'youtube') {
       setTitle('YouTube Episodic Documentary Series — Season 1');
       setClientName('Creator Studios');
-      setBudgetEstimate(5500);
       setSubtasks([
         { id: `st-${Date.now()}-1`, title: 'Episode 1 & 2 Main 4K Video Cut', taskType: 'YouTube Editing', deadline: '2026-09-14' },
         { id: `st-${Date.now()}-2`, title: 'Custom YouTube Thumbnails (2x Variations)', taskType: 'Thumbnail Design', deadline: '2026-09-10' },
@@ -96,7 +90,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
     } else if (preset === 'podcast') {
       setTitle('Weekly Video Podcast & Multi-Platform Syndication');
       setClientName('FinTech Weekly');
-      setBudgetEstimate(2400);
       setSubtasks([
         { id: `st-${Date.now()}-1`, title: 'Full 60-min Multi-Cam Switcher Edit', taskType: 'Podcast Editing', deadline: '2026-09-11' },
         { id: `st-${Date.now()}-2`, title: 'Bite-sized Highlight Reels with Animated Subtitles (5x)', taskType: 'Reels Editing', deadline: '2026-09-09' },
@@ -105,7 +98,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
     } else {
       setTitle('Global Brand Re-launch & Broadcast Campaign');
       setClientName('Enterprise Partner Inc.');
-      setBudgetEstimate(8500);
       setSubtasks([
         { id: `st-${Date.now()}-1`, title: 'Hero Cinematic Commercial Film (60s & 90s)', taskType: 'Commercial Ads', deadline: '2026-09-16' },
         { id: `st-${Date.now()}-2`, title: 'DaVinci Resolve HDR Color Grade & 5.1 Mix', taskType: 'Color Grading', deadline: '2026-09-18' },
@@ -135,7 +127,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       })),
     };
     addProject(project);
-    addToast(`"${title.trim()}" created! Cloudflare R2 bucket provisioned.`, 'success');
+    addToast(`"${title.trim()}" created successfully!`, 'success');
     onNavigate(`/admin/projects/${projectId}`);
   };
 
@@ -161,7 +153,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
             Create Campaign Project
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Configure campaign deliverables, automated Cloudflare R2 buckets, and editor deadlines
+            Configure campaign deliverables and editor deadlines
           </p>
         </div>
       </div>
@@ -242,50 +234,6 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
               onChange={(e) => setClientName(e.target.value)}
               className="w-full px-3.5 py-2.5 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 shadow-2xs font-medium"
             />
-          </div>
-        </div>
-
-        {/* Budget & Storage Tier Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-          <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                Target Budget Allocation
-              </label>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                100% Allocated
-              </span>
-            </div>
-            <input
-              type="number"
-              value={budgetEstimate}
-              onChange={(e) => setBudgetEstimate(Number(e.target.value))}
-              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-bold text-gray-900"
-            />
-            <p className="text-[10.5px] text-gray-400">Total project budget allocation for deliverables.</p>
-          </div>
-
-          <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                <HardDrive className="w-3.5 h-3.5 text-gray-700" />
-                Cloudflare R2 Bucket Provisioning
-              </label>
-              <span className="text-[10px] font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
-                $0 Egress
-              </span>
-            </div>
-            <select
-              value={storagePreset}
-              onChange={(e) => setStoragePreset(e.target.value as any)}
-              className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-semibold text-gray-800"
-            >
-              <option value="Standard_1GB">Standard Workspace (1 GB Included per Editor)</option>
-              <option value="Pro_50GB">Pro High-Speed Workspace (50 GB Bucket)</option>
-              <option value="Studio_200GB">Studio Master Workspace (200 GB 4K Archive)</option>
-            </select>
-            <p className="text-[10.5px] text-gray-400">Direct S3 presigned upload URLs with automated version queues.</p>
           </div>
         </div>
       </Card>
