@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input, Textarea, Select, Button, SkillTag } from '@/components/ui';
 import { useApp } from '@/context';
 import { allSkills, allSoftware } from '@/data';
@@ -25,6 +25,7 @@ import {
   XCircle,
   AlertCircle,
   X,
+  Camera,
 } from 'lucide-react';
 import type { AvailabilityStatus, Skill, Software, VerificationStatus } from '@/types';
 
@@ -60,6 +61,9 @@ export function EditorProfile() {
   const editor = getCurrentEditor();
   const [saved, setSaved] = useState(false);
 
+  const [avatarUrl, setAvatarUrl] = useState(editor?.avatarUrl || '');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     fullName: editor?.fullName || '',
     phone: editor?.phone || '',
@@ -82,9 +86,36 @@ export function EditorProfile() {
 
   if (!editor) return null;
 
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      addToast('Please select a valid image file (PNG, JPG, WebP)', 'error');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      addToast('Profile image size must be under 5MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setAvatarUrl(dataUrl);
+        updateEditor(editor.id, { avatarUrl: dataUrl });
+        addToast('Profile picture updated successfully!', 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = () => {
     updateEditor(editor.id, {
       ...form,
+      avatarUrl: avatarUrl || editor.avatarUrl,
       skills,
       editingSoftware: software,
       hardware: JSON.stringify(hardwareSpecs),
@@ -160,19 +191,40 @@ export function EditorProfile() {
         {/* Compact Header Bar */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
+            {/* Hidden File Input for Image Upload */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarFileChange}
+              className="hidden"
+            />
+            
+            {/* Clickable Avatar with Camera Overlay */}
             <div className="relative shrink-0">
-              <img 
-                src={editor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'} 
-                alt={editor.fullName} 
-                className="w-14 h-14 rounded-2xl object-cover border-2 border-white dark:border-zinc-700 shadow-2xs" 
-              />
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="relative w-16 h-16 rounded-2xl overflow-hidden cursor-pointer border-2 border-white dark:border-zinc-700 shadow-2xs group"
+                title="Click to upload profile photo"
+              >
+                <img 
+                  src={avatarUrl || editor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'} 
+                  alt={editor.fullName} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" 
+                />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-bold gap-0.5">
+                  <Camera className="w-4 h-4" />
+                  <span>Update</span>
+                </div>
+              </div>
               <span 
                 title={`Status: ${currentVerification.badgeText}`}
-                className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${currentVerification.avatarBadgeClass} border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-2xs`}
+                className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${currentVerification.avatarBadgeClass} border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white shadow-2xs z-10 pointer-events-none`}
               >
                 {currentVerification.avatarIcon}
               </span>
             </div>
+
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{editor.fullName || 'Creator Profile'}</h1>
@@ -181,9 +233,20 @@ export function EditorProfile() {
                   {currentVerification.badgeText}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Manage your creator studio profile, hardware specifications, and public portfolio.
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-700 dark:text-zinc-300 hover:text-black dark:hover:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                >
+                  <Camera className="w-3 h-3" />
+                  <span>Change photo</span>
+                </button>
+                <span className="text-xs text-gray-400 dark:text-zinc-500">•</span>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">
+                  Manage your creator studio profile, hardware specifications, and public portfolio.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -266,6 +329,15 @@ export function EditorProfile() {
                   onChange={(e) => setForm({ ...form, city: e.target.value })} 
                   icon={<MapPin className="w-3.5 h-3.5 text-gray-400" />}
                 />
+                <div className="sm:col-span-2">
+                  <Input 
+                    label="Profile Picture URL (or click your avatar above to upload image file)" 
+                    placeholder="https://images.unsplash.com/... or paste image URL" 
+                    value={avatarUrl} 
+                    onChange={(e) => setAvatarUrl(e.target.value)} 
+                    icon={<Camera className="w-3.5 h-3.5 text-gray-400" />}
+                  />
+                </div>
               </div>
             </div>
 
