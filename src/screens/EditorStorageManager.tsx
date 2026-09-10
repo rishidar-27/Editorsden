@@ -181,12 +181,12 @@ export function EditorStorageManager() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-            <HardDrive className="w-7 h-7 text-gray-900" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <HardDrive className="w-7 h-7 text-gray-900 dark:text-zinc-100" />
             Storage & Cloud Assets
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Manage your Cloudflare R2 video storage bucket, monitor your 1 GB limit, and clean old draft cuts
+          <p className="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+            Manage your Cloudflare R2 video storage bucket, monitor your 1 GB limit, and organize deliverables.
           </p>
         </div>
 
@@ -195,9 +195,9 @@ export function EditorStorageManager() {
             variant="outline"
             size="sm"
             onClick={() => setIsUpgradeModalOpen(true)}
-            className="border-gray-300 text-gray-900 bg-gray-50 hover:bg-gray-100 font-bold text-xs shadow-2xs"
+            className="border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 font-bold text-xs shadow-2xs"
           >
-            <Sparkles className="w-3.5 h-3.5 mr-1 text-gray-900" />
+            <Sparkles className="w-3.5 h-3.5 mr-1 text-gray-900 dark:text-white" />
             Upgrade Storage Plan
           </Button>
         </div>
@@ -206,15 +206,15 @@ export function EditorStorageManager() {
       {/* 4 Top KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* Card 1: Used Capacity */}
-        <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+        <Card className="p-4 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-500">Storage Used</span>
-            <div className="w-8 h-8 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center">
+            <span className="text-xs font-semibold text-gray-500 dark:text-zinc-400">Storage Used</span>
+            <div className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 flex items-center justify-center">
               <HardDrive className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               {usedMB} <span className="text-sm font-semibold text-gray-400">/ {limitMB} MB</span>
             </h2>
             <span className={`text-xs font-bold ${isNearLimit ? 'text-amber-600' : 'text-emerald-600'}`}>
@@ -227,16 +227,16 @@ export function EditorStorageManager() {
         </Card>
 
         {/* Card 2: Zero Egress Bandwidth */}
-        <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+        <Card className="p-4 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-500">Bandwidth Cost</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-100/70 text-emerald-700 flex items-center justify-center">
+            <span className="text-xs font-semibold text-gray-500 dark:text-zinc-400">Bandwidth Cost</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-100/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-2xl font-extrabold text-emerald-600 tracking-tight">$0.00</h2>
-            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <h2 className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">$0.00</h2>
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
               Zero Egress
             </span>
           </div>
@@ -246,18 +246,18 @@ export function EditorStorageManager() {
         </Card>
 
         {/* Card 3: Files in Bucket */}
-        <Card className="p-4 bg-white border border-gray-100 rounded-2xl shadow-2xs">
+        <Card className="p-4 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-500">Files Stored</span>
-            <div className="w-8 h-8 rounded-xl bg-gray-100 text-gray-900 flex items-center justify-center">
+            <span className="text-xs font-semibold text-gray-500 dark:text-zinc-400">Files Stored</span>
+            <div className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 flex items-center justify-center">
               <Film className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               {displayAssetsList.length} <span className="text-sm font-semibold text-gray-400">videos</span>
             </h2>
-            <span className="text-xs font-bold text-gray-900">Cloudflare R2</span>
+            <span className="text-xs font-bold text-gray-900 dark:text-zinc-200">Cloudflare R2</span>
           </div>
           <span className="text-[11px] text-gray-400 font-medium block mt-1">
             ProRes, MP4, MOV masters
