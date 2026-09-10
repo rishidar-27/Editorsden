@@ -304,7 +304,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                 <th className="py-3 px-4 min-w-[140px]">AVAILABILITY</th>
                 <th className="py-3 px-4 min-w-[150px]">LAST ACTIVE</th>
                 <th className="py-3 px-4 min-w-[120px]">STATUS</th>
-                <th className="py-3 px-4 w-28 text-right">ACTIONS</th>
+                <th className="py-3 px-4 w-32 text-center">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-zinc-800 text-xs text-gray-700 dark:text-zinc-300">
@@ -322,7 +322,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                     className="hover:bg-gray-50/70 dark:hover:bg-zinc-800/40 transition-colors group cursor-pointer"
                   >
                   {/* Checkbox */}
-                  <td className="py-3.5 px-4 text-center" onClick={(ev) => ev.stopPropagation()}>
+                  <td className="py-3.5 px-4 text-center align-middle" onClick={(ev) => ev.stopPropagation()}>
                     <Checkbox
                       checked={selected.includes(e.id)}
                       onChange={() => toggleSelect(e.id)}
@@ -330,7 +330,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Editor Info */}
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 align-middle">
                     <div className="flex items-center gap-3">
                       <img
                         src={e.avatarUrl}
@@ -353,7 +353,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Skills */}
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 align-middle">
                     <div className="flex flex-wrap items-center gap-1 max-w-[220px]">
                       {e.skills.slice(0, 2).map((skill, i) => (
                         <span
@@ -372,7 +372,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Software */}
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 align-middle">
                     <div className="flex flex-wrap items-center gap-1 max-w-[180px]">
                       {e.editingSoftware.slice(0, 2).map((soft, i) => (
                         <span key={i} className="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded text-[10px] font-semibold">
@@ -383,12 +383,12 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Experience */}
-                  <td className="py-3.5 px-4 font-medium text-gray-800 dark:text-zinc-200">
+                  <td className="py-3.5 px-4 font-medium text-gray-800 dark:text-zinc-200 align-middle">
                     {e.experience} years
                   </td>
 
                   {/* Availability */}
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 align-middle">
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">{e.availability}</p>
                       <p className="text-[10.5px] text-gray-400 dark:text-zinc-500">{e.hoursPerWeek} hrs/week</p>
@@ -396,7 +396,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Last Active */}
-                  <td className="py-3.5 px-4" title={`Exact time: ${formatDateTime(getEditorLastActiveDate(e))}`}>
+                  <td className="py-3.5 px-4 align-middle" title={`Exact time: ${formatDateTime(getEditorLastActiveDate(e))}`}>
                     {(() => {
                       const activeIso = getEditorLastActiveDate(e);
                       const isRecent = isRecentlyActive(activeIso);
@@ -416,7 +416,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Status */}
-                  <td className="py-3.5 px-4">
+                  <td className="py-3.5 px-4 align-middle">
                     <Badge
                       variant={
                         e.verificationStatus === 'Verified'
@@ -431,8 +431,8 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                   </td>
 
                   {/* Actions: 2 icons alone (tick for approve, wrong for deactivate) */}
-                  <td className="py-3.5 px-4 text-right" onClick={(ev) => ev.stopPropagation()}>
-                    <div className="flex items-center justify-end gap-2" onClick={(ev) => ev.stopPropagation()}>
+                  <td className="py-3.5 px-4 text-center align-middle" onClick={(ev) => ev.stopPropagation()}>
+                    <div className="flex items-center justify-center gap-2" onClick={(ev) => ev.stopPropagation()}>
                       {/* Approve / Verify (Tick) */}
                       <button
                         type="button"
