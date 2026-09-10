@@ -60,6 +60,7 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
 
   const availableEditors = useMemo(() => {
     return editors.filter((e) => {
+      if (e.email === 'admin@gogangs.com' || (e as any).role === 'admin') return false;
       if (e.verificationStatus !== 'Verified') return false;
       if (!e.active) return false;
       if (search && !e.fullName.toLowerCase().includes(search.toLowerCase()) && !e.city.toLowerCase().includes(search.toLowerCase())) {

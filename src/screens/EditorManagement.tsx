@@ -38,12 +38,22 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
+  // Exclude admin accounts from the editor directory roster and metrics
+  const editorList = useMemo(() => {
+    return editors.filter(
+      (e) =>
+        e.email !== 'admin@gogangs.com' &&
+        (e as any).role !== 'admin' &&
+        !e.fullName?.toLowerCase().includes('administrator')
+    );
+  }, [editors]);
+
   // Live metrics from context
-  const totalEditors = editors.length;
-  const verifiedEditors = editors.filter((e) => e.verificationStatus === 'Verified').length;
-  const pendingEditors = editors.filter((e) => e.verificationStatus === 'Pending').length;
-  const activeEditors = editors.filter((e) => e.active).length;
-  const inactiveEditors = editors.filter((e) => !e.active).length;
+  const totalEditors = editorList.length;
+  const verifiedEditors = editorList.filter((e) => e.verificationStatus === 'Verified').length;
+  const pendingEditors = editorList.filter((e) => e.verificationStatus === 'Pending').length;
+  const activeEditors = editorList.filter((e) => e.active).length;
+  const inactiveEditors = editorList.filter((e) => !e.active).length;
 
   const metrics = [
     {
@@ -95,7 +105,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
 
   // Dynamic filter logic
   const filtered = useMemo(() => {
-    return editors.filter((e) => {
+    return editorList.filter((e) => {
       if (
         search &&
         !e.fullName.toLowerCase().includes(search.toLowerCase()) &&
@@ -110,7 +120,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       if (activeSoftwareFilter !== 'All' && !e.editingSoftware.includes(activeSoftwareFilter as never)) return false;
       return true;
     });
-  }, [editors, search, activeStatusFilter, activeAvailabilityFilter, activeSkillFilter, activeSoftwareFilter]);
+  }, [editorList, search, activeStatusFilter, activeAvailabilityFilter, activeSkillFilter, activeSoftwareFilter]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>

@@ -21,11 +21,36 @@ import {
   Wifi,
   ExternalLink,
   Layers,
-  Award,
+  HardDrive,
 } from 'lucide-react';
 import type { AvailabilityStatus, Skill, Software } from '@/types';
 
 const availabilityOptions: AvailabilityStatus[] = ['Full-Time', 'Part-Time', 'Weekends', 'Not Available'];
+
+interface HardwareConfig {
+  workstation: string;
+  displays: string;
+  storage: string;
+  audioConnectivity: string;
+}
+
+const parseHardware = (raw?: string): HardwareConfig => {
+  if (!raw) return { workstation: '', displays: '', storage: '', audioConnectivity: '' };
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === 'object' && parsed !== null) {
+      return {
+        workstation: parsed.workstation || '',
+        displays: parsed.displays || '',
+        storage: parsed.storage || '',
+        audioConnectivity: parsed.audioConnectivity || parsed.connectivity || '',
+      };
+    }
+  } catch {
+    return { workstation: raw, displays: '', storage: '', audioConnectivity: '' };
+  }
+  return { workstation: '', displays: '', storage: '', audioConnectivity: '' };
+};
 
 export function EditorProfile() {
   const { getCurrentEditor, updateEditor, addToast } = useApp();
@@ -46,12 +71,7 @@ export function EditorProfile() {
     hoursPerWeek: editor?.hoursPerWeek || 0,
   });
 
-  const [hardwareSpecs, setHardwareSpecs] = useState({
-    workstation: 'Apple Mac Studio M2 Ultra (128GB Unified Memory, 24-Core CPU)',
-    displays: 'Dual ASUS ProArt 32" 4K HDR (Calibrated Rec.709 & DCI-P3 Delta E < 1.5)',
-    connectivity: '1 Gbps Symmetrical Fiber Optical (Low-Latency R2 Sync)',
-    audioMonitors: 'Yamaha HS8 Studio Reference Monitors + Sennheiser HD 650 Pro',
-  });
+  const [hardwareSpecs, setHardwareSpecs] = useState<HardwareConfig>(() => parseHardware(editor?.hardware));
 
   const [skills, setSkills] = useState<Skill[]>(editor?.skills || []);
   const [software, setSoftware] = useState<Software[]>(editor?.editingSoftware || []);
@@ -64,6 +84,7 @@ export function EditorProfile() {
       ...form,
       skills,
       editingSoftware: software,
+      hardware: JSON.stringify(hardwareSpecs),
     });
     setSaved(true);
     addToast('Studio profile and hardware specs updated successfully!', 'success');
@@ -193,17 +214,20 @@ export function EditorProfile() {
               </div>
             </div>
 
-            {/* Hardware & Workstation Specs (NEW) */}
+            {/* Hardware & Workstation Specs (Dynamic & User-Editable) */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
                     <Cpu className="w-3.5 h-3.5" />
                   </div>
-                  <h2 className="text-sm font-bold text-gray-900">Studio Workstation & Hardware Benchmark</h2>
+                  <div>
+                    <h2 className="text-sm font-bold text-gray-900">Workstation & Hardware Specifications</h2>
+                    <p className="text-[11px] text-gray-400">Specify your computer specs, displays, and setup details</p>
+                  </div>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                  4K 60FPS Certified
+                  Editor Specified
                 </span>
               </div>
 
@@ -211,11 +235,12 @@ export function EditorProfile() {
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5 text-gray-900" />
-                    Primary Workstation / GPU
+                    Primary Workstation / CPU / GPU
                   </label>
                   <input
                     type="text"
                     value={hardwareSpecs.workstation}
+                    placeholder="e.g. Apple Mac Studio M2 Ultra (64GB) / PC RTX 4090, Intel i9"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, workstation: e.target.value })}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
@@ -224,12 +249,27 @@ export function EditorProfile() {
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
                     <Tv className="w-3.5 h-3.5 text-emerald-600" />
-                    Color-Calibrated Displays
+                    Monitors & Color Reference Displays
                   </label>
                   <input
                     type="text"
                     value={hardwareSpecs.displays}
+                    placeholder="e.g. Dual 4K ASUS ProArt 32-inch HDR, Calibrated DCI-P3"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, displays: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                    <HardDrive className="w-3.5 h-3.5 text-blue-600" />
+                    Storage & Scratch Disks
+                  </label>
+                  <input
+                    type="text"
+                    value={hardwareSpecs.storage}
+                    placeholder="e.g. 4TB NVMe SSD + 16TB High-Speed RAID Array"
+                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, storage: e.target.value })}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
                 </div>
@@ -241,8 +281,9 @@ export function EditorProfile() {
                   </label>
                   <input
                     type="text"
-                    value={hardwareSpecs.connectivity}
-                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, connectivity: e.target.value })}
+                    value={hardwareSpecs.audioConnectivity}
+                    placeholder="e.g. 1 Gbps Symmetrical Fiber, Yamaha HS8 Monitors, Sony MDR-7506"
+                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, audioConnectivity: e.target.value })}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
                   />
                 </div>

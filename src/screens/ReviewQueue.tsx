@@ -75,7 +75,7 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
       p.subtasks.forEach((st) => {
         // Collect items that have been submitted or are in review/approved/returned
         if (st.status === 'Ready for Review' || st.status === 'Sent Back' || st.status === 'Approved' || (st.deliverablesQueue && st.deliverablesQueue.length > 0)) {
-          const editor = editors.find((e) => st.assignedEditorIds.includes(e.id)) || editors[0];
+          const editor = editors.find((e) => st.assignedEditorIds?.includes(e.id));
           
           let thumbnail = '';
           if (p.title.includes('Aurora') && (st.taskType === 'Commercial Ads' || st.title.includes('Film'))) {
@@ -505,12 +505,12 @@ export function ReviewQueue({ onNavigate }: ReviewQueueProps) {
                           <div className="flex items-center gap-2.5 min-w-0">
                             <img
                               src={editor?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800'}
-                              alt={editor?.fullName || 'Editor'}
+                              alt={editor?.fullName || 'Unassigned'}
                               className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-2xs shrink-0"
                             />
                             <div className="min-w-0">
-                              <p className="font-bold text-gray-900 leading-tight truncate">{editor?.fullName || 'Editor'}</p>
-                              <p className="text-[10px] text-gray-400 truncate mt-0.5">{editor?.city || 'Remote'}</p>
+                              <p className="font-bold text-gray-900 leading-tight truncate">{editor ? editor.fullName : 'Unassigned'}</p>
+                              <p className="text-[10px] text-gray-400 truncate mt-0.5">{editor ? (editor.city || 'Remote') : 'No editor assigned'}</p>
                             </div>
                           </div>
                         </td>

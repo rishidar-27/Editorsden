@@ -59,7 +59,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           setError(result.error || 'Invalid credentials. Please verify your email and password.');
         }
       } else {
-        const result = await register(email, password);
+        const result = await register(email, password, fullName, specialty);
         if (result.success) {
           if (addToast) addToast(`Welcome ${fullName || 'Editor'}! Your Gogangs workspace is ready.`, 'success');
           onNavigate('/editor/dashboard');
@@ -72,12 +72,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickFill = (fillEmail: string, fillPass: string) => {
-    setEmail(fillEmail);
-    setPassword(fillPass);
-    setError('');
   };
 
   return (
@@ -321,41 +315,6 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                 </button>
               </form>
             </div>
-
-            {/* Quick Test Helper (Discreet Sample Fill) */}
-            <div className="pt-5 border-t border-gray-100 dark:border-zinc-800 space-y-2.5">
-              <div className="flex items-center justify-between text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
-                <span>Quick Test Credentials:</span>
-                <span className="text-[9px] font-normal text-emerald-600 dark:text-emerald-400">Auto-fill 1-Click</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('admin@gogangs.com', 'admin1234')}
-                  className="p-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/60 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 text-left transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <div className="text-[11px] font-bold text-gray-900 dark:text-white group-hover:text-pink-500 transition-colors">Admin Portal</div>
-                    <div className="text-[9px] text-gray-500 dark:text-zinc-400">admin@gogangs.com</div>
-                  </div>
-                  <ArrowRight className="w-3 h-3 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('marcus@gogangs.com', 'demo1234')}
-                  className="p-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/60 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 text-left transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <div className="text-[11px] font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">Editor Portal</div>
-                    <div className="text-[9px] text-gray-500 dark:text-zinc-400">marcus@gogangs.com</div>
-                  </div>
-                  <ArrowRight className="w-3 h-3 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            </div>
-
           </div>
 
           {/* Right Column: High-End Feature Deck & Visuals (5 Columns) */}

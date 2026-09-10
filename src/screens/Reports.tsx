@@ -31,10 +31,19 @@ export function Reports({ onNavigate }: ReportsProps) {
   const [availabilityFilter, setAvailabilityFilter] = useState('All');
   const [skillFilter, setSkillFilter] = useState('All');
 
-  const totalEditors = editors.length;
-  const activeCount = editors.filter((e) => e.active).length;
-  const verifiedCount = editors.filter((e) => e.verificationStatus === 'Verified').length;
-  const inactiveCount = editors.filter((e) => !e.active).length;
+  const actualEditors = useMemo(() => {
+    return editors.filter(
+      (e) =>
+        e.email !== 'admin@gogangs.com' &&
+        (e as any).role !== 'admin' &&
+        !e.fullName?.toLowerCase().includes('administrator')
+    );
+  }, [editors]);
+
+  const totalEditors = actualEditors.length;
+  const activeCount = actualEditors.filter((e) => e.active).length;
+  const verifiedCount = actualEditors.filter((e) => e.verificationStatus === 'Verified').length;
+  const inactiveCount = actualEditors.filter((e) => !e.active).length;
 
   const stats = [
     {
@@ -76,7 +85,7 @@ export function Reports({ onNavigate }: ReportsProps) {
   ];
 
   const filteredEditors = useMemo(() => {
-    return editors.filter((e) => {
+    return actualEditors.filter((e) => {
       if (
         search &&
         !e.fullName.toLowerCase().includes(search.toLowerCase()) &&
@@ -89,7 +98,7 @@ export function Reports({ onNavigate }: ReportsProps) {
       if (skillFilter !== 'All' && !e.skills.includes(skillFilter as never)) return false;
       return true;
     });
-  }, [editors, search, availabilityFilter, skillFilter]);
+  }, [actualEditors, search, availabilityFilter, skillFilter]);
 
   const handleExport = () => {
     const csvContent =

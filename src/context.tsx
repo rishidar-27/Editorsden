@@ -10,6 +10,8 @@ import {
   deleteAssetsFromStorage,
   fetchEditorAssets,
   addDeliverableSubmissionRecord,
+  fetchAllActivityLogs,
+  createActivityLogRecord,
   subscribeToDatabaseChanges,
   signInWithEmail,
   signUpWithEmail,
@@ -67,7 +69,7 @@ interface AppState {
   assets: EditorAsset[];
   toasts: Toast[];
   login: (email: string, password: string) => Promise<{ success: boolean; userType?: 'admin' | 'editor'; error?: string }>;
-  register: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, fullName?: string, specialty?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   getEditor: (id: string) => Editor | undefined;
   getCurrentEditor: () => Editor | undefined;
@@ -157,16 +159,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadRealData() {
       try {
-        const [liveEditors, liveProjects] = await Promise.all([
+        const [liveEditors, liveProjects, liveActivity] = await Promise.all([
           fetchAllEditors(),
           fetchAllProjects(),
+          fetchAllActivityLogs(),
         ]);
         if (isSupabaseConfigured()) {
           setEditors(liveEditors || []);
           setProjects(liveProjects || []);
+          setActivity(liveActivity || []);
         } else {
           if (liveEditors && liveEditors.length > 0) setEditors(liveEditors);
           if (liveProjects && liveProjects.length > 0) setProjects(liveProjects);
+          if (liveActivity && liveActivity.length > 0) setActivity(liveActivity);
         }
       } catch (err) {
         console.warn('Real data load notice:', err);
@@ -251,15 +256,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return { success: false, error: 'Invalid email or password' };
   }, [editors]);
 
-  const register = useCallback(async (emailInput: string, passwordInput: string): Promise<{ success: boolean; error?: string }> => {
+  const register = useCallback(async (emailInput: string, passwordInput: string, fullNameInput?: string, specialtyInput?: string): Promise<{ success: boolean; error?: string }> => {
     const email = emailInput.trim().toLowerCase();
     const password = passwordInput.trim();
-    const displayName = email.split('@')[0] || 'New Editor';
+    const displayName = fullNameInput?.trim() || email.split('@')[0] || 'New Editor';
 
     // SUPABASE AUTH REGISTRATION FOR EDITORS
     if (isSupabaseConfigured()) {
       try {
-        const authRes = await signUpWithEmail(email, password, displayName, 'editor');
+        const authRes = await signUpWithEmail(email, password, displayName, 'editor', specialtyInput);
         if (authRes?.user) {
           setUser({ type: 'editor', editorId: authRes.user.id });
           return { success: true };
@@ -281,8 +286,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       phone: '',
       city: '',
       experience: 0,
-      editingSoftware: [],
-      skills: [],
+      editingSoftware: (specialtyInput ? [specialtyInput] : []) as any,
+      skills: (specialtyInput ? [specialtyInput] : []) as any,
       availability: 'Not Available',
       hoursPerWeek: 0,
       bio: '',
@@ -366,6 +371,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       timestamp: new Date().toISOString(),
     };
     setActivity((prev) => [event, ...prev]);
+    createActivityLogRecord({ type: event.type, message: event.message }).catch(() => null);
   }, []);
 
   const updateSubtask = useCallback((projectId: string, subtaskId: string, updates: Partial<import('./types').Subtask>) => {
@@ -391,6 +397,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         timestamp: new Date().toISOString(),
       };
       setActivity((prev) => [event, ...prev]);
+      createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId } }).catch(() => null);
     }
   }, [projects, editors]);
 

@@ -18,7 +18,7 @@ interface TopNavProps {
 }
 
 export function TopNav({ items, currentRoute, onNavigate, showSearch = false, showNotifications = true }: TopNavProps) {
-  const { user, getCurrentEditor, logout, projects, darkMode, toggleDarkMode } = useApp();
+  const { user, getCurrentEditor, editors, logout, projects, darkMode, toggleDarkMode } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -27,71 +27,143 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
   const notificationsRef = useRef<HTMLDivElement>(null);
   const currentEditor = getCurrentEditor();
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 'notif-1',
-      title: 'Admin Revision Feedback',
-      message: 'Client requested warmer color grading on Hero Brand Film (60s).',
-      time: '2 hours ago',
-      unread: true,
-      route: '/editor/projects',
-      type: 'feedback',
-    },
-    {
-      id: 'notif-2',
-      title: 'New Assignment',
-      message: 'You have been assigned to "Product Tutorial Videos (3x)".',
-      time: '5 hours ago',
-      unread: true,
-      route: '/editor/projects',
-      type: 'assign',
-    },
-    {
-      id: 'notif-3',
-      title: 'Deliverable Approved',
-      message: 'Your deliverable for "Brand Commercial" was approved by client!',
-      time: 'Yesterday',
-      unread: true,
-      route: '/editor/projects',
-      type: 'approve',
-    },
-    {
-      id: 'notif-4',
-      title: 'Upcoming Deadline',
-      message: 'Hero Brand Film submission is due soon.',
-      time: '2 days ago',
-      unread: true,
-      route: '/editor/projects',
-      type: 'deadline',
-    },
-    {
-      id: 'notif-5',
-      title: 'Creator Verified',
-      message: 'Your editor profile is verified for commercial assignments.',
-      time: '3 days ago',
-      unread: true,
-      route: '/editor/profile',
-      type: 'verify',
-    },
-    {
-      id: 'notif-6',
-      title: 'Storage Synchronized',
-      message: 'Cloud media assets are synced with R2 object storage.',
-      time: '4 days ago',
-      unread: true,
-      route: '/editor/storage',
-      type: 'storage',
-    },
-  ]);
+  const storageKey = `gogangs_read_notifs_${user?.type === 'admin' ? 'admin' : (user?.editorId || 'guest')}`;
+  const [readIds, setReadIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const notifications = useMemo(() => {
+    const list: Array<{
+      id: string;
+      title: string;
+      message: string;
+      time: string;
+      unread: boolean;
+      route: string;
+      type: string;
+    }> = [];
+
+    if (user?.type === 'admin') {
+      // 1. Pending reviews in projects
+      projects.forEach((proj) => {
+        proj.subtasks?.forEach((st) => {
+          if (st.status === 'Ready for Review') {
+            const assignedEditor = editors.find((e) => st.assignedEditorIds?.includes(e.id));
+            list.push({
+              id: `review-${st.id}`,
+              title: 'Review Needed',
+              message: `${assignedEditor?.fullName || 'Editor'} submitted deliverable for "${st.title}" in ${proj.title}.`,
+              time: 'In Queue',
+              unread: !readIds.includes(`review-${st.id}`),
+              route: '/admin/reviews',
+              type: 'review',
+            });
+          }
+        });
+      });
+
+      // 2. Pending editor verifications
+      editors.forEach((ed) => {
+        if (ed.verificationStatus === 'Pending') {
+          list.push({
+            id: `verify-${ed.id}`,
+            title: 'Verification Request',
+            message: `${ed.fullName} registered and requested editor verification.`,
+            time: 'Pending',
+            unread: !readIds.includes(`verify-${ed.id}`),
+            route: '/admin/verification',
+            type: 'verify',
+          });
+        }
+      });
+    } else if (user?.type === 'editor' && currentEditor) {
+      // Dynamic notifications for the logged in editor
+      projects.forEach((proj) => {
+        proj.subtasks?.forEach((st) => {
+          if (st.assignedEditorIds?.includes(currentEditor.id)) {
+            if (st.status === 'Sent Back') {
+              list.push({
+                id: `feedback-${st.id}`,
+                title: 'Admin Revision Feedback',
+                message: st.feedback || `Revisions requested on "${st.title}". Please check revision notes.`,
+                time: 'Revision',
+                unread: !readIds.includes(`feedback-${st.id}`),
+                route: '/editor/projects',
+                type: 'feedback',
+              });
+            } else if (st.status === 'Approved') {
+              list.push({
+                id: `approved-${st.id}`,
+                title: 'Deliverable Approved',
+                message: `Your deliverable for "${st.title}" in ${proj.title} has been approved!`,
+                time: 'Approved',
+                unread: !readIds.includes(`approved-${st.id}`),
+                route: '/editor/projects',
+                type: 'approve',
+              });
+            } else if (st.status === 'Assigned' || st.status === 'In Progress') {
+              list.push({
+                id: `assign-${st.id}`,
+                title: 'Assigned Task',
+                message: `You are assigned to "${st.title}" in project "${proj.title}".`,
+                time: 'Active',
+                unread: !readIds.includes(`assign-${st.id}`),
+                route: '/editor/projects',
+                type: 'assign',
+              });
+            }
+          }
+        });
+      });
+
+      if (currentEditor.verificationStatus === 'Verified') {
+        list.push({
+          id: `verified-${currentEditor.id}`,
+          title: 'Creator Verified',
+          message: 'Your editor profile is verified for commercial agency assignments.',
+          time: 'Active',
+          unread: !readIds.includes(`verified-${currentEditor.id}`),
+          route: '/editor/profile',
+          type: 'verify',
+        });
+      } else if (currentEditor.verificationStatus === 'Rejected') {
+        list.push({
+          id: `rejected-${currentEditor.id}`,
+          title: 'Verification Feedback',
+          message: currentEditor.verificationFeedback || 'Your verification submission requires updates.',
+          time: 'Action Needed',
+          unread: !readIds.includes(`rejected-${currentEditor.id}`),
+          route: '/editor/profile',
+          type: 'verify',
+        });
+      }
+    }
+
+    return list;
+  }, [user, currentEditor, projects, editors, readIds]);
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    const allIds = notifications.map((n) => n.id);
+    const updated = Array.from(new Set([...readIds, ...allIds]));
+    setReadIds(updated);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch {}
   };
 
   const markAsRead = (id: string, route?: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+    const updated = Array.from(new Set([...readIds, id]));
+    setReadIds(updated);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch {}
     if (route) {
       setNotificationsOpen(false);
       onNavigate(route);
@@ -269,11 +341,11 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
                       <button
                         onClick={() => {
                           setNotificationsOpen(false);
-                          onNavigate('/editor/projects');
+                          onNavigate(user?.type === 'admin' ? '/admin/reviews' : '/editor/projects');
                         }}
                         className="text-[11px] font-bold text-gray-900 dark:text-zinc-200 hover:underline py-1 inline-block"
                       >
-                        View all tasks & assignments →
+                        {user?.type === 'admin' ? 'View review queue →' : 'View all tasks & assignments →'}
                       </button>
                     </div>
                   </div>

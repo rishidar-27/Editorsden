@@ -33,7 +33,7 @@ export async function signInWithEmail(email: string, password: string) {
   return { user: { id: 'e1', email } };
 }
 
-export async function signUpWithEmail(email: string, password: string, fullName: string, role: 'admin' | 'editor' = 'editor') {
+export async function signUpWithEmail(email: string, password: string, fullName: string, role: 'admin' | 'editor' = 'editor', specialty?: string) {
   if (isSupabaseConfigured()) {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -42,6 +42,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
         data: {
           full_name: fullName,
           role,
+          specialty: specialty || 'DaVinci Resolve Colorist',
         },
       },
     });
@@ -64,66 +65,78 @@ export async function signOutUser() {
  * ============================================================
  */
 export async function fetchAllEditors(): Promise<Editor[]> {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*, portfolio:portfolio_items(*)')
-      .order('created_at', { ascending: false });
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*, portfolio:portfolio_items(*)')
+        .order('created_at', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      return data.map((p) => ({
-        id: p.id,
-        email: p.email,
-        fullName: p.full_name,
-        city: p.city || '',
-        phone: p.phone || '',
-        experience: p.experience_years || 0,
-        skills: p.skills || [],
-        editingSoftware: p.editing_software || [],
-        availability: p.availability || 'Part-Time',
-        hoursPerWeek: p.hours_per_week || 20,
-        bio: p.bio || '',
-        avatarUrl: p.avatar_url || `https://i.pravatar.cc/150?u=${p.id}`,
-        portfolio: (p.portfolio || []).map((port: any) => ({
-          id: port.id,
-          title: port.title,
-          type: port.type || 'video',
-          thumbnailUrl: port.thumbnail_url || '',
-          link: port.link,
-          featured: port.featured ?? false,
-        })),
-        verificationStatus: p.verification_status || 'Pending',
-        verificationFeedback: p.verification_feedback || undefined,
-        verificationDocs: {
-          resumeLink: p.resume_link,
-          sampleWorkLinks: p.sample_work_links || [],
-          portfolioLinks: p.portfolio_links || [],
-        },
-        active: p.is_active ?? true,
-        lastLogin: p.last_login || p.updated_at || new Date().toISOString(),
-        lastProfileUpdate: p.updated_at || new Date().toISOString(),
-        lastPortfolioUpdate: p.updated_at || new Date().toISOString(),
-        storageUsedBytes: Number(p.storage_used_bytes) || 0,
-        storageLimitBytes: Number(p.storage_limit_bytes) || 1073741824,
-        storageTier: p.storage_tier || 'Free',
-        hourlyRate: p.hourly_rate || '$65/hr',
-        rating: p.rating || 5.0,
-        reviewsCount: p.reviews_count || 0,
-        completedProjects: p.completed_projects || 0,
-        hardware: p.hardware,
-        turnaround: p.turnaround || '24h - 48h',
-      }));
+      if (!error && data) {
+        // Exclude administrator accounts from the editors directory
+        const editorProfiles = data.filter(
+          (p) => p.role !== 'admin' && p.email !== 'admin@gogangs.com'
+        );
+
+        return editorProfiles.map((p) => ({
+          id: p.id,
+          email: p.email,
+          fullName: p.full_name,
+          city: p.city || '',
+          phone: p.phone || '',
+          experience: p.experience_years || 0,
+          skills: p.skills || [],
+          editingSoftware: p.editing_software || [],
+          availability: p.availability || 'Part-Time',
+          hoursPerWeek: p.hours_per_week || 20,
+          bio: p.bio || '',
+          avatarUrl: p.avatar_url || `https://i.pravatar.cc/150?u=${p.id}`,
+          portfolio: (p.portfolio || []).map((port: any) => ({
+            id: port.id,
+            title: port.title,
+            type: port.type || 'video',
+            thumbnailUrl: port.thumbnail_url || '',
+            link: port.link,
+            featured: port.featured ?? false,
+          })),
+          verificationStatus: p.verification_status || 'Pending',
+          verificationFeedback: p.verification_feedback || undefined,
+          verificationDocs: {
+            resumeLink: p.resume_link,
+            sampleWorkLinks: p.sample_work_links || [],
+            portfolioLinks: p.portfolio_links || [],
+          },
+          active: p.is_active ?? true,
+          lastLogin: p.last_login || p.updated_at || new Date().toISOString(),
+          lastProfileUpdate: p.updated_at || new Date().toISOString(),
+          lastPortfolioUpdate: p.updated_at || new Date().toISOString(),
+          createdAt: p.created_at || p.joined_date || p.last_login || new Date().toISOString(),
+          role: p.role || 'editor',
+          storageUsedBytes: Number(p.storage_used_bytes) || 0,
+          storageLimitBytes: Number(p.storage_limit_bytes) || 1073741824,
+          storageTier: p.storage_tier || 'Free',
+          hourlyRate: p.hourly_rate || '$65/hr',
+          rating: p.rating || 5.0,
+          reviewsCount: p.reviews_count || 0,
+          completedProjects: p.completed_projects || 0,
+          hardware: p.hardware,
+          turnaround: p.turnaround || '24h - 48h',
+        }));
+      }
+    } catch (err) {
+      console.warn('Supabase fetchAllEditors notice:', err);
     }
-  } catch (err) {
-    console.warn('Supabase fetchAllEditors notice:', err);
+    return [];
   }
 
-  // Fallback to Express backend if local server is active
+  // Fallback to Express backend only if Supabase is not configured
   try {
     const res = await fetch('http://localhost:5000/api/editors');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.filter((e: any) => e.email !== 'admin@gogangs.com' && e.role !== 'admin');
+      }
     }
   } catch {}
 
@@ -147,6 +160,7 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
   if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
   if (updates.storageTier !== undefined) dbUpdates.storage_tier = updates.storageTier;
   if (updates.storageLimitBytes !== undefined) dbUpdates.storage_limit_bytes = updates.storageLimitBytes;
+  if (updates.hardware !== undefined) dbUpdates.hardware = updates.hardware;
 
   if (isSupabaseConfigured()) {
     const { data, error } = await supabase.from('profiles').update(dbUpdates).eq('id', id).select().single();
@@ -167,85 +181,88 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
  * ============================================================
  */
 export async function fetchAllProjects(): Promise<Project[]> {
-  try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select(`
-        id,
-        title,
-        client_name,
-        description,
-        status,
-        created_at,
-        subtasks (
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select(`
           id,
-          project_id,
           title,
-          task_type,
-          deadline,
+          client_name,
+          description,
           status,
-          deliverable_link,
-          feedback,
-          assigned_editor_ids,
-          deliverable_submissions (
+          created_at,
+          subtasks (
             id,
-            subtask_id,
-            version,
-            file_name,
-            file_size_bytes,
-            file_url,
-            mime_type,
-            notes,
+            project_id,
+            title,
+            task_type,
+            deadline,
             status,
+            deliverable_link,
             feedback,
-            feedback_given_at,
-            submitted_at,
-            submitted_by_editor_id
+            assigned_editor_ids,
+            deliverable_submissions (
+              id,
+              subtask_id,
+              version,
+              file_name,
+              file_size_bytes,
+              file_url,
+              mime_type,
+              notes,
+              status,
+              feedback,
+              feedback_given_at,
+              submitted_at,
+              submitted_by_editor_id
+            )
           )
-        )
-      `)
-      .order('created_at', { ascending: false });
+        `)
+        .order('created_at', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      return data.map((p) => ({
-        id: p.id,
-        title: p.title,
-        clientName: p.client_name,
-        createdAt: p.created_at,
-        subtasks: (p.subtasks || []).map((st: any) => ({
-          id: st.id,
-          projectId: st.project_id,
-          title: st.title,
-          taskType: st.task_type,
-          deadline: st.deadline,
-          status: st.status,
-          deliverableLink: st.deliverable_link,
-          feedback: st.feedback,
-          assignedEditorIds: st.assigned_editor_ids || [],
-          deliverablesQueue: (st.deliverable_submissions || [])
-            .sort((a: any, b: any) => (b.version || 0) - (a.version || 0))
-            .map((sub: any) => ({
-              id: sub.id,
-              version: sub.version,
-              fileName: sub.file_name,
-              fileSizeBytes: Number(sub.file_size_bytes) || 0,
-              fileUrl: sub.file_url,
-              mimeType: sub.mime_type,
-              notes: sub.notes,
-              status: sub.status,
-              feedback: sub.feedback,
-              feedbackGivenAt: sub.feedback_given_at,
-              submittedAt: sub.submitted_at,
-              submittedByEditorId: sub.submitted_by_editor_id,
-            })),
-        })),
-      }));
+      if (!error && data) {
+        return data.map((p) => ({
+          id: p.id,
+          title: p.title,
+          clientName: p.client_name,
+          createdAt: p.created_at,
+          subtasks: (p.subtasks || []).map((st: any) => ({
+            id: st.id,
+            projectId: st.project_id,
+            title: st.title,
+            taskType: st.task_type,
+            deadline: st.deadline,
+            status: st.status,
+            deliverableLink: st.deliverable_link,
+            feedback: st.feedback,
+            assignedEditorIds: st.assigned_editor_ids || [],
+            deliverablesQueue: (st.deliverable_submissions || [])
+              .sort((a: any, b: any) => (b.version || 0) - (a.version || 0))
+              .map((sub: any) => ({
+                id: sub.id,
+                version: sub.version,
+                fileName: sub.file_name,
+                fileSizeBytes: Number(sub.file_size_bytes) || 0,
+                fileUrl: sub.file_url,
+                mimeType: sub.mime_type,
+                notes: sub.notes,
+                status: sub.status,
+                feedback: sub.feedback,
+                feedbackGivenAt: sub.feedback_given_at,
+                submittedAt: sub.submitted_at,
+                submittedByEditorId: sub.submitted_by_editor_id,
+              })),
+          })),
+        }));
+      }
+    } catch (err) {
+      console.warn('Supabase fetchAllProjects notice:', err);
     }
-  } catch (err) {
-    console.warn('Supabase fetchAllProjects notice:', err);
+    return [];
   }
 
-  // Fallback to Express backend if local server is active
+  // Fallback to Express backend only if Supabase is not configured
   try {
     const res = await fetch('http://localhost:5000/api/projects');
     if (res.ok) {
@@ -391,7 +408,49 @@ export async function uploadToSupabaseStorage(
 
 /**
  * ============================================================
- * 5. REALTIME SYNC LISTENER
+ * 5. ACTIVITY LOGS / AUDIT SERVICES (Realtime Activity Feed)
+ * ============================================================
+ */
+export async function fetchAllActivityLogs(): Promise<ActivityEvent[]> {
+  if (isSupabaseConfigured()) {
+    const { data, error } = await supabase
+      .from('activity_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (!error && data) {
+      return data.map((log: any) => ({
+        id: log.id,
+        type: log.type,
+        message: log.message,
+        timestamp: log.created_at,
+      }));
+    }
+  }
+
+  return [];
+}
+
+export async function createActivityLogRecord(event: {
+  type: string;
+  message: string;
+  actorId?: string;
+  metadata?: Record<string, any>;
+}) {
+  if (isSupabaseConfigured()) {
+    await supabase.from('activity_logs').insert({
+      type: event.type,
+      message: event.message,
+      actor_id: event.actorId || null,
+      metadata: event.metadata || {},
+    });
+  }
+}
+
+/**
+ * ============================================================
+ * 6. REALTIME SYNC LISTENER
  * ============================================================
  */
 export function subscribeToDatabaseChanges(onPayload: () => void) {
@@ -404,9 +463,11 @@ export function subscribeToDatabaseChanges(onPayload: () => void) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'subtasks' }, () => onPayload())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'deliverable_submissions' }, () => onPayload())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'editor_assets' }, () => onPayload())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, () => onPayload())
     .subscribe();
 
   return () => {
     supabase.removeChannel(channel);
   };
 }
+

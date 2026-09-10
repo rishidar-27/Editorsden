@@ -32,12 +32,21 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const { editors, projects, activity } = useApp();
   const [selectedRange] = useState('Aug 20 – Aug 28, 2026');
 
-  // Dynamic stat metrics from context
-  const totalEditors = editors.length;
-  const verifiedEditors = editors.filter((e) => e.verificationStatus === 'Verified').length;
-  const pendingEditors = editors.filter((e) => e.verificationStatus === 'Pending').length;
-  const activeEditors = editors.filter((e) => e.active).length;
-  const inactiveEditors = editors.filter((e) => !e.active).length;
+  // Dynamic stat metrics from context (excluding admin account)
+  const actualEditors = useMemo(() => {
+    return editors.filter(
+      (e) =>
+        e.email !== 'admin@gogangs.com' &&
+        (e as any).role !== 'admin' &&
+        !e.fullName?.toLowerCase().includes('administrator')
+    );
+  }, [editors]);
+
+  const totalEditors = actualEditors.length;
+  const verifiedEditors = actualEditors.filter((e) => e.verificationStatus === 'Verified').length;
+  const pendingEditors = actualEditors.filter((e) => e.verificationStatus === 'Pending').length;
+  const activeEditors = actualEditors.filter((e) => e.active).length;
+  const inactiveEditors = actualEditors.filter((e) => !e.active).length;
 
   const totalSubtasks = projects.reduce((acc, p) => acc + p.subtasks.length, 0);
   const pendingReviewSubtasks = projects.reduce(

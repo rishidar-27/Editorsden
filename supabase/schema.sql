@@ -208,26 +208,70 @@ $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 
 -- Trigger: Automatically create public.profiles row upon Supabase Auth sign-up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER 
+LANGUAGE plpgsql 
+SECURITY DEFINER 
+SET search_path = public
+AS $$
+DECLARE
+    assigned_role user_role := 'editor';
+    user_fullname TEXT;
+    user_avatar TEXT;
 BEGIN
+    -- Safely determine role
+    IF LOWER(COALESCE(NEW.raw_user_meta_data->>'role', '')) = 'admin' THEN
+        assigned_role := 'admin';
+    ELSE
+        assigned_role := 'editor';
+    END IF;
+
+    user_fullname := COALESCE(NULLIF(NEW.raw_user_meta_data->>'full_name', ''), split_part(NEW.email, '@', 1));
+    user_avatar := COALESCE(NULLIF(NEW.raw_user_meta_data->>'avatar_url', ''), 'https://i.pravatar.cc/150?u=' || NEW.id);
+
     INSERT INTO public.profiles (
         id,
         email,
         full_name,
         role,
-        avatar_url
+        avatar_url,
+        skills,
+        editing_software,
+        storage_tier,
+        storage_limit_bytes,
+        storage_used_bytes,
+        verification_status,
+        created_at,
+        updated_at
     )
     VALUES (
         NEW.id,
         NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
-        COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'editor'),
-        COALESCE(NEW.raw_user_meta_data->>'avatar_url', 'https://i.pravatar.cc/150?u=' || NEW.id)
+        user_fullname,
+        assigned_role,
+        user_avatar,
+        CASE WHEN NEW.raw_user_meta_data->>'specialty' IS NOT NULL 
+             THEN ARRAY[NEW.raw_user_meta_data->>'specialty'] 
+             ELSE '{}'::text[] 
+        END,
+        ARRAY['Premiere Pro', 'DaVinci Resolve'],
+        'Free',
+        1073741824, -- 1GB default
+        0,
+        'Pending',
+        NOW(),
+        NOW()
     )
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+        updated_at = NOW();
+
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'handle_new_user error for user %: %', NEW.id, SQLERRM;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
@@ -315,7 +359,7 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 DO $$ BEGIN
-    CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id OR public.is_admin());
+    CREATE POLICY "Allow insert profile" ON public.profiles FOR INSERT WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
@@ -526,3 +570,16 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN
     NULL;
 END $$;
+
+-- ============================================================================
+-- 15. PERMISSIONS & ROLE GRANTS (Required for PostgREST & Supabase Auth)
+-- ============================================================================
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+

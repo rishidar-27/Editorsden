@@ -56,23 +56,17 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
   const [quoteResolution, setQuoteResolution] = useState<'1080p' | '4k' | '8k'>('4k');
   const [quoteSpeed, setQuoteSpeed] = useState<'rush' | 'standard'>('standard');
 
-  // Fallback enriched data for any editor
+  // Enriched editor data from Supabase
   const editor = useMemo(() => {
     if (rawEditor) {
       return {
         ...rawEditor,
-        role: rawEditor.id === 'e1' ? 'Lead Commercial Reel Specialist & Finisher' 
-            : rawEditor.id === 'e2' ? 'Commercial & Fashion Content Director' 
-            : rawEditor.id === 'e3' ? 'Senior DaVinci Colorist & 8K Finisher'
-            : rawEditor.id === 'e4' ? '3D Motion Graphics & VFX Supervisor'
-            : rawEditor.id === 'e5' ? 'Viral Shorts & High-Retention Strategist'
-            : 'Senior Creative Video Editor',
-        hourlyRate: rawEditor.id === 'e1' ? '$65/hr' : rawEditor.id === 'e2' ? '$70/hr' : rawEditor.id === 'e3' ? '$85/hr' : rawEditor.id === 'e4' ? '$80/hr' : '$55/hr',
-        rating: '4.9',
-        reviewsCount: 48,
-        completedProjects: 142,
-        turnaround: '18h - 24h',
-        hardware: 'Apple Mac Studio M2 Ultra (128GB Unified) • ASUS ProArt 4K HDR 1600nits • 1Gbps Fiber • 16TB NVMe RAID',
+        role: rawEditor.skills?.[0] ? `${rawEditor.skills[0]} Specialist` : 'Creative Video Editor',
+        rating: rawEditor.rating || '5.0',
+        reviewsCount: rawEditor.reviewsCount || 12,
+        completedProjects: rawEditor.completedProjects || 24,
+        turnaround: rawEditor.turnaround || '24h - 48h',
+        hardware: rawEditor.hardware,
         avatarUrl: rawEditor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
       };
     }
@@ -106,6 +100,15 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
       portfolio: [],
     };
   }, [rawEditor, editorId]);
+
+  const parsedHardware = useMemo(() => {
+    if (!editor.hardware) return null;
+    try {
+      const parsed = JSON.parse(editor.hardware);
+      if (typeof parsed === 'object' && parsed !== null) return parsed;
+    } catch {}
+    return { workstation: editor.hardware };
+  }, [editor.hardware]);
 
   // Curated Master Portfolio Items
   const masterPortfolio = useMemo(() => {
@@ -684,20 +687,20 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
 
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
-                <span className="text-gray-500">Primary Render Rig</span>
-                <span className="font-bold text-gray-900">Apple Mac Studio M2 Ultra (128GB Unified)</span>
+                <span className="text-gray-500">Primary Workstation / Rig</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.workstation || 'High-Performance Workstation'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Color Reference Display</span>
-                <span className="font-bold text-gray-900">ASUS ProArt PA32UCG 4K HDR (1600 nits)</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.displays || 'Calibrated Color Display'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
-                <span className="text-gray-500">High-Speed Storage</span>
-                <span className="font-bold text-gray-900">16TB NVMe RAID Array (7,000 MB/s)</span>
+                <span className="text-gray-500">High-Speed Local Storage</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.storage || 'Fast NVMe Scratch Storage'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
-                <span className="text-gray-500">Bandwidth & Egress</span>
-                <span className="font-bold text-gray-900">1.0 Gbps Symmetrical Fiber</span>
+                <span className="text-gray-500">Audio & Network Pipeline</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.audioConnectivity || parsedHardware?.connectivity || 'Studio Audio & High-Speed Network'}</span>
               </div>
             </div>
           </div>

@@ -87,6 +87,8 @@ export interface Editor {
   completedProjects?: number;
   hardware?: string;
   turnaround?: string;
+  createdAt?: string;
+  role?: string;
 }
 
 export interface EditorAsset {
@@ -150,3 +152,16 @@ export interface ActivityEvent {
   message: string;
   timestamp: string;
 }
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  time: string;
+  unread: boolean;
+  route: string;
+  type: 'feedback' | 'assign' | 'approve' | 'deadline' | 'verify' | 'storage' | 'system';
+  userId?: string;
+  createdAt?: string;
+}
+
