@@ -17,6 +17,7 @@ import {
   signUpWithEmail,
   signOutUser,
   isSupabaseConfigured,
+  supabase,
 } from './lib/supabase';
 
 export interface Toast {
@@ -154,6 +155,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     } catch {}
   }, [user]);
+
+  // Listen for Supabase session and email confirmation redirects
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
+    // Check existing active Supabase session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const isUserAdmin = session.user.email === 'admin@gogangs.com';
+        setUser({
+          type: isUserAdmin ? 'admin' : 'editor',
+          editorId: session.user.id,
+        });
+      }
+    }).catch(() => null);
+
+    // Listen to auth events (e.g. Email Confirmation callback, token exchange, sign in, sign out)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
+        const isUserAdmin = session.user.email === 'admin@gogangs.com';
+        setUser({
+          type: isUserAdmin ? 'admin' : 'editor',
+          editorId: session.user.id,
+        });
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Fetch real data from Supabase / Backend with Realtime Sync
   useEffect(() => {

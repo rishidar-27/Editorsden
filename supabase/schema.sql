@@ -583,3 +583,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authentic
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 
+-- ============================================================================
+-- 16. AUTO-CONFIRM ALL USERS (Immediate fix for "Email not confirmed")
+-- ============================================================================
+-- If you or any editor gets "Email not confirmed", run this in Supabase SQL Editor:
+UPDATE auth.users
+SET email_confirmed_at = NOW()
+WHERE email_confirmed_at IS NULL;
+

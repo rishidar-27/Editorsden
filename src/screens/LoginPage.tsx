@@ -23,6 +23,7 @@ import {
   FolderLock
 } from 'lucide-react';
 import { useApp } from '@/context';
+import { resendConfirmationEmail } from '@/lib/supabase';
 
 interface LoginPageProps {
   onNavigate: (route: string) => void;
@@ -39,6 +40,24 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError('Please enter your email address above to resend verification.');
+      return;
+    }
+    setResending(true);
+    try {
+      await resendConfirmationEmail(email.trim().toLowerCase());
+      if (addToast) addToast(`Fresh confirmation email sent to ${email}!`, 'success');
+      setError('Fresh confirmation email sent! Please check your inbox and spam folder.');
+    } catch (err: any) {
+      if (addToast) addToast(err.message || 'Could not resend verification email', 'error');
+    } finally {
+      setResending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,9 +193,27 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
 
               {/* Error Alert Box */}
               {error && (
-                <div className="p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-2xl text-xs text-red-700 dark:text-red-300 font-medium flex items-start gap-2.5 animate-fade-in">
-                  <div className="w-4 h-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">!</div>
-                  <div className="leading-snug">{error}</div>
+                <div className="p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-2xl text-xs text-red-700 dark:text-red-300 font-medium space-y-2 animate-fade-in">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-4 h-4 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">!</div>
+                    <div className="leading-snug flex-1">{error}</div>
+                  </div>
+
+                  {error.toLowerCase().includes('not confirmed') && (
+                    <div className="pt-2 border-t border-red-200/60 dark:border-red-900/50 flex flex-col gap-1.5 text-[11px]">
+                      <p className="text-red-600 dark:text-red-300">
+                        Supabase requires email confirmation before initial login. If the confirmation link didn't activate or expired, you can request a fresh one:
+                      </p>
+                      <button
+                        type="button"
+                        disabled={resending}
+                        onClick={handleResendConfirmation}
+                        className="self-start text-xs font-bold text-red-800 dark:text-red-200 underline hover:opacity-80 cursor-pointer disabled:opacity-50"
+                      >
+                        {resending ? 'Sending confirmation link...' : 'Resend Confirmation Email →'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

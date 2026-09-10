@@ -44,6 +44,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
           role,
           specialty: specialty || 'DaVinci Resolve Colorist',
         },
+        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
       },
     });
     if (error) throw error;
@@ -51,6 +52,21 @@ export async function signUpWithEmail(email: string, password: string, fullName:
   }
 
   return { user: { id: `e-${Date.now()}`, email } };
+}
+
+export async function resendConfirmationEmail(email: string) {
+  if (isSupabaseConfigured()) {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    });
+    if (error) throw error;
+    return true;
+  }
+  return true;
 }
 
 export async function signOutUser() {
