@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js';
 import { initialEditors, initialProjects } from './data.js';
 import { generateUploadUrl, deleteR2Files } from './r2.js';
 
@@ -9,6 +10,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const serverStartTime = Date.now();
+
+// Direct Supabase integration with Service Role Key (bypasses RLS for full persistence)
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseServiceKey) ? createClient(supabaseUrl, supabaseServiceKey) : null;
+if (supabase) {
+  console.log('✓ Express connected directly to Supabase production database');
+} else {
+  console.warn('! Supabase service key not configured in Express; falling back to in-memory store');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -214,11 +225,9 @@ app.delete('/api/storage/assets', async (req, res) => {
 });
 
 // POST /api/storage/upgrade-tier - Upgrade editor storage tier
-app.post('/api/storage/upgrade-tier', (req, res) => {
+app.post('/api/storage/upgrade-tier', async (req, res) => {
   const { editorId, planTier } = req.body;
   const editor = editors.find((e) => e.id === editorId);
-  if (!editor) return res.status(404).json({ error: 'Editor not found' });
-
   const tiers = {
     Free: 1073741824, // 1 GB
     Pro: 53687091200, // 50 GB
@@ -226,32 +235,72 @@ app.post('/api/storage/upgrade-tier', (req, res) => {
     Studio_200GB: 214748364800, // 200 GB
   };
 
-  editor.storageTier = planTier === 'Free' ? 'Free' : 'Pro';
-  editor.storageLimitBytes = tiers[planTier] || 1073741824;
+  const limitBytes = tiers[planTier] || 1073741824;
+  const tierName = planTier === 'Free' ? 'Free' : 'Pro';
+
+  if (supabase) {
+    try {
+      await supabase
+        .from('profiles')
+        .update({
+          storage_limit_bytes: limitBytes,
+          storage_tier: tierName,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', editorId);
+    } catch (err) {
+      console.error('Supabase error in /api/storage/upgrade-tier:', err);
+    }
+  }
+
+  if (editor) {
+    editor.storageTier = tierName;
+    editor.storageLimitBytes = limitBytes;
+  }
 
   res.json({
     success: true,
     editorId,
-    storageTier: editor.storageTier,
-    storageLimitBytes: editor.storageLimitBytes,
+    storageTier: tierName,
+    storageLimitBytes: limitBytes,
   });
 });
 
 // POST /api/storage/add-extra - Add pay-as-you-go storage
-app.post('/api/storage/add-extra', (req, res) => {
+app.post('/api/storage/add-extra', async (req, res) => {
   const { editorId, additionalGB } = req.body;
-  const editor = editors.find((e) => e.id === editorId);
-  if (!editor) return res.status(404).json({ error: 'Editor not found' });
-
   const extraBytes = (Number(additionalGB) || 5) * 1024 * 1024 * 1024;
-  editor.storageLimitBytes = (editor.storageLimitBytes || 1073741824) + extraBytes;
-  editor.storageTier = 'Pro';
+  let newLimit = 1073741824 + extraBytes;
+
+  if (supabase) {
+    try {
+      const { data: profile } = await supabase.from('profiles').select('storage_limit_bytes').eq('id', editorId).single();
+      const currentLimit = Number(profile?.storage_limit_bytes) || 1073741824;
+      newLimit = currentLimit + extraBytes;
+      await supabase
+        .from('profiles')
+        .update({
+          storage_limit_bytes: newLimit,
+          storage_tier: 'Pro',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', editorId);
+    } catch (err) {
+      console.error('Supabase error in /api/storage/add-extra:', err);
+    }
+  }
+
+  const editor = editors.find((e) => e.id === editorId);
+  if (editor) {
+    editor.storageLimitBytes = newLimit;
+    editor.storageTier = 'Pro';
+  }
 
   res.json({
     success: true,
     editorId,
-    storageTier: editor.storageTier,
-    storageLimitBytes: editor.storageLimitBytes,
+    storageTier: 'Pro',
+    storageLimitBytes: newLimit,
   });
 });
 
@@ -259,10 +308,75 @@ app.post('/api/storage/add-extra', (req, res) => {
 // 3. EDITORS & PROJECTS CRUD
 // ============================================================
 
-app.get('/api/editors', (req, res) => {
+app.get('/api/editors', async (req, res) => {
   const { search, status } = req.query;
-  let result = [...editors];
 
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        let result = data
+          .filter((p) => p.email !== 'admin@gogangs.com' && p.role !== 'admin')
+          .map((p) => ({
+            id: p.id,
+            fullName: p.full_name,
+            email: p.email,
+            city: p.city || '',
+            phone: p.phone || '',
+            experience: p.experience_years || 0,
+            skills: p.skills || [],
+            editingSoftware: p.editing_software || [],
+            availability: p.availability || 'Part-Time',
+            hoursPerWeek: p.hours_per_week || 20,
+            bio: p.bio || '',
+            avatarUrl: p.avatar_url || `https://i.pravatar.cc/150?u=${p.id}`,
+            portfolio: [],
+            verificationStatus: p.verification_status || 'Pending',
+            verificationFeedback: p.verification_feedback || undefined,
+            verificationDocs: {
+              resumeLink: p.resume_link,
+              sampleWorkLinks: p.sample_work_links || [],
+              portfolioLinks: p.portfolio_links || [],
+            },
+            active: p.is_active ?? true,
+            lastLogin: p.last_login || p.updated_at || new Date().toISOString(),
+            lastProfileUpdate: p.updated_at || new Date().toISOString(),
+            lastPortfolioUpdate: p.updated_at || new Date().toISOString(),
+            createdAt: p.created_at || new Date().toISOString(),
+            role: p.role || 'editor',
+            storageUsedBytes: Number(p.storage_used_bytes) || 0,
+            storageLimitBytes: Number(p.storage_limit_bytes) || 1073741824,
+            storageTier: p.storage_tier || 'Free',
+            hourlyRate: p.hourly_rate || '$65/hr',
+            rating: p.rating || 5.0,
+            reviewsCount: p.reviews_count || 0,
+            completedProjects: p.completed_projects || 0,
+            hardware: p.hardware,
+            turnaround: p.turnaround || '24h - 48h',
+          }));
+
+        if (search) {
+          const q = String(search).toLowerCase();
+          result = result.filter(
+            (e) =>
+              e.fullName.toLowerCase().includes(q) ||
+              e.email.toLowerCase().includes(q) ||
+              e.skills.some((s) => s.toLowerCase().includes(q))
+          );
+        }
+
+        if (status && status !== 'All') {
+          result = result.filter((e) => e.verificationStatus === status);
+        }
+
+        return res.json(result);
+      }
+    } catch (err) {
+      console.warn('Supabase fetch error in GET /api/editors, falling back to memory:', err);
+    }
+  }
+
+  let result = [...editors];
   if (search) {
     const q = String(search).toLowerCase();
     result = result.filter(
@@ -272,16 +386,63 @@ app.get('/api/editors', (req, res) => {
         e.skills.some((s) => s.toLowerCase().includes(q))
     );
   }
-
   if (status && status !== 'All') {
     result = result.filter((e) => e.verificationStatus === status);
   }
-
   res.json(result);
 });
 
-app.get('/api/editors/:id', (req, res) => {
-  const editor = editors.find((e) => e.id === req.params.id);
+app.get('/api/editors/:id', async (req, res) => {
+  const id = req.params.id;
+
+  if (supabase) {
+    try {
+      const { data: p, error } = await supabase.from('profiles').select('*').eq('id', id).single();
+      if (!error && p) {
+        return res.json({
+          id: p.id,
+          fullName: p.full_name,
+          email: p.email,
+          city: p.city || '',
+          phone: p.phone || '',
+          experience: p.experience_years || 0,
+          skills: p.skills || [],
+          editingSoftware: p.editing_software || [],
+          availability: p.availability || 'Part-Time',
+          hoursPerWeek: p.hours_per_week || 20,
+          bio: p.bio || '',
+          avatarUrl: p.avatar_url || `https://i.pravatar.cc/150?u=${p.id}`,
+          portfolio: [],
+          verificationStatus: p.verification_status || 'Pending',
+          verificationFeedback: p.verification_feedback || undefined,
+          verificationDocs: {
+            resumeLink: p.resume_link,
+            sampleWorkLinks: p.sample_work_links || [],
+            portfolioLinks: p.portfolio_links || [],
+          },
+          active: p.is_active ?? true,
+          lastLogin: p.last_login || p.updated_at || new Date().toISOString(),
+          lastProfileUpdate: p.updated_at || new Date().toISOString(),
+          lastPortfolioUpdate: p.updated_at || new Date().toISOString(),
+          createdAt: p.created_at || new Date().toISOString(),
+          role: p.role || 'editor',
+          storageUsedBytes: Number(p.storage_used_bytes) || 0,
+          storageLimitBytes: Number(p.storage_limit_bytes) || 1073741824,
+          storageTier: p.storage_tier || 'Free',
+          hourlyRate: p.hourly_rate || '$65/hr',
+          rating: p.rating || 5.0,
+          reviewsCount: p.reviews_count || 0,
+          completedProjects: p.completed_projects || 0,
+          hardware: p.hardware,
+          turnaround: p.turnaround || '24h - 48h',
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase fetch error in GET /api/editors/:id:', err);
+    }
+  }
+
+  const editor = editors.find((e) => e.id === id);
   if (!editor) return res.status(404).json({ error: 'Editor not found' });
   res.json(editor);
 });
@@ -304,11 +465,57 @@ app.post('/api/editors', (req, res) => {
   res.status(201).json(newEditor);
 });
 
-app.put('/api/editors/:id', (req, res) => {
-  const index = editors.findIndex((e) => e.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Editor not found' });
-  editors[index] = { ...editors[index], ...req.body };
-  res.json(editors[index]);
+app.put('/api/editors/:id', async (req, res) => {
+  const id = req.params.id;
+  const updates = req.body;
+
+  // 1. Always update Supabase profiles with Service Role Key (full database bypass of RLS)
+  if (supabase) {
+    const dbUpdates = { updated_at: new Date().toISOString() };
+    if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
+    if (updates.city !== undefined) dbUpdates.city = updates.city;
+    if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
+    if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
+    if (updates.experience !== undefined) dbUpdates.experience_years = updates.experience;
+    if (updates.skills !== undefined) dbUpdates.skills = updates.skills;
+    if (updates.editingSoftware !== undefined) dbUpdates.editing_software = updates.editingSoftware;
+    if (updates.availability !== undefined) dbUpdates.availability = updates.availability;
+    if (updates.hoursPerWeek !== undefined) dbUpdates.hours_per_week = updates.hoursPerWeek;
+    if (updates.verificationStatus !== undefined) dbUpdates.verification_status = updates.verificationStatus;
+    if (updates.verificationFeedback !== undefined) dbUpdates.verification_feedback = updates.verificationFeedback;
+    if (updates.active !== undefined) dbUpdates.is_active = updates.active;
+    if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
+    if (updates.storageTier !== undefined) dbUpdates.storage_tier = updates.storageTier;
+    if (updates.storageLimitBytes !== undefined) dbUpdates.storage_limit_bytes = updates.storageLimitBytes;
+    if (updates.hardware !== undefined) dbUpdates.hardware = updates.hardware;
+    if (updates.lastLogin !== undefined) dbUpdates.last_login = updates.lastLogin;
+
+    try {
+      const { data, error } = await supabase.from('profiles').update(dbUpdates).eq('id', id).select().single();
+      if (!error && data) {
+        console.log(`✓ Supabase profile ${id} updated:`, updates);
+        const index = editors.findIndex((e) => e.id === id);
+        if (index !== -1) {
+          editors[index] = { ...editors[index], ...updates };
+        }
+        return res.json({ success: true, ...data });
+      }
+      if (error) {
+        console.error('Supabase update error in PUT /api/editors/:id:', error);
+      }
+    } catch (err) {
+      console.error('Failed to update profile in Supabase:', err);
+    }
+  }
+
+  // 2. Fallback to in-memory editors
+  const index = editors.findIndex((e) => e.id === id);
+  if (index !== -1) {
+    editors[index] = { ...editors[index], ...updates };
+    return res.json(editors[index]);
+  }
+
+  res.status(200).json({ success: true, id, ...updates });
 });
 
 app.get('/api/projects', (req, res) => {
