@@ -228,16 +228,16 @@ export function EditorProfile() {
         {/* 2-Column Grid Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Left Column (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Left Column (6 cols) */}
+          <div className="lg:col-span-6 space-y-6">
             
             {/* Personal Information Card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 flex items-center justify-center">
                   <User className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm font-bold text-gray-900">Personal & Contact Information</h2>
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white">Personal & Contact Information</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -270,26 +270,26 @@ export function EditorProfile() {
             </div>
 
             {/* Hardware & Workstation Specs (Dynamic & User-Editable) */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                     <Cpu className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-bold text-gray-900">Workstation & Hardware Specifications</h2>
-                    <p className="text-[11px] text-gray-400">Specify your computer specs, displays, and setup details</p>
+                    <h2 className="text-sm font-bold text-gray-900 dark:text-white">Workstation & Hardware Specifications</h2>
+                    <p className="text-[11px] text-gray-400 dark:text-zinc-400">Specify your computer specs, displays, and setup details</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                   Editor Specified
                 </span>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5 text-gray-900" />
+                  <label className="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-gray-900 dark:text-zinc-200" />
                     Primary Workstation / CPU / GPU
                   </label>
                   <input
@@ -297,13 +297,13 @@ export function EditorProfile() {
                     value={hardwareSpecs.workstation}
                     placeholder="e.g. Apple Mac Studio M2 Ultra (64GB) / PC RTX 4090, Intel i9"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, workstation: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Tv className="w-3.5 h-3.5 text-emerald-600" />
+                  <label className="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                    <Tv className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     Monitors & Color Reference Displays
                   </label>
                   <input
@@ -311,13 +311,13 @@ export function EditorProfile() {
                     value={hardwareSpecs.displays}
                     placeholder="e.g. Dual 4K ASUS ProArt 32-inch HDR, Calibrated DCI-P3"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, displays: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <HardDrive className="w-3.5 h-3.5 text-blue-600" />
+                  <label className="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                    <HardDrive className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                     Storage & Scratch Disks
                   </label>
                   <input
@@ -325,13 +325,13 @@ export function EditorProfile() {
                     value={hardwareSpecs.storage}
                     placeholder="e.g. 4TB NVMe SSD + 16TB High-Speed RAID Array"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, storage: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Wifi className="w-3.5 h-3.5 text-gray-900" />
+                  <label className="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                    <Wifi className="w-3.5 h-3.5 text-gray-900 dark:text-zinc-200" />
                     Network Pipeline & Audio Monitoring
                   </label>
                   <input
@@ -339,19 +339,35 @@ export function EditorProfile() {
                     value={hardwareSpecs.audioConnectivity}
                     placeholder="e.g. 1 Gbps Symmetrical Fiber, Yamaha HS8 Monitors, Sony MDR-7506"
                     onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, audioConnectivity: e.target.value })}
-                    className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 font-medium"
+                    className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Links & Social Media Card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="w-7 h-7 rounded-lg bg-gray-100 text-gray-800 flex items-center justify-center">
+            {/* Bio Card */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Creator Bio & Narrative Style</h2>
+              <Textarea
+                rows={3}
+                placeholder="Describe your editing philosophy, favorite niches, pacing style, and major commercial highlights..."
+                value={form.bio}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              />
+            </div>
+
+          </div>
+
+          {/* Right Column (6 cols) */}
+          <div className="lg:col-span-6 space-y-6">
+            
+            {/* Links & Social Presence Card (Moved to Right Column) */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 flex items-center justify-center">
                   <Globe className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm font-bold text-gray-900">Links & Social Presence</h2>
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white">Links & Social Presence</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -387,90 +403,13 @@ export function EditorProfile() {
               </div>
             </div>
 
-            {/* Bio Card */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
-              <h2 className="text-sm font-bold text-gray-900">Creator Bio & Narrative Style</h2>
-              <Textarea
-                rows={3}
-                placeholder="Describe your editing philosophy, favorite niches, pacing style, and major commercial highlights..."
-                value={form.bio}
-                onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              />
-            </div>
-
-          </div>
-
-          {/* Right Column (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Skills & Specialties */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
-              <h2 className="text-sm font-bold text-gray-900">Editing Disciplines & Skills</h2>
-              
-              <div className="flex flex-wrap gap-1.5">
-                {skills.map((skill) => (
-                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-gray-100 text-gray-900 font-bold px-2.5 py-1 rounded-lg text-xs">
-                    {skill}
-                  </SkillTag>
-                ))}
-                {skills.length === 0 && <p className="text-xs text-gray-400">No skills added yet.</p>}
-              </div>
-
-              <div className="relative pt-1">
-                <Input
-                  placeholder="Type to add skills..."
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  icon={<Plus className="w-3.5 h-3.5 text-gray-400" />}
-                />
-                {skillInput && filteredSkills.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20 max-h-40 overflow-y-auto">
-                    {filteredSkills.map((skill) => (
-                      <button
-                        key={skill}
-                        onClick={() => addSkill(skill)}
-                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors font-semibold"
-                      >
-                        + {skill}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Editing Software */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-3">
-              <h2 className="text-sm font-bold text-gray-900">Creative Software Suite</h2>
-              
-              <div className="flex flex-wrap gap-1.5">
-                {allSoftware.map((sw) => {
-                  const selected = software.includes(sw as Software);
-                  return (
-                    <button
-                      key={sw}
-                      onClick={() => toggleSoftware(sw)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
-                        selected
-                          ? 'bg-gray-900 border-gray-900 text-white shadow-2xs'
-                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {selected && <Check className="w-3.5 h-3.5 text-white" />}
-                      {sw}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Work Availability */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-2xs space-y-4">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-zinc-800 pb-3">
+                <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 flex items-center justify-center">
                   <Clock className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm font-bold text-gray-900">Work Capacity & Availability</h2>
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white">Work Capacity & Availability</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -493,6 +432,67 @@ export function EditorProfile() {
                   onChange={(e) => setForm({ ...form, hoursPerWeek: parseInt(e.target.value) || 0 })}
                   icon={<Clock className="w-3.5 h-3.5 text-gray-400" />}
                 />
+              </div>
+            </div>
+
+            {/* Skills & Specialties */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Editing Disciplines & Skills</h2>
+              
+              <div className="flex flex-wrap gap-1.5">
+                {skills.map((skill) => (
+                  <SkillTag key={skill} onRemove={() => removeSkill(skill)} className="bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white font-bold px-2.5 py-1 rounded-lg text-xs">
+                    {skill}
+                  </SkillTag>
+                ))}
+                {skills.length === 0 && <p className="text-xs text-gray-400 dark:text-zinc-500">No skills added yet.</p>}
+              </div>
+
+              <div className="relative pt-1">
+                <Input
+                  placeholder="Type to add skills..."
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  icon={<Plus className="w-3.5 h-3.5 text-gray-400" />}
+                />
+                {skillInput && filteredSkills.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-lg py-1 z-20 max-h-40 overflow-y-auto">
+                    {filteredSkills.map((skill) => (
+                      <button
+                        key={skill}
+                        onClick={() => addSkill(skill)}
+                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-900 dark:hover:text-white transition-colors font-semibold"
+                      >
+                        + {skill}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Editing Software */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-3">
+              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Creative Software Suite</h2>
+              
+              <div className="flex flex-wrap gap-1.5">
+                {allSoftware.map((sw) => {
+                  const selected = software.includes(sw as Software);
+                  return (
+                    <button
+                      key={sw}
+                      onClick={() => toggleSoftware(sw)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
+                        selected
+                          ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900 shadow-2xs'
+                          : 'bg-white dark:bg-zinc-800/80 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {selected && <Check className="w-3.5 h-3.5 text-white dark:text-gray-900" />}
+                      {sw}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
