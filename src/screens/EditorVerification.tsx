@@ -10,13 +10,6 @@ import {
   Link2,
   Plus,
   X,
-  Sparkles,
-  Cpu,
-  Tv,
-  Zap,
-  Volume2,
-  Layers,
-  Award,
 } from 'lucide-react';
 import type { VerificationStatus } from '@/types';
 
@@ -59,44 +52,6 @@ export function EditorVerification() {
     Rejected: { icon: <XCircle className="w-5 h-5 text-red-600" />, variant: 'rejected' },
   };
 
-  const vettingStages = [
-    {
-      num: '01',
-      title: 'Hardware & Render Benchmark',
-      description: 'Minimum 32GB RAM, Dedicated GPU (Apple Silicon / RTX 4080+), 1Gbps Fiber connection.',
-      status: 'Passed (Score: 98/100)',
-      icon: <Cpu className="w-4 h-4 text-gray-900" />,
-    },
-    {
-      num: '02',
-      title: 'Color Science & Rec.709 / HDR Accuracy',
-      description: 'Delta E < 1.5 color grading accuracy tested across calibrated ProArt displays.',
-      status: 'Passed (Score: 99/100)',
-      icon: <Tv className="w-4 h-4 text-emerald-600" />,
-    },
-    {
-      num: '03',
-      title: 'Audio Dynamics & -14 LUFS Broadcast Standard',
-      description: 'Pristine dialogue isolation, spectral de-noise, and broadcast LUFS compliance.',
-      status: 'Passed (Score: 96/100)',
-      icon: <Volume2 className="w-4 h-4 text-gray-900" />,
-    },
-    {
-      num: '04',
-      title: 'Narrative Pacing & Hook Retention',
-      description: 'Tested on short-form viral retention (first 3 seconds drop-off < 18%).',
-      status: 'Passed (Score: 97/100)',
-      icon: <Layers className="w-4 h-4 text-amber-600" />,
-    },
-    {
-      num: '05',
-      title: 'Rapid Turnaround Speed Test',
-      description: 'Same-day 4-hour rough assembly delivery test on raw multi-cam footage.',
-      status: 'Passed (Score: 100/100)',
-      icon: <Zap className="w-4 h-4 text-gray-900" />,
-    },
-  ];
-
   return (
     <div className="max-w-[960px] mx-auto px-4 lg:px-8 py-8 space-y-6 font-sans">
       <div>
@@ -105,7 +60,7 @@ export function EditorVerification() {
           <span>Editor Verification & Quality Badging</span>
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gogangs verifies top video editors through a comprehensive 5-stage benchmark test to unlock high-budget enterprise campaigns.
+          Gogangs verifies video editors through portfolio review and credentials to unlock high-budget enterprise campaigns.
         </p>
       </div>
 
@@ -128,45 +83,6 @@ export function EditorVerification() {
               {status === 'Rejected' && 'Your verification needs revisions. Please review the admin feedback below and update your portfolio assets.'}
             </p>
           </div>
-        </div>
-      </Card>
-
-      {/* 5-Stage Vetting Scorecard */}
-      <Card className="p-6 bg-white border border-gray-100 rounded-2xl shadow-2xs space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-gray-900" />
-            <h2 className="text-base font-bold text-gray-900">
-              5-Stage Quality Benchmark Results
-            </h2>
-          </div>
-          <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-            Top 1% Creator Badge
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-          {vettingStages.map((stage, idx) => (
-            <div
-              key={idx}
-              className={`p-3.5 rounded-xl border border-gray-100 bg-gray-50/70 space-y-1.5 ${idx === 4 ? 'md:col-span-2' : ''}`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-2xs">
-                    {stage.icon}
-                  </div>
-                  <h4 className="text-xs font-bold text-gray-900">{stage.title}</h4>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                  {stage.status}
-                </span>
-              </div>
-              <p className="text-[11px] text-gray-500 pl-8 leading-relaxed">
-                {stage.description}
-              </p>
-            </div>
-          ))}
         </div>
       </Card>
 
