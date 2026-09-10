@@ -30,7 +30,7 @@ app.use(express.json());
 
 // In-Memory State Store (Falls back seamlessly when DB offline)
 let editors = [...initialEditors];
-let projects = [...initialProjects];
+let projects = [];
 
 // Storage assets tracking table
 let editorAssets = [
@@ -560,90 +560,6 @@ function mapDbProject(p) {
   };
 }
 
-async function seedInitialProjectsToSupabase() {
-  if (!supabase) return;
-  try {
-    const { data: existing } = await supabase.from('projects').select('id').limit(1);
-    if (existing && existing.length > 0) return;
-
-    console.log('Seeding initial projects into Supabase...');
-    const now = new Date();
-    const proj1Id = '11111111-1111-4111-8111-111111111111';
-    const proj2Id = '22222222-2222-4222-8222-222222222222';
-
-    await supabase.from('projects').insert([
-      {
-        id: proj1Id,
-        title: 'Summer Viral Social Media Campaign',
-        client_name: 'Aurora Skincare',
-        description: 'Viral social media campaigns across TikTok, Instagram Reels, and YouTube Shorts.',
-        status: 'In Progress',
-        created_at: new Date(now.getTime() - 3600000 * 2).toISOString(),
-      },
-      {
-        id: proj2Id,
-        title: 'Aurora Skincare — Q4 Launch Campaign',
-        client_name: 'Aurora Cosmetics Inc.',
-        description: 'Full video asset production for nationwide skincare launch across Instagram and YouTube.',
-        status: 'In Progress',
-        created_at: new Date(now.getTime() - 86400000 * 5).toISOString(),
-      },
-    ]);
-
-    await supabase.from('subtasks').insert([
-      {
-        id: '33333333-3333-4333-8333-333333333331',
-        project_id: proj1Id,
-        title: 'Viral Instagram Reels (5x Hook Variations)',
-        task_type: 'Reels Editing',
-        deadline: new Date(now.getTime() + 86400000 * 5).toISOString(),
-        status: 'Assigned',
-        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
-      },
-      {
-        id: '33333333-3333-4333-8333-333333333332',
-        project_id: proj1Id,
-        title: 'High-CTR Thumbnail Graphic Package',
-        task_type: 'Thumbnail Design',
-        deadline: new Date(now.getTime() + 86400000 * 3).toISOString(),
-        status: 'Assigned',
-        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
-      },
-      {
-        id: '33333333-3333-4333-8333-333333333333',
-        project_id: proj1Id,
-        title: 'TikTok Trending Audio Cutdown (3x)',
-        task_type: 'Reels Editing',
-        deadline: new Date(now.getTime() + 86400000 * 6).toISOString(),
-        status: 'Assigned',
-        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
-      },
-      {
-        id: '33333333-3333-4333-8333-333333333334',
-        project_id: proj2Id,
-        title: 'Hero Brand Film (60s)',
-        task_type: 'Commercial Ads',
-        deadline: new Date(now.getTime() + 86400000 * 10).toISOString(),
-        status: 'In Progress',
-        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
-      },
-      {
-        id: '33333333-3333-4333-8333-333333333335',
-        project_id: proj2Id,
-        title: 'Product Tutorial Videos (3x)',
-        task_type: 'YouTube Editing',
-        deadline: new Date(now.getTime() + 86400000 * 12).toISOString(),
-        status: 'Assigned',
-        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
-      },
-    ]);
-
-    console.log('✓ Initial projects successfully seeded into Supabase with Mathew assigned');
-  } catch (err) {
-    console.error('Error seeding initial projects to Supabase:', err);
-  }
-}
-
 app.get('/api/projects', async (req, res) => {
   if (supabase) {
     try {
@@ -672,43 +588,9 @@ app.get('/api/projects', async (req, res) => {
         .order('created_at', { ascending: false });
 
       if (!error && Array.isArray(dbProjects)) {
-        if (dbProjects.length > 0) {
-          const mapped = dbProjects.map(mapDbProject);
-          projects = mapped;
-          return res.json(mapped);
-        } else {
-          // Supabase is empty: Seed initial projects and return
-          await seedInitialProjectsToSupabase();
-          const { data: seeded } = await supabase
-            .from('projects')
-            .select(`
-              id,
-              title,
-              client_name,
-              description,
-              status,
-              created_at,
-              subtasks (
-                id,
-                project_id,
-                title,
-                task_type,
-                deadline,
-                status,
-                deliverable_link,
-                feedback,
-                assigned_editor_ids,
-                deliverable_submissions (*)
-              )
-            `)
-            .order('created_at', { ascending: false });
-
-          if (seeded && seeded.length > 0) {
-            const mapped = seeded.map(mapDbProject);
-            projects = mapped;
-            return res.json(mapped);
-          }
-        }
+        const mapped = dbProjects.map(mapDbProject);
+        projects = mapped;
+        return res.json(mapped);
       }
     } catch (err) {
       console.warn('Supabase fetch error in GET /api/projects, falling back to memory:', err);
@@ -806,7 +688,6 @@ app.post('/api/projects', async (req, res) => {
         }
       }
 
-      // Read back complete project with subtasks from Supabase
       const { data: fullProject } = await supabase
         .from('projects')
         .select(`

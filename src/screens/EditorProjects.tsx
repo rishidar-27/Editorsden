@@ -49,8 +49,6 @@ export function EditorProjects() {
 
   const [showNewTaskNotice, setShowNewTaskNotice] = useState(false);
 
-  if (!editor) return null;
-
   const now = new Date();
 
   // Find active modal subtask live from state
@@ -64,6 +62,7 @@ export function EditorProjects() {
 
   // Extract all subtasks assigned to current editor
   const myAssignedItems = useMemo(() => {
+    if (!editor) return [];
     const items: Array<{
       subtask: Subtask;
       project: Project;
@@ -104,7 +103,7 @@ export function EditorProjects() {
     });
 
     return items;
-  }, [projects, editor.id]);
+  }, [projects, editor?.id]);
 
   // Counts
   const inProgressCount = myAssignedItems.filter((i) => i.subtask.status === 'In Progress').length;
@@ -170,7 +169,7 @@ export function EditorProjects() {
 
   const handleUploadAndSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!modalData || !selectedFile) {
+    if (!modalData || !selectedFile || !editor) {
       addToast('Please select a deliverable file to upload.', 'error');
       return;
     }
@@ -238,6 +237,14 @@ export function EditorProjects() {
       setSubmissionNotes('');
     }, 900);
   };
+
+  if (!editor) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#f4f6fb] dark:bg-[#09090B] flex items-center justify-center p-8">
+        <p className="text-sm text-gray-500 font-medium">Loading editor profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f4f6fb] px-4 sm:px-6 lg:px-10 py-7 font-sans flex flex-col justify-between space-y-8">

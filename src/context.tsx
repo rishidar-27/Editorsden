@@ -119,7 +119,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return null;
   });
   const [editors, setEditors] = useState<Editor[]>(() => isSupabaseConfigured() ? [] : initialEditors);
-  const [projects, setProjects] = useState<Project[]>(() => isSupabaseConfigured() ? [] : initialProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>(() => isSupabaseConfigured() ? [] : initialActivity);
   const [assets, setAssets] = useState<EditorAsset[]>(() => isSupabaseConfigured() ? [] : initialAssets);
   const [toasts, setToasts] = useState<Toast[]>([]);
