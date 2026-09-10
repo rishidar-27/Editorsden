@@ -128,6 +128,7 @@ export interface Subtask {
   status: ProjectStatus;
   deliverableLink?: string;
   feedback?: string;
+  description?: string;
   deliverablesQueue?: DeliverableSubmission[];
   createdAt?: string;
   updatedAt?: string;

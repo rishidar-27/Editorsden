@@ -29,17 +29,19 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
   const [title, setTitle] = useState('');
   const [clientName, setClientName] = useState('');
   const [subtasks, setSubtasks] = useState<
-    { id: string; title: string; taskType: TaskType; deadline: string }[]
+    { id: string; title: string; description?: string; taskType: TaskType; deadline: string }[]
   >([
     {
       id: generateUuid(),
       title: 'Hero Brand Commercial (60s)',
+      description: 'Create high energy 60s cut with dynamic typography and sound design.',
       taskType: 'Commercial Ads',
       deadline: '2026-09-10',
     },
     {
       id: generateUuid(),
       title: 'Instagram Reels & TikTok Cutdowns (4x)',
+      description: 'Vertical 9:16 cuts highlighting best moments with viral pacing.',
       taskType: 'Reels Editing',
       deadline: '2026-09-08',
     },
@@ -51,6 +53,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
       {
         id: generateUuid(),
         title: '',
+        description: '',
         taskType: 'Reels Editing' as TaskType,
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
       },
@@ -63,7 +66,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
 
   const updateSubtaskField = (
     id: string,
-    field: 'title' | 'taskType' | 'deadline',
+    field: 'title' | 'description' | 'taskType' | 'deadline',
     value: string
   ) => {
     setSubtasks(subtasks.map((st) => (st.id === id ? { ...st, [field]: value } : st)));
@@ -121,6 +124,7 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
         id: st.id,
         projectId,
         title: st.title || 'Untitled deliverable',
+        description: st.description?.trim() || undefined,
         taskType: st.taskType,
         deadline: new Date(st.deadline).toISOString(),
         assignedEditorIds: [],
@@ -269,55 +273,67 @@ export function CreateProject({ onNavigate }: CreateProjectProps) {
             {subtasks.map((st, i) => (
               <div
                 key={st.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3.5 bg-gray-50/80 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors"
+                className="flex flex-col gap-2.5 p-3.5 bg-gray-50/80 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors"
               >
-                <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-900 flex items-center justify-center text-xs font-bold shrink-0">
-                  {i + 1}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gray-200 text-gray-900 flex items-center justify-center text-xs font-bold shrink-0">
+                    {i + 1}
+                  </div>
+
+                  <div className="flex-1 w-full sm:w-auto">
+                    <input
+                      type="text"
+                      placeholder="Deliverable title (e.g. Hero Commercial 60s Cut)"
+                      value={st.title}
+                      onChange={(e) => updateSubtaskField(st.id, 'title', e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-900"
+                    />
+                  </div>
+
+                  <div className="w-full sm:w-48">
+                    <select
+                      value={st.taskType}
+                      onChange={(e) =>
+                        updateSubtaskField(st.id, 'taskType', e.target.value as TaskType)
+                      }
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-semibold text-gray-700"
+                    >
+                      {allTaskTypes.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="w-full sm:w-40">
+                    <input
+                      type="date"
+                      value={st.deadline}
+                      onChange={(e) => updateSubtaskField(st.id, 'deadline', e.target.value)}
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-700"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeSubtask(st.id)}
+                    title="Remove deliverable"
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <div className="flex-1 w-full sm:w-auto">
+                <div className="pl-0 sm:pl-9">
                   <input
                     type="text"
-                    placeholder="Deliverable title (e.g. Hero Commercial 60s Cut)"
-                    value={st.title}
-                    onChange={(e) => updateSubtaskField(st.id, 'title', e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-900"
+                    placeholder="Brief / Description for editor (optional: e.g. Keep intro punchy, use motion text overlays)"
+                    value={st.description || ''}
+                    onChange={(e) => updateSubtaskField(st.id, 'description', e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 placeholder:text-gray-400 text-gray-700"
                   />
                 </div>
-
-                <div className="w-full sm:w-48">
-                  <select
-                    value={st.taskType}
-                    onChange={(e) =>
-                      updateSubtaskField(st.id, 'taskType', e.target.value as TaskType)
-                    }
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-semibold text-gray-700"
-                  >
-                    {allTaskTypes.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="w-full sm:w-40">
-                  <input
-                    type="date"
-                    value={st.deadline}
-                    onChange={(e) => updateSubtaskField(st.id, 'deadline', e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 font-medium text-gray-700"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => removeSubtask(st.id)}
-                  title="Remove deliverable"
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
             ))}
           </div>

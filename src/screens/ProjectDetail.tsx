@@ -43,9 +43,14 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
 
   // Add Subtask Form State
   const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
   const [newTaskType, setNewTaskType] = useState<TaskType>('Reels Editing');
   const [newDeadline, setNewDeadline] = useState('');
   const [newEditorId, setNewEditorId] = useState('');
+
+  // Adjust Deadline Modal State
+  const [editingDeadlineSubtask, setEditingDeadlineSubtask] = useState<{ id: string; currentDeadline: string; title: string } | null>(null);
+  const [updatedDeadline, setUpdatedDeadline] = useState('');
 
   if (!project) {
     return (
@@ -147,6 +152,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
       id: generateUuid(),
       projectId: project.id,
       title: newTitle.trim(),
+      description: newDescription.trim() || undefined,
       taskType: newTaskType,
       deadline: newDeadline || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       assignedEditorIds: newEditorId ? [newEditorId] : [],
@@ -157,6 +163,7 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
     addToast('Subtask created successfully!', 'success');
     setIsAddModalOpen(false);
     setNewTitle('');
+    setNewDescription('');
     setNewDeadline('');
     setNewEditorId('');
   };
@@ -438,18 +445,35 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                               {st.taskType}
                             </span>
 
-                            <span
-                              className={`inline-flex items-center gap-1 font-semibold text-[11px] ${
-                                overdue
-                                  ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
-                                  : urgent
-                                  ? 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md'
-                                  : 'text-gray-500'
-                              }`}
-                            >
-                              <Clock className="w-3 h-3" />
-                              {deadlineLabel}
-                            </span>
+                            <div className="inline-flex items-center gap-1.5">
+                              <span
+                                className={`inline-flex items-center gap-1 font-semibold text-[11px] ${
+                                  overdue
+                                    ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
+                                    : urgent
+                                    ? 'text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md'
+                                    : 'text-gray-500'
+                                }`}
+                              >
+                                <Clock className="w-3 h-3" />
+                                {deadlineLabel}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingDeadlineSubtask({
+                                    id: st.id,
+                                    currentDeadline: st.deadline,
+                                    title: st.title,
+                                  });
+                                  setUpdatedDeadline(st.deadline ? st.deadline.split('T')[0] : '');
+                                }}
+                                className="text-[10px] font-bold text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-1.5 py-0.5 rounded transition-colors"
+                                title="Adjust deadline"
+                              >
+                                Adjust
+                              </button>
+                            </div>
 
                             {st.deliverableLink && (
                               <a
@@ -463,6 +487,14 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                               </a>
                             )}
                           </div>
+
+                          {/* Subtask Brief / Description if present */}
+                          {st.description && (
+                            <div className="p-2.5 bg-gray-50/90 border border-gray-200 rounded-lg text-xs text-gray-700 mt-2 space-y-0.5">
+                              <span className="font-bold text-gray-900 text-[11px] block">Brief / Instructions:</span>
+                              <p className="text-gray-600 whitespace-pre-line leading-relaxed">{st.description}</p>
+                            </div>
+                          )}
 
                           {/* Feedback / note snippet if present */}
                           {st.feedback && (
@@ -682,6 +714,17 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
               </div>
 
               <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Description / Brief (Visible to Editor)</label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Hook within first 3 seconds, dynamic subtitles, upbeat royalty-free music..."
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900"
+                />
+              </div>
+
+              <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Task Category / Skill</label>
                 <select
                   value={newTaskType}
@@ -827,6 +870,68 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                   Approve Deliverable
                 </Button>
               </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Adjust Deadline Modal */}
+      {editingDeadlineSubtask && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <Card className="w-full max-w-sm p-5 bg-white rounded-2xl shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-900">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-gray-900">Adjust Deadline</h3>
+                  <p className="text-[11px] text-gray-500 truncate max-w-[200px]">{editingDeadlineSubtask.title}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingDeadlineSubtask(null)}
+                className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-gray-700">New Deadline Date</label>
+              <input
+                type="date"
+                value={updatedDeadline}
+                onChange={(e) => setUpdatedDeadline(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 font-medium text-gray-800"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingDeadlineSubtask(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  if (updatedDeadline) {
+                    updateSubtask(project.id, editingDeadlineSubtask.id, {
+                      deadline: new Date(updatedDeadline).toISOString(),
+                    });
+                    addToast('Subtask deadline updated successfully!', 'success');
+                  }
+                  setEditingDeadlineSubtask(null);
+                }}
+              >
+                Save Deadline
+              </Button>
             </div>
           </Card>
         </div>

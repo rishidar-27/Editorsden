@@ -530,33 +530,47 @@ function mapDbProject(p) {
     description: p.description || '',
     status: p.status || 'In Progress',
     createdAt: p.created_at,
-    subtasks: (p.subtasks || []).map((st) => ({
-      id: st.id,
-      projectId: st.project_id,
-      title: st.title,
-      taskType: st.task_type,
-      deadline: st.deadline,
-      status: st.status || 'Assigned',
-      deliverableLink: st.deliverable_link || undefined,
-      feedback: st.feedback || undefined,
-      assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
-      deliverablesQueue: (st.deliverable_submissions || [])
-        .sort((a, b) => (b.version || 0) - (a.version || 0))
-        .map((sub) => ({
-          id: sub.id,
-          version: sub.version,
-          fileName: sub.file_name,
-          fileSizeBytes: Number(sub.file_size_bytes) || 0,
-          fileUrl: sub.file_url,
-          mimeType: sub.mime_type,
-          notes: sub.notes,
-          status: sub.status,
-          feedback: sub.feedback,
-          feedbackGivenAt: sub.feedback_given_at,
-          submittedAt: sub.submitted_at,
-          submittedByEditorId: sub.submitted_by_editor_id,
-        })),
-    })),
+    subtasks: (p.subtasks || []).map((st) => {
+      let desc = st.description;
+      let fb = st.feedback;
+      if (fb && typeof fb === 'string' && fb.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(fb);
+          if (parsed && typeof parsed === 'object') {
+            if (parsed.description !== undefined) desc = parsed.description;
+            if (parsed.feedback !== undefined) fb = parsed.feedback;
+          }
+        } catch {}
+      }
+      return {
+        id: st.id,
+        projectId: st.project_id,
+        title: st.title,
+        taskType: st.task_type,
+        deadline: st.deadline,
+        status: st.status || 'Assigned',
+        description: desc || undefined,
+        deliverableLink: st.deliverable_link || undefined,
+        feedback: fb || undefined,
+        assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
+        deliverablesQueue: (st.deliverable_submissions || [])
+          .sort((a, b) => (b.version || 0) - (a.version || 0))
+          .map((sub) => ({
+            id: sub.id,
+            version: sub.version,
+            fileName: sub.file_name,
+            fileSizeBytes: Number(sub.file_size_bytes) || 0,
+            fileUrl: sub.file_url,
+            mimeType: sub.mime_type,
+            notes: sub.notes,
+            status: sub.status,
+            feedback: sub.feedback,
+            feedbackGivenAt: sub.feedback_given_at,
+            submittedAt: sub.submitted_at,
+            submittedByEditorId: sub.submitted_by_editor_id,
+          })),
+      };
+    }),
   };
 }
 
@@ -668,20 +682,25 @@ app.post('/api/projects', async (req, res) => {
 
       if (pError) {
         console.error('Supabase error inserting project:', pError);
-      } else if (projectRow && subtasksList.length > 0) {
-        const subtaskInserts = subtasksList.map((st) => ({
-          id: ensureUuid(st.id),
-          project_id: projectUuid,
-          title: st.title || 'Deliverable',
-          task_type: st.taskType || st.task_type || 'Reels Editing',
-          deadline: st.deadline ? new Date(st.deadline).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString(),
-          status: st.status || 'Assigned',
-          deliverable_link: st.deliverableLink || null,
-          feedback: st.feedback || null,
-          assigned_editor_ids: Array.isArray(st.assignedEditorIds) ? st.assignedEditorIds : [],
-          created_at: nowIso,
-          updated_at: nowIso,
-        }));
+        const subtaskInserts = subtasksList.map((st) => {
+          let fbValue = st.feedback || null;
+          if (st.description) {
+            fbValue = JSON.stringify({ description: st.description, feedback: st.feedback || '' });
+          }
+          return {
+            id: ensureUuid(st.id),
+            project_id: projectUuid,
+            title: st.title || 'Deliverable',
+            task_type: st.taskType || st.task_type || 'Reels Editing',
+            deadline: st.deadline ? new Date(st.deadline).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString(),
+            status: st.status || 'Assigned',
+            deliverable_link: st.deliverableLink || null,
+            feedback: fbValue,
+            assigned_editor_ids: Array.isArray(st.assignedEditorIds) ? st.assignedEditorIds : [],
+            created_at: nowIso,
+            updated_at: nowIso,
+          };
+        });
         const { error: stError } = await supabase.from('subtasks').insert(subtaskInserts);
         if (stError) {
           console.error('Supabase error inserting subtasks:', stError);
@@ -753,7 +772,32 @@ app.put('/api/projects/:projectId/subtasks/:subtaskId', async (req, res) => {
       if (updates.taskType !== undefined) dbUpdates.task_type = updates.taskType;
       if (updates.deadline !== undefined) dbUpdates.deadline = new Date(updates.deadline).toISOString();
       if (updates.deliverableLink !== undefined) dbUpdates.deliverable_link = updates.deliverableLink;
-      if (updates.feedback !== undefined) dbUpdates.feedback = updates.feedback;
+      if (updates.description !== undefined || updates.feedback !== undefined) {
+        // fetch existing feedback to preserve description or feedback
+        const { data: currentSt } = await supabase.from('subtasks').select('feedback').eq('id', subtaskId).single();
+        let existingDesc = '';
+        let existingFb = '';
+        if (currentSt?.feedback) {
+          try {
+            const parsed = JSON.parse(currentSt.feedback);
+            if (parsed && typeof parsed === 'object') {
+              existingDesc = parsed.description || '';
+              existingFb = parsed.feedback || '';
+            } else {
+              existingFb = currentSt.feedback;
+            }
+          } catch {
+            existingFb = currentSt.feedback;
+          }
+        }
+        const newDesc = updates.description !== undefined ? updates.description : existingDesc;
+        const newFb = updates.feedback !== undefined ? updates.feedback : existingFb;
+        if (newDesc) {
+          dbUpdates.feedback = JSON.stringify({ description: newDesc, feedback: newFb });
+        } else {
+          dbUpdates.feedback = newFb || null;
+        }
+      }
 
       const { data, error } = await supabase
         .from('subtasks')
@@ -769,7 +813,7 @@ app.put('/api/projects/:projectId/subtasks/:subtaskId', async (req, res) => {
           const st = project.subtasks.find((s) => s.id === subtaskId);
           if (st) Object.assign(st, updates);
         }
-        return res.json({ success: true, ...data });
+        return res.json({ success: true, ...data, ...updates });
       }
       if (error) {
         console.error('Supabase subtask update error in PUT /api/projects/:projectId/subtasks/:subtaskId:', error);
@@ -797,6 +841,11 @@ app.post('/api/projects/:projectId/subtasks', async (req, res) => {
   const subtaskUuid = ensureUuid(st.id);
   const nowIso = new Date().toISOString();
 
+  let fbValue = st.feedback || null;
+  if (st.description) {
+    fbValue = JSON.stringify({ description: st.description, feedback: st.feedback || '' });
+  }
+
   if (supabase && isUuid(projectId)) {
     try {
       const { data, error } = await supabase
@@ -809,7 +858,7 @@ app.post('/api/projects/:projectId/subtasks', async (req, res) => {
           deadline: st.deadline ? new Date(st.deadline).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString(),
           status: st.status || 'Assigned',
           deliverable_link: st.deliverableLink || null,
-          feedback: st.feedback || null,
+          feedback: fbValue,
           assigned_editor_ids: Array.isArray(st.assignedEditorIds) ? st.assignedEditorIds : [],
           created_at: nowIso,
           updated_at: nowIso,
@@ -828,13 +877,14 @@ app.post('/api/projects/:projectId/subtasks', async (req, res) => {
             taskType: data.task_type,
             deadline: data.deadline,
             status: data.status,
+            description: st.description || undefined,
             deliverableLink: data.deliverable_link,
-            feedback: data.feedback,
+            feedback: st.feedback || undefined,
             assignedEditorIds: data.assigned_editor_ids || [],
             deliverablesQueue: [],
           });
         }
-        return res.status(201).json(data);
+        return res.status(201).json({ ...data, description: st.description });
       }
     } catch (err) {
       console.error('Failed to create subtask in Supabase:', err);

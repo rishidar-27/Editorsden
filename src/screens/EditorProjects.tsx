@@ -494,6 +494,14 @@ export function EditorProjects() {
                         <span className="truncate">{project.title}</span>
                       </div>
 
+                      {/* Subtask Brief / Instructions */}
+                      {subtask.description && (
+                        <div className="p-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs text-gray-600 leading-relaxed">
+                          <span className="font-bold text-gray-900 block text-[11px] mb-0.5">Brief / Instructions:</span>
+                          <p className="line-clamp-2">{subtask.description}</p>
+                        </div>
+                      )}
+
                       {/* Status Badge & Queue Tag */}
                       <div className="pt-1 flex items-center justify-between gap-2">
                         <span
@@ -612,6 +620,19 @@ export function EditorProjects() {
                 {modalData.subtask.taskType}
               </span>
             </div>
+
+            {/* Task Description / Instructions for Editor */}
+            {modalData.subtask.description && (
+              <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-2xl space-y-1">
+                <div className="flex items-center gap-1.5 text-blue-900 font-bold text-xs">
+                  <FileText className="w-3.5 h-3.5 text-blue-700" />
+                  <span>Task Brief / Description</span>
+                </div>
+                <p className="text-xs text-blue-950/90 leading-relaxed font-medium pl-5 whitespace-pre-line">
+                  {modalData.subtask.description}
+                </p>
+              </div>
+            )}
 
             {/* Admin Feedback Section (Prominently displayed when feedback exists) */}
             {modalData.subtask.feedback && (

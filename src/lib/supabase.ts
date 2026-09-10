@@ -277,33 +277,47 @@ export async function fetchAllProjects(): Promise<Project[]> {
           title: p.title,
           clientName: p.client_name,
           createdAt: p.created_at,
-          subtasks: (p.subtasks || []).map((st: any) => ({
-            id: st.id,
-            projectId: st.project_id,
-            title: st.title,
-            taskType: st.task_type,
-            deadline: st.deadline,
-            status: st.status,
-            deliverableLink: st.deliverable_link,
-            feedback: st.feedback,
-            assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
-            deliverablesQueue: (st.deliverable_submissions || [])
-              .sort((a: any, b: any) => (b.version || 0) - (a.version || 0))
-              .map((sub: any) => ({
-                id: sub.id,
-                version: sub.version,
-                fileName: sub.file_name,
-                fileSizeBytes: Number(sub.file_size_bytes) || 0,
-                fileUrl: sub.file_url,
-                mimeType: sub.mime_type,
-                notes: sub.notes,
-                status: sub.status,
-                feedback: sub.feedback,
-                feedbackGivenAt: sub.feedback_given_at,
-                submittedAt: sub.submitted_at,
-                submittedByEditorId: sub.submitted_by_editor_id,
-              })),
-          })),
+          subtasks: (p.subtasks || []).map((st: any) => {
+            let desc = st.description;
+            let fb = st.feedback;
+            if (fb && typeof fb === 'string' && fb.startsWith('{')) {
+              try {
+                const parsed = JSON.parse(fb);
+                if (parsed && typeof parsed === 'object') {
+                  if (parsed.description !== undefined) desc = parsed.description;
+                  if (parsed.feedback !== undefined) fb = parsed.feedback;
+                }
+              } catch {}
+            }
+            return {
+              id: st.id,
+              projectId: st.project_id,
+              title: st.title,
+              taskType: st.task_type,
+              deadline: st.deadline,
+              status: st.status,
+              description: desc || undefined,
+              deliverableLink: st.deliverable_link,
+              feedback: fb,
+              assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
+              deliverablesQueue: (st.deliverable_submissions || [])
+                .sort((a: any, b: any) => (b.version || 0) - (a.version || 0))
+                .map((sub: any) => ({
+                  id: sub.id,
+                  version: sub.version,
+                  fileName: sub.file_name,
+                  fileSizeBytes: Number(sub.file_size_bytes) || 0,
+                  fileUrl: sub.file_url,
+                  mimeType: sub.mime_type,
+                  notes: sub.notes,
+                  status: sub.status,
+                  feedback: sub.feedback,
+                  feedbackGivenAt: sub.feedback_given_at,
+                  submittedAt: sub.submitted_at,
+                  submittedByEditorId: sub.submitted_by_editor_id,
+                })),
+            };
+          }),
         }));
       }
     } catch (err) {
@@ -339,17 +353,23 @@ export async function createProjectRecord(project: Project) {
       }).select().single();
 
       if (!error && projectData && project.subtasks && project.subtasks.length > 0) {
-        const subtaskInserts = project.subtasks.map((st) => ({
-          id: st.id,
-          project_id: projectData.id,
-          title: st.title,
-          task_type: st.taskType,
-          deadline: st.deadline,
-          status: st.status,
-          deliverable_link: st.deliverableLink,
-          feedback: st.feedback,
-          assigned_editor_ids: st.assignedEditorIds || [],
-        }));
+        const subtaskInserts = project.subtasks.map((st) => {
+          let fbValue = st.feedback || null;
+          if (st.description) {
+            fbValue = JSON.stringify({ description: st.description, feedback: st.feedback || '' });
+          }
+          return {
+            id: st.id,
+            project_id: projectData.id,
+            title: st.title,
+            task_type: st.taskType,
+            deadline: st.deadline,
+            status: st.status,
+            deliverable_link: st.deliverableLink,
+            feedback: fbValue,
+            assigned_editor_ids: st.assignedEditorIds || [],
+          };
+        });
         await supabase.from('subtasks').insert(subtaskInserts);
       }
       return projectData;
@@ -383,9 +403,35 @@ export async function updateSubtaskRecord(
       const dbUpdates: Record<string, any> = { updated_at: new Date().toISOString() };
       if (updates.status !== undefined) dbUpdates.status = updates.status;
       if (updates.deliverableLink !== undefined) dbUpdates.deliverable_link = updates.deliverableLink;
-      if (updates.feedback !== undefined) dbUpdates.feedback = updates.feedback;
       if (updates.assignedEditorIds !== undefined) dbUpdates.assigned_editor_ids = updates.assignedEditorIds;
       if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.deadline !== undefined) dbUpdates.deadline = new Date(updates.deadline).toISOString();
+
+      if (updates.description !== undefined || updates.feedback !== undefined) {
+        const { data: currentSt } = await supabase.from('subtasks').select('feedback').eq('id', subtaskId).single();
+        let existingDesc = '';
+        let existingFb = '';
+        if (currentSt?.feedback) {
+          try {
+            const parsed = JSON.parse(currentSt.feedback);
+            if (parsed && typeof parsed === 'object') {
+              existingDesc = parsed.description || '';
+              existingFb = parsed.feedback || '';
+            } else {
+              existingFb = currentSt.feedback;
+            }
+          } catch {
+            existingFb = currentSt.feedback;
+          }
+        }
+        const newDesc = updates.description !== undefined ? updates.description : existingDesc;
+        const newFb = updates.feedback !== undefined ? updates.feedback : existingFb;
+        if (newDesc) {
+          dbUpdates.feedback = JSON.stringify({ description: newDesc, feedback: newFb });
+        } else {
+          dbUpdates.feedback = newFb || null;
+        }
+      }
 
       await supabase.from('subtasks').update(dbUpdates).eq('id', subtaskId);
     } catch {}
@@ -411,6 +457,10 @@ export async function createSubtaskRecord(subtask: Subtask) {
   // 2. Direct browser Supabase insert
   if (isSupabaseConfigured()) {
     try {
+      let fbValue = subtask.feedback || null;
+      if (subtask.description) {
+        fbValue = JSON.stringify({ description: subtask.description, feedback: subtask.feedback || '' });
+      }
       await supabase.from('subtasks').insert({
         id: subtask.id,
         project_id: subtask.projectId,
@@ -419,7 +469,7 @@ export async function createSubtaskRecord(subtask: Subtask) {
         deadline: subtask.deadline,
         status: subtask.status,
         deliverable_link: subtask.deliverableLink,
-        feedback: subtask.feedback,
+        feedback: fbValue,
         assigned_editor_ids: subtask.assignedEditorIds || [],
       });
     } catch {}

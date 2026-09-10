@@ -427,6 +427,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       addDeliverableSubmissionRecord(subtaskId, updates.deliverablesQueue[0]).catch(() => null);
     }
 
+    if (updates.status === 'In Progress') {
+      const project = projects.find((p) => p.id === projectId);
+      const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+      const editor = subtask ? editors.find((e) => e.id === subtask.assignedEditorIds[0]) : undefined;
+      const editorName = editor?.fullName || 'Editor';
+      const taskName = updates.title || subtask?.title || 'subtask';
+      const event: ActivityEvent = {
+        id: `a${Date.now()}`,
+        type: 'assign',
+        message: `${editorName} started working on "${taskName}"`,
+        timestamp: new Date().toISOString(),
+      };
+      setActivity((prev) => [event, ...prev]);
+      createActivityLogRecord({ type: event.type, message: event.message, metadata: { projectId, subtaskId, status: 'In Progress' } }).catch(() => null);
+    }
+
     if (updates.status === 'Ready for Review') {
       const project = projects.find((p) => p.id === projectId);
       const subtask = project?.subtasks.find((st) => st.id === subtaskId);
