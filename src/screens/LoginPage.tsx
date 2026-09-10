@@ -33,7 +33,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
   const { login, register, addToast, darkMode, toggleDarkMode } = useApp();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [fullName, setFullName] = useState('');
-  const [specialty, setSpecialty] = useState('DaVinci Colorist');
+  const [specialty, setSpecialty] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -78,7 +78,7 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
           setError(result.error || 'Invalid credentials. Please verify your email and password.');
         }
       } else {
-        const result = await register(email, password, fullName, specialty);
+        const result = await register(email, password, fullName, specialty.trim() || undefined);
         if (result.success) {
           if (addToast) addToast(`Welcome ${fullName || 'Editor'}! Your Gogangs workspace is ready.`, 'success');
           onNavigate('/editor/dashboard');
@@ -239,18 +239,19 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
 
                     <div>
                       <label className="block font-bold text-gray-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider text-[10px]">
-                        Primary Editing Specialty
+                        Primary Editing Specialty <span className="normal-case font-normal text-gray-400 dark:text-zinc-500">(Optional)</span>
                       </label>
                       <select
                         value={specialty}
                         onChange={(e) => setSpecialty(e.target.value)}
                         className="w-full bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl px-3.5 py-3 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-gray-900 dark:focus:border-white transition-colors"
                       >
-                        <option>DaVinci Resolve Colorist</option>
-                        <option>Commercial & Brand Editor</option>
-                        <option>Shorts & Viral Reels Specialist</option>
-                        <option>3D Motion Graphics & VFX</option>
-                        <option>Documentary & Long-Form</option>
+                        <option value="">Select primary specialty (optional)</option>
+                        <option value="DaVinci Resolve Colorist">DaVinci Resolve Colorist</option>
+                        <option value="Commercial & Brand Editor">Commercial & Brand Editor</option>
+                        <option value="Shorts & Viral Reels Specialist">Shorts & Viral Reels Specialist</option>
+                        <option value="3D Motion Graphics & VFX">3D Motion Graphics & VFX</option>
+                        <option value="Documentary & Long-Form">Documentary & Long-Form</option>
                       </select>
                     </div>
                   </div>

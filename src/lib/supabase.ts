@@ -42,7 +42,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
         data: {
           full_name: fullName,
           role,
-          specialty: specialty || 'DaVinci Resolve Colorist',
+          ...(specialty && specialty.trim() ? { specialty: specialty.trim() } : {}),
         },
         emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
       },

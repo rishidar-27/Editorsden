@@ -249,11 +249,11 @@ BEGIN
         user_fullname,
         assigned_role,
         user_avatar,
-        CASE WHEN NEW.raw_user_meta_data->>'specialty' IS NOT NULL 
+        CASE WHEN NEW.raw_user_meta_data->>'specialty' IS NOT NULL AND NEW.raw_user_meta_data->>'specialty' != ''
              THEN ARRAY[NEW.raw_user_meta_data->>'specialty'] 
              ELSE '{}'::text[] 
         END,
-        ARRAY['Premiere Pro', 'DaVinci Resolve'],
+        '{}'::text[],
         'Free',
         1073741824, -- 1GB default
         0,
