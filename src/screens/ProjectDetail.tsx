@@ -24,6 +24,7 @@ import {
   Share2,
 } from 'lucide-react';
 import type { ProjectStatus, TaskType, Subtask, Editor } from '@/types';
+import { generateUuid } from '@/lib/supabase';
 
 interface ProjectDetailProps {
   projectId: string;
@@ -31,7 +32,7 @@ interface ProjectDetailProps {
 }
 
 export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
-  const { projects, editors, updateSubtask, addToast } = useApp();
+  const { projects, editors, updateSubtask, addSubtaskToProject, addToast } = useApp();
   const project = projects.find((p) => p.id === projectId);
 
   const [statusFilter, setStatusFilter] = useState<string>('All');
@@ -143,16 +144,16 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
     if (!newTitle.trim()) return;
 
     const newSubtaskObj: Subtask = {
-      id: `st-${Date.now()}`,
+      id: generateUuid(),
       projectId: project.id,
       title: newTitle.trim(),
       taskType: newTaskType,
       deadline: newDeadline || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       assignedEditorIds: newEditorId ? [newEditorId] : [],
-      status: newEditorId ? 'Assigned' : 'Assigned',
+      status: 'Assigned',
     };
 
-    project.subtasks.push(newSubtaskObj);
+    addSubtaskToProject(project.id, newSubtaskObj);
     addToast('Subtask created successfully!', 'success');
     setIsAddModalOpen(false);
     setNewTitle('');

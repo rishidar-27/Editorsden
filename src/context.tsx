@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { Editor, Project, User, ActivityEvent, VerificationStatus, EditorAsset } from './types';
+import type { Editor, Project, User, ActivityEvent, VerificationStatus, EditorAsset, Subtask } from './types';
 import { editors as initialEditors, projects as initialProjects, activityFeed as initialActivity, adminCredentials } from './data';
 import {
   fetchAllEditors,
@@ -7,6 +7,7 @@ import {
   updateEditorProfile,
   createProjectRecord,
   updateSubtaskRecord,
+  createSubtaskRecord,
   deleteAssetsFromStorage,
   fetchEditorAssets,
   addDeliverableSubmissionRecord,
@@ -80,6 +81,7 @@ interface AppState {
   addProject: (project: Project) => void;
   updateSubtask: (projectId: string, subtaskId: string, updates: Partial<import('./types').Subtask>) => void;
   assignEditors: (projectId: string, subtaskId: string, editorIds: string[]) => void;
+  addSubtaskToProject: (projectId: string, subtask: Subtask) => void;
   deleteEditorAssets: (editorId: string, assetIds: string[]) => Promise<{ success: boolean; freedBytes: number }>;
   addEditorAsset: (asset: EditorAsset) => void;
   upgradeStorageTier: (editorId: string, tier: 'Free' | 'Pro_50GB' | 'Studio_200GB' | 'Pro' | string) => void;
@@ -449,6 +451,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateSubtaskRecord(projectId, subtaskId, { assignedEditorIds: editorIds }).catch(() => null);
   }, []);
 
+  const addSubtaskToProject = useCallback((projectId: string, subtask: Subtask) => {
+    setProjects((prev) => prev.map((p) => p.id === projectId ? {
+      ...p,
+      subtasks: [...p.subtasks, subtask],
+    } : p));
+
+    createSubtaskRecord(subtask).catch(() => null);
+  }, []);
+
   // Storage Quota Methods
   const getEditorStorageStats = useCallback((editorId: string) => {
     const editor = editors.find((e) => e.id === editorId);
@@ -557,7 +568,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       user, editors, projects, activity, assets, toasts,
       login, register, logout, getEditor, getCurrentEditor,
       updateEditor, setVerificationStatus, toggleEditorActive,
-      addProject, updateSubtask, assignEditors,
+      addProject, updateSubtask, assignEditors, addSubtaskToProject,
       getEditorStorageStats, addEditorAsset, deleteEditorAssets, upgradeStorageTier, addPayAsYouGoStorage,
       addToast, removeToast,
       darkMode, toggleDarkMode,

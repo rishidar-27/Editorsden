@@ -205,10 +205,32 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
 
 /**
  * ============================================================
- * 3. PROJECTS & SUBTASKS SERVICES (Direct Supabase)
+ * 3. PROJECTS & SUBTASKS SERVICES (Supabase via Service-Role & Client)
  * ============================================================
  */
+
+export function generateUuid(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export async function fetchAllProjects(): Promise<Project[]> {
+  // 1. Guaranteed server-side Supabase query (uses Service Role Key to bypass RLS)
+  try {
+    const res = await fetch('http://localhost:5000/api/projects');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {}
+
+  // 2. Direct browser Supabase query
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase
@@ -249,7 +271,7 @@ export async function fetchAllProjects(): Promise<Project[]> {
         `)
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
+      if (!error && data && data.length > 0) {
         return data.map((p) => ({
           id: p.id,
           title: p.title,
@@ -264,7 +286,7 @@ export async function fetchAllProjects(): Promise<Project[]> {
             status: st.status,
             deliverableLink: st.deliverable_link,
             feedback: st.feedback,
-            assignedEditorIds: st.assigned_editor_ids || [],
+            assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
             deliverablesQueue: (st.deliverable_submissions || [])
               .sort((a: any, b: any) => (b.version || 0) - (a.version || 0))
               .map((sub: any) => ({
@@ -287,50 +309,54 @@ export async function fetchAllProjects(): Promise<Project[]> {
     } catch (err) {
       console.warn('Supabase fetchAllProjects notice:', err);
     }
-    return [];
   }
-
-  // Fallback to Express backend only if Supabase is not configured
-  try {
-    const res = await fetch('http://localhost:5000/api/projects');
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
-    }
-  } catch {}
 
   return [];
 }
 
 export async function createProjectRecord(project: Project) {
-  if (isSupabaseConfigured()) {
-    const { data: projectData, error } = await supabase.from('projects').insert({
-      id: project.id.startsWith('p-') ? undefined : project.id,
-      title: project.title,
-      client_name: project.clientName,
-      status: 'In Progress',
-    }).select().single();
-
-    if (!error && projectData && project.subtasks && project.subtasks.length > 0) {
-      const subtaskInserts = project.subtasks.map((st) => ({
-        project_id: projectData.id,
-        title: st.title,
-        task_type: st.taskType,
-        deadline: st.deadline,
-        status: st.status,
-        deliverable_link: st.deliverableLink,
-        feedback: st.feedback,
-        assigned_editor_ids: st.assignedEditorIds || [],
-      }));
-      await supabase.from('subtasks').insert(subtaskInserts);
+  // 1. Guaranteed server-side Supabase write using Service Role Key (bypasses RLS)
+  try {
+    const res = await fetch('http://localhost:5000/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(project),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) return data;
     }
+  } catch {}
+
+  // 2. Direct browser Supabase insert
+  if (isSupabaseConfigured()) {
+    try {
+      const { data: projectData, error } = await supabase.from('projects').insert({
+        id: project.id,
+        title: project.title,
+        client_name: project.clientName,
+        status: 'In Progress',
+      }).select().single();
+
+      if (!error && projectData && project.subtasks && project.subtasks.length > 0) {
+        const subtaskInserts = project.subtasks.map((st) => ({
+          id: st.id,
+          project_id: projectData.id,
+          title: st.title,
+          task_type: st.taskType,
+          deadline: st.deadline,
+          status: st.status,
+          deliverable_link: st.deliverableLink,
+          feedback: st.feedback,
+          assigned_editor_ids: st.assignedEditorIds || [],
+        }));
+        await supabase.from('subtasks').insert(subtaskInserts);
+      }
+      return projectData;
+    } catch {}
   }
 
-  return await fetch('http://localhost:5000/api/projects', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(project),
-  }).then((r) => r.json()).catch(() => null);
+  return null;
 }
 
 export async function updateSubtaskRecord(
@@ -338,22 +364,68 @@ export async function updateSubtaskRecord(
   subtaskId: string,
   updates: Partial<Subtask>
 ) {
-  if (isSupabaseConfigured()) {
-    const dbUpdates: Record<string, any> = { updated_at: new Date().toISOString() };
-    if (updates.status !== undefined) dbUpdates.status = updates.status;
-    if (updates.deliverableLink !== undefined) dbUpdates.deliverable_link = updates.deliverableLink;
-    if (updates.feedback !== undefined) dbUpdates.feedback = updates.feedback;
-    if (updates.assignedEditorIds !== undefined) dbUpdates.assigned_editor_ids = updates.assignedEditorIds;
-    if (updates.title !== undefined) dbUpdates.title = updates.title;
+  // 1. Guaranteed server-side Supabase write using Service Role Key (bypasses RLS)
+  try {
+    const res = await fetch(`http://localhost:5000/api/projects/${projectId}/subtasks/${subtaskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) return data;
+    }
+  } catch {}
 
-    await supabase.from('subtasks').update(dbUpdates).eq('id', subtaskId);
+  // 2. Direct browser Supabase update
+  if (isSupabaseConfigured()) {
+    try {
+      const dbUpdates: Record<string, any> = { updated_at: new Date().toISOString() };
+      if (updates.status !== undefined) dbUpdates.status = updates.status;
+      if (updates.deliverableLink !== undefined) dbUpdates.deliverable_link = updates.deliverableLink;
+      if (updates.feedback !== undefined) dbUpdates.feedback = updates.feedback;
+      if (updates.assignedEditorIds !== undefined) dbUpdates.assigned_editor_ids = updates.assignedEditorIds;
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+
+      await supabase.from('subtasks').update(dbUpdates).eq('id', subtaskId);
+    } catch {}
   }
 
-  return await fetch(`http://localhost:5000/api/projects/${projectId}/subtasks/${subtaskId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  }).then((r) => r.json()).catch(() => null);
+  return null;
+}
+
+export async function createSubtaskRecord(subtask: Subtask) {
+  // 1. Guaranteed server-side Supabase write using Service Role Key (bypasses RLS)
+  try {
+    const res = await fetch(`http://localhost:5000/api/projects/${subtask.projectId}/subtasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subtask),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) return data;
+    }
+  } catch {}
+
+  // 2. Direct browser Supabase insert
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('subtasks').insert({
+        id: subtask.id,
+        project_id: subtask.projectId,
+        title: subtask.title,
+        task_type: subtask.taskType,
+        deadline: subtask.deadline,
+        status: subtask.status,
+        deliverable_link: subtask.deliverableLink,
+        feedback: subtask.feedback,
+        assigned_editor_ids: subtask.assignedEditorIds || [],
+      });
+    } catch {}
+  }
+
+  return null;
 }
 
 export async function addDeliverableSubmissionRecord(subtaskId: string, submission: DeliverableSubmission) {

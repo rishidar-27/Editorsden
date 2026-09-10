@@ -1,11 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { initialEditors, initialProjects } from './data.js';
 import { generateUploadUrl, deleteR2Files } from './r2.js';
 
 dotenv.config();
+
+const isUuid = (id) => typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+const ensureUuid = (id) => (isUuid(id) ? id : crypto.randomUUID());
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -518,38 +522,445 @@ app.put('/api/editors/:id', async (req, res) => {
   res.status(200).json({ success: true, id, ...updates });
 });
 
-app.get('/api/projects', (req, res) => {
+function mapDbProject(p) {
+  return {
+    id: p.id,
+    title: p.title,
+    clientName: p.client_name,
+    description: p.description || '',
+    status: p.status || 'In Progress',
+    createdAt: p.created_at,
+    subtasks: (p.subtasks || []).map((st) => ({
+      id: st.id,
+      projectId: st.project_id,
+      title: st.title,
+      taskType: st.task_type,
+      deadline: st.deadline,
+      status: st.status || 'Assigned',
+      deliverableLink: st.deliverable_link || undefined,
+      feedback: st.feedback || undefined,
+      assignedEditorIds: Array.isArray(st.assigned_editor_ids) ? st.assigned_editor_ids : [],
+      deliverablesQueue: (st.deliverable_submissions || [])
+        .sort((a, b) => (b.version || 0) - (a.version || 0))
+        .map((sub) => ({
+          id: sub.id,
+          version: sub.version,
+          fileName: sub.file_name,
+          fileSizeBytes: Number(sub.file_size_bytes) || 0,
+          fileUrl: sub.file_url,
+          mimeType: sub.mime_type,
+          notes: sub.notes,
+          status: sub.status,
+          feedback: sub.feedback,
+          feedbackGivenAt: sub.feedback_given_at,
+          submittedAt: sub.submitted_at,
+          submittedByEditorId: sub.submitted_by_editor_id,
+        })),
+    })),
+  };
+}
+
+async function seedInitialProjectsToSupabase() {
+  if (!supabase) return;
+  try {
+    const { data: existing } = await supabase.from('projects').select('id').limit(1);
+    if (existing && existing.length > 0) return;
+
+    console.log('Seeding initial projects into Supabase...');
+    const now = new Date();
+    const proj1Id = '11111111-1111-4111-8111-111111111111';
+    const proj2Id = '22222222-2222-4222-8222-222222222222';
+
+    await supabase.from('projects').insert([
+      {
+        id: proj1Id,
+        title: 'Summer Viral Social Media Campaign',
+        client_name: 'Aurora Skincare',
+        description: 'Viral social media campaigns across TikTok, Instagram Reels, and YouTube Shorts.',
+        status: 'In Progress',
+        created_at: new Date(now.getTime() - 3600000 * 2).toISOString(),
+      },
+      {
+        id: proj2Id,
+        title: 'Aurora Skincare — Q4 Launch Campaign',
+        client_name: 'Aurora Cosmetics Inc.',
+        description: 'Full video asset production for nationwide skincare launch across Instagram and YouTube.',
+        status: 'In Progress',
+        created_at: new Date(now.getTime() - 86400000 * 5).toISOString(),
+      },
+    ]);
+
+    await supabase.from('subtasks').insert([
+      {
+        id: '33333333-3333-4333-8333-333333333331',
+        project_id: proj1Id,
+        title: 'Viral Instagram Reels (5x Hook Variations)',
+        task_type: 'Reels Editing',
+        deadline: new Date(now.getTime() + 86400000 * 5).toISOString(),
+        status: 'Assigned',
+        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333332',
+        project_id: proj1Id,
+        title: 'High-CTR Thumbnail Graphic Package',
+        task_type: 'Thumbnail Design',
+        deadline: new Date(now.getTime() + 86400000 * 3).toISOString(),
+        status: 'Assigned',
+        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        project_id: proj1Id,
+        title: 'TikTok Trending Audio Cutdown (3x)',
+        task_type: 'Reels Editing',
+        deadline: new Date(now.getTime() + 86400000 * 6).toISOString(),
+        status: 'Assigned',
+        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333334',
+        project_id: proj2Id,
+        title: 'Hero Brand Film (60s)',
+        task_type: 'Commercial Ads',
+        deadline: new Date(now.getTime() + 86400000 * 10).toISOString(),
+        status: 'In Progress',
+        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333335',
+        project_id: proj2Id,
+        title: 'Product Tutorial Videos (3x)',
+        task_type: 'YouTube Editing',
+        deadline: new Date(now.getTime() + 86400000 * 12).toISOString(),
+        status: 'Assigned',
+        assigned_editor_ids: ['54f0cf55-c086-4c9f-9f4c-451b1fe407ee'],
+      },
+    ]);
+
+    console.log('✓ Initial projects successfully seeded into Supabase with Mathew assigned');
+  } catch (err) {
+    console.error('Error seeding initial projects to Supabase:', err);
+  }
+}
+
+app.get('/api/projects', async (req, res) => {
+  if (supabase) {
+    try {
+      const { data: dbProjects, error } = await supabase
+        .from('projects')
+        .select(`
+          id,
+          title,
+          client_name,
+          description,
+          status,
+          created_at,
+          subtasks (
+            id,
+            project_id,
+            title,
+            task_type,
+            deadline,
+            status,
+            deliverable_link,
+            feedback,
+            assigned_editor_ids,
+            deliverable_submissions (*)
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (!error && Array.isArray(dbProjects)) {
+        if (dbProjects.length > 0) {
+          const mapped = dbProjects.map(mapDbProject);
+          projects = mapped;
+          return res.json(mapped);
+        } else {
+          // Supabase is empty: Seed initial projects and return
+          await seedInitialProjectsToSupabase();
+          const { data: seeded } = await supabase
+            .from('projects')
+            .select(`
+              id,
+              title,
+              client_name,
+              description,
+              status,
+              created_at,
+              subtasks (
+                id,
+                project_id,
+                title,
+                task_type,
+                deadline,
+                status,
+                deliverable_link,
+                feedback,
+                assigned_editor_ids,
+                deliverable_submissions (*)
+              )
+            `)
+            .order('created_at', { ascending: false });
+
+          if (seeded && seeded.length > 0) {
+            const mapped = seeded.map(mapDbProject);
+            projects = mapped;
+            return res.json(mapped);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Supabase fetch error in GET /api/projects, falling back to memory:', err);
+    }
+  }
+
   res.json(projects);
 });
 
-app.get('/api/projects/:id', (req, res) => {
-  const project = projects.find((p) => p.id === req.params.id);
+app.get('/api/projects/:id', async (req, res) => {
+  const id = req.params.id;
+
+  if (supabase && isUuid(id)) {
+    try {
+      const { data: p, error } = await supabase
+        .from('projects')
+        .select(`
+          id,
+          title,
+          client_name,
+          description,
+          status,
+          created_at,
+          subtasks (
+            id,
+            project_id,
+            title,
+            task_type,
+            deadline,
+            status,
+            deliverable_link,
+            feedback,
+            assigned_editor_ids,
+            deliverable_submissions (*)
+          )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (!error && p) {
+        return res.json(mapDbProject(p));
+      }
+    } catch (err) {
+      console.warn('Supabase fetch error in GET /api/projects/:id:', err);
+    }
+  }
+
+  const project = projects.find((p) => p.id === id);
   if (!project) return res.status(404).json({ error: 'Project not found' });
   res.json(project);
 });
 
-app.post('/api/projects', (req, res) => {
+app.post('/api/projects', async (req, res) => {
+  const projectUuid = ensureUuid(req.body.id);
+  const nowIso = new Date().toISOString();
+  const title = req.body.title || 'Untitled Project';
+  const clientName = req.body.clientName || req.body.client_name || 'Client';
+  const status = req.body.status || 'In Progress';
+  const subtasksList = Array.isArray(req.body.subtasks) ? req.body.subtasks : [];
+
+  if (supabase) {
+    try {
+      const { data: projectRow, error: pError } = await supabase
+        .from('projects')
+        .insert({
+          id: projectUuid,
+          title,
+          client_name: clientName,
+          status,
+          created_at: req.body.createdAt || nowIso,
+          updated_at: nowIso,
+        })
+        .select()
+        .single();
+
+      if (pError) {
+        console.error('Supabase error inserting project:', pError);
+      } else if (projectRow && subtasksList.length > 0) {
+        const subtaskInserts = subtasksList.map((st) => ({
+          id: ensureUuid(st.id),
+          project_id: projectUuid,
+          title: st.title || 'Deliverable',
+          task_type: st.taskType || st.task_type || 'Reels Editing',
+          deadline: st.deadline ? new Date(st.deadline).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString(),
+          status: st.status || 'Assigned',
+          deliverable_link: st.deliverableLink || null,
+          feedback: st.feedback || null,
+          assigned_editor_ids: Array.isArray(st.assignedEditorIds) ? st.assignedEditorIds : [],
+          created_at: nowIso,
+          updated_at: nowIso,
+        }));
+        const { error: stError } = await supabase.from('subtasks').insert(subtaskInserts);
+        if (stError) {
+          console.error('Supabase error inserting subtasks:', stError);
+        }
+      }
+
+      // Read back complete project with subtasks from Supabase
+      const { data: fullProject } = await supabase
+        .from('projects')
+        .select(`
+          id,
+          title,
+          client_name,
+          description,
+          status,
+          created_at,
+          subtasks (
+            id,
+            project_id,
+            title,
+            task_type,
+            deadline,
+            status,
+            deliverable_link,
+            feedback,
+            assigned_editor_ids,
+            deliverable_submissions (*)
+          )
+        `)
+        .eq('id', projectUuid)
+        .single();
+
+      if (fullProject) {
+        const mapped = mapDbProject(fullProject);
+        projects.unshift(mapped);
+        console.log(`✓ Project "${title}" (${projectUuid}) successfully saved to Supabase with ${subtasksList.length} subtasks`);
+        return res.status(201).json(mapped);
+      }
+    } catch (err) {
+      console.error('Failed to create project in Supabase:', err);
+    }
+  }
+
   const newProject = {
-    id: `p-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-    status: 'In Progress',
-    subtasks: [],
-    ...req.body,
+    id: projectUuid,
+    title,
+    clientName,
+    createdAt: nowIso,
+    status,
+    subtasks: subtasksList.map((st) => ({
+      ...st,
+      id: ensureUuid(st.id),
+      projectId: projectUuid,
+    })),
   };
   projects.unshift(newProject);
   res.status(201).json(newProject);
 });
 
-app.put('/api/projects/:projectId/subtasks/:subtaskId', (req, res) => {
+app.put('/api/projects/:projectId/subtasks/:subtaskId', async (req, res) => {
   const { projectId, subtaskId } = req.params;
+  const updates = req.body;
+
+  if (supabase && isUuid(subtaskId)) {
+    try {
+      const dbUpdates = { updated_at: new Date().toISOString() };
+      if (updates.assignedEditorIds !== undefined) dbUpdates.assigned_editor_ids = updates.assignedEditorIds;
+      if (updates.status !== undefined) dbUpdates.status = updates.status;
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.taskType !== undefined) dbUpdates.task_type = updates.taskType;
+      if (updates.deadline !== undefined) dbUpdates.deadline = new Date(updates.deadline).toISOString();
+      if (updates.deliverableLink !== undefined) dbUpdates.deliverable_link = updates.deliverableLink;
+      if (updates.feedback !== undefined) dbUpdates.feedback = updates.feedback;
+
+      const { data, error } = await supabase
+        .from('subtasks')
+        .update(dbUpdates)
+        .eq('id', subtaskId)
+        .select()
+        .single();
+
+      if (!error && data) {
+        console.log(`✓ Supabase subtask ${subtaskId} updated:`, updates);
+        const project = projects.find((p) => p.id === projectId);
+        if (project) {
+          const st = project.subtasks.find((s) => s.id === subtaskId);
+          if (st) Object.assign(st, updates);
+        }
+        return res.json({ success: true, ...data });
+      }
+      if (error) {
+        console.error('Supabase subtask update error in PUT /api/projects/:projectId/subtasks/:subtaskId:', error);
+      }
+    } catch (err) {
+      console.error('Failed to update subtask in Supabase:', err);
+    }
+  }
+
   const project = projects.find((p) => p.id === projectId);
-  if (!project) return res.status(404).json({ error: 'Project not found' });
+  if (project) {
+    const subtask = project.subtasks.find((st) => st.id === subtaskId);
+    if (subtask) {
+      Object.assign(subtask, updates);
+      return res.json(subtask);
+    }
+  }
 
-  const subtask = project.subtasks.find((st) => st.id === subtaskId);
-  if (!subtask) return res.status(404).json({ error: 'Subtask not found' });
+  res.json({ success: true, ...updates });
+});
 
-  Object.assign(subtask, req.body);
-  res.json(subtask);
+app.post('/api/projects/:projectId/subtasks', async (req, res) => {
+  const { projectId } = req.params;
+  const st = req.body;
+  const subtaskUuid = ensureUuid(st.id);
+  const nowIso = new Date().toISOString();
+
+  if (supabase && isUuid(projectId)) {
+    try {
+      const { data, error } = await supabase
+        .from('subtasks')
+        .insert({
+          id: subtaskUuid,
+          project_id: projectId,
+          title: st.title || 'Untitled deliverable',
+          task_type: st.taskType || st.task_type || 'Reels Editing',
+          deadline: st.deadline ? new Date(st.deadline).toISOString() : new Date(Date.now() + 7 * 86400000).toISOString(),
+          status: st.status || 'Assigned',
+          deliverable_link: st.deliverableLink || null,
+          feedback: st.feedback || null,
+          assigned_editor_ids: Array.isArray(st.assignedEditorIds) ? st.assignedEditorIds : [],
+          created_at: nowIso,
+          updated_at: nowIso,
+        })
+        .select()
+        .single();
+
+      if (!error && data) {
+        console.log(`✓ Subtask created in Supabase:`, data.title);
+        const project = projects.find((p) => p.id === projectId);
+        if (project) {
+          project.subtasks.push({
+            id: data.id,
+            projectId: data.project_id,
+            title: data.title,
+            taskType: data.task_type,
+            deadline: data.deadline,
+            status: data.status,
+            deliverableLink: data.deliverable_link,
+            feedback: data.feedback,
+            assignedEditorIds: data.assigned_editor_ids || [],
+            deliverablesQueue: [],
+          });
+        }
+        return res.status(201).json(data);
+      }
+    } catch (err) {
+      console.error('Failed to create subtask in Supabase:', err);
+    }
+  }
+
+  res.status(201).json({ id: subtaskUuid, ...st });
 });
 
 app.get('/api/review-queue', (req, res) => {
