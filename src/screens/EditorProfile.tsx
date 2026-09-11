@@ -336,7 +336,7 @@ export function EditorProfile() {
 
           <div className="flex items-center gap-2.5">
             <a
-              href={`#/editor/${editor.id}`}
+              href={`/editor/${editor.id}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-colors"

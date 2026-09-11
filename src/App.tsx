@@ -75,12 +75,15 @@ function Router() {
     );
   }
 
+  const cleanRoute = route.split('?')[0].split('#')[0];
+
   // Public portfolio
-  const editorMatch = route.match(/^\/editor\/([^/]+)$/);
+  const editorMatch = cleanRoute.match(/^\/editor\/([^/]+)$/);
   const isPublicPortfolio = editorMatch && !['dashboard', 'profile', 'portfolio', 'verification', 'projects', 'storage'].includes(editorMatch[1]);
   if (isPublicPortfolio) {
     const editorId = editorMatch[1];
-    if (user?.type === 'admin') {
+    const isFromAdmin = user?.type === 'admin' || route.includes('from=admin');
+    if (isFromAdmin) {
       return (
         <div className="min-h-screen bg-[#f4f6fb] dark:bg-[#09090B] text-gray-900 dark:text-zinc-100 transition-colors">
           <TopNav items={adminNavItems} currentRoute="/admin/editors" onNavigate={navigate} showSearch showNotifications />
@@ -114,7 +117,7 @@ function Router() {
                 </div>
               </div>
             </div>
-            <PublicPortfolioPage editorId={editorId} onNavigate={navigate} />
+            <PublicPortfolioPage editorId={editorId} onNavigate={navigate} fromAdmin={true} />
           </div>
           <ToastContainer toasts={toasts} onRemove={removeToast} />
         </div>
@@ -123,7 +126,7 @@ function Router() {
 
     return (
       <>
-        <PublicPortfolioPage editorId={editorId} onNavigate={navigate} />
+        <PublicPortfolioPage editorId={editorId} onNavigate={navigate} fromAdmin={false} />
         <ToastContainer toasts={toasts} onRemove={removeToast} />
       </>
     );
@@ -145,21 +148,60 @@ function Router() {
   // Admin routes
   if (isAdmin) {
     let content: React.ReactNode = null;
-    if (route === '/admin/dashboard') content = <AdminDashboard onNavigate={navigate} />;
-    else if (route === '/admin/editors') content = <EditorManagement onNavigate={navigate} />;
-    else if (route === '/admin/review') content = <ReviewQueue onNavigate={navigate} />;
-    else if (route === '/admin/reports') content = <Reports onNavigate={navigate} />;
-    else if (route === '/admin/projects') content = <ProjectsOverview onNavigate={navigate} />;
-    else if (route === '/admin/projects/new') content = <CreateProject onNavigate={navigate} />;
+    if (cleanRoute === '/admin/dashboard') content = <AdminDashboard onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/editors') content = <EditorManagement onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/review') content = <ReviewQueue onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/reports') content = <Reports onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/projects') content = <ProjectsOverview onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/projects/new') content = <CreateProject onNavigate={navigate} />;
     else {
-      const projMatch = route.match(/^\/admin\/projects\/([^/]+)$/);
-      if (projMatch) content = <ProjectDetail projectId={projMatch[1]} onNavigate={navigate} />;
-      else {
-        const assignMatch = route.match(/^\/admin\/projects\/([^/]+)\/subtasks\/([^/]+)\/assign$/);
-        if (assignMatch) content = <AssignEditors projectId={assignMatch[1]} subtaskId={assignMatch[2]} onNavigate={navigate} />;
+      const adminPreviewMatch = cleanRoute.match(/^\/admin\/editor\/([^/]+)\/(?:preview|public)$/);
+      if (adminPreviewMatch) {
+        const editorId = adminPreviewMatch[1];
+        content = (
+          <div>
+            <div className="bg-gray-900 text-white px-4 sm:px-8 py-2.5 text-xs font-semibold border-b border-gray-800 shadow-xs">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-bold">Administrative View</span>
+                  <span className="text-gray-400">• Inspecting public profile as administrator</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate(`/admin/editor/${editorId}`)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <span>← Return to Editor Details</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/admin/editors')}
+                    className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    All Editors
+                  </button>
+                  <button
+                    onClick={() => navigate('/admin/dashboard')}
+                    className="px-3 py-1 bg-white text-gray-950 hover:bg-gray-100 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Admin Dashboard
+                  </button>
+                </div>
+              </div>
+            </div>
+            <PublicPortfolioPage editorId={editorId} onNavigate={navigate} fromAdmin={true} />
+          </div>
+        );
+      } else {
+        const projMatch = cleanRoute.match(/^\/admin\/projects\/([^/]+)$/);
+        if (projMatch) content = <ProjectDetail projectId={projMatch[1]} onNavigate={navigate} />;
         else {
-          const editorDetailMatch = route.match(/^\/admin\/editor\/([^/]+)$/);
-          if (editorDetailMatch) content = <EditorDetail editorId={editorDetailMatch[1]} onNavigate={navigate} />;
+          const assignMatch = cleanRoute.match(/^\/admin\/projects\/([^/]+)\/subtasks\/([^/]+)\/assign$/);
+          if (assignMatch) content = <AssignEditors projectId={assignMatch[1]} subtaskId={assignMatch[2]} onNavigate={navigate} />;
+          else {
+            const editorDetailMatch = cleanRoute.match(/^\/admin\/editor\/([^/]+)$/);
+            if (editorDetailMatch) content = <EditorDetail editorId={editorDetailMatch[1]} onNavigate={navigate} />;
+          }
         }
       }
     }

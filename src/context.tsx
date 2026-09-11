@@ -176,9 +176,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         const isUserAdmin = session.user.email === 'admin@gogangs.com';
-        setUser({
-          type: isUserAdmin ? 'admin' : 'editor',
-          editorId: session.user.id,
+        setUser((currentUser) => {
+          if (currentUser?.type === 'admin' && !isUserAdmin) {
+            return currentUser; // Keep existing active admin session
+          }
+          return {
+            type: isUserAdmin ? 'admin' : 'editor',
+            editorId: session.user.id,
+          };
         });
       }
     }).catch(() => null);
@@ -187,12 +192,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
         const isUserAdmin = session.user.email === 'admin@gogangs.com';
-        setUser({
-          type: isUserAdmin ? 'admin' : 'editor',
-          editorId: session.user.id,
+        setUser((currentUser) => {
+          if (currentUser?.type === 'admin' && !isUserAdmin && event !== 'SIGNED_IN') {
+            return currentUser;
+          }
+          return {
+            type: isUserAdmin ? 'admin' : 'editor',
+            editorId: session.user.id,
+          };
         });
       } else if (event === 'SIGNED_OUT') {
-        setUser(null);
+        setUser((currentUser) => (currentUser?.type === 'admin' ? currentUser : null));
       }
     });
 

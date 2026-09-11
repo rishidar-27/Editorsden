@@ -40,11 +40,22 @@ import { useApp } from '@/context';
 interface PublicPortfolioPageProps {
   editorId: string;
   onNavigate: (route: string) => void;
+  fromAdmin?: boolean;
 }
 
-export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPageProps) {
+export function PublicPortfolioPage({ editorId, onNavigate, fromAdmin = false }: PublicPortfolioPageProps) {
   const { user, getEditor, addToast, darkMode, toggleDarkMode } = useApp();
   const rawEditor = getEditor(editorId);
+
+  const isAdminViewing = Boolean(
+    fromAdmin ||
+    user?.type === 'admin' ||
+    (typeof window !== 'undefined' && (
+      window.location.pathname.startsWith('/admin') ||
+      window.location.search.includes('from=admin') ||
+      document.referrer.includes('/admin')
+    ))
+  );
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedVideoModal, setSelectedVideoModal] = useState<any | null>(null);
@@ -273,8 +284,8 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
           <div className="flex items-center gap-6">
             <button 
               onClick={() => {
-                if (user?.type === 'admin') {
-                  onNavigate('/admin/dashboard');
+                if (isAdminViewing) {
+                  onNavigate(`/admin/editor/${editorId}`);
                 } else if (user?.type === 'editor') {
                   onNavigate('/editor/dashboard');
                 } else {
@@ -290,24 +301,26 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
 
             <button
               onClick={() => {
-                if (user?.type === 'admin') {
+                if (isAdminViewing) {
                   onNavigate(`/admin/editor/${editorId}`);
                 } else if (user?.type === 'editor') {
                   onNavigate('/editor/dashboard');
+                } else if (window.history.length > 1) {
+                  window.history.back();
                 } else {
                   onNavigate('/');
                 }
               }}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{user?.type === 'admin' ? 'Back to Editor Profile' : user?.type === 'editor' ? 'Back to Workspace' : 'Back to Directory'}</span>
+              <span>{isAdminViewing ? 'Back to Editor Profile' : user?.type === 'editor' ? 'Back to Workspace' : 'Back to Directory'}</span>
             </button>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {user?.type === 'admin' && (
-              <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+            {isAdminViewing && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                 Admin Active
               </span>
