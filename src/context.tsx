@@ -119,7 +119,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch {}
     if (typeof window !== 'undefined') {
       if (window.location.pathname.startsWith('/admin')) return { type: 'admin' };
-      if (window.location.pathname.startsWith('/editor')) return { type: 'editor', editorId: 'e1' };
+      // Only default to editor session on internal workspace screens, NOT on public portfolio pages
+      const isInternalEditorRoute = ['/editor/dashboard', '/editor/projects', '/editor/storage', '/editor/portfolio', '/editor/profile', '/editor/verification'].some(
+        (p) => window.location.pathname.startsWith(p)
+      );
+      if (isInternalEditorRoute) return { type: 'editor', editorId: 'e1' };
     }
     return null;
   });

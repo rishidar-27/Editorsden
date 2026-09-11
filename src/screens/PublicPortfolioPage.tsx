@@ -43,7 +43,7 @@ interface PublicPortfolioPageProps {
 }
 
 export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPageProps) {
-  const { getEditor, addToast, darkMode, toggleDarkMode } = useApp();
+  const { user, getEditor, addToast, darkMode, toggleDarkMode } = useApp();
   const rawEditor = getEditor(editorId);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -269,7 +269,15 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
           
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => onNavigate('/')}
+              onClick={() => {
+                if (user?.type === 'admin') {
+                  onNavigate('/admin/dashboard');
+                } else if (user?.type === 'editor') {
+                  onNavigate('/editor/dashboard');
+                } else {
+                  onNavigate('/');
+                }
+              }}
               className="flex items-center gap-1.5 focus:outline-none group hover:scale-105 transition-transform cursor-pointer"
             >
               <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white flex items-center">
@@ -278,15 +286,29 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
             </button>
 
             <button
-              onClick={() => onNavigate('/')}
+              onClick={() => {
+                if (user?.type === 'admin') {
+                  onNavigate(`/admin/editor/${editorId}`);
+                } else if (user?.type === 'editor') {
+                  onNavigate('/editor/dashboard');
+                } else {
+                  onNavigate('/');
+                }
+              }}
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-zinc-800 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Directory</span>
+              <span>{user?.type === 'admin' ? 'Back to Editor Profile' : user?.type === 'editor' ? 'Back to Workspace' : 'Back to Directory'}</span>
             </button>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {user?.type === 'admin' && (
+              <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                Admin Active
+              </span>
+            )}
             <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Available for Hire

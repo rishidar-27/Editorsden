@@ -110,7 +110,7 @@ function Reveal({
 }
 
 export function LandingPage({ onNavigate }: LandingPageProps) {
-  const { editors, addToast, darkMode, toggleDarkMode } = useApp();
+  const { user, editors, addToast, darkMode, toggleDarkMode } = useApp();
   const [heroRevealed, setHeroRevealed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -706,20 +706,32 @@ export function LandingPage({ onNavigate }: LandingPageProps) {
               )}
             </button>
 
-            <button
-              onClick={() => onNavigate('/login')}
-              className="text-xs font-bold text-gray-700 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white transition-colors px-3.5 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer"
-            >
-              Log In
-            </button>
+            {user ? (
+              <button
+                onClick={() => onNavigate(user.type === 'admin' ? '/admin/dashboard' : '/editor/dashboard')}
+                className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>{user.type === 'admin' ? 'Admin Dashboard' : 'Editor Workspace'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => onNavigate('/login')}
+                  className="text-xs font-bold text-gray-700 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white transition-colors px-3.5 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer"
+                >
+                  Log In
+                </button>
 
-            <button
-              onClick={() => onNavigate('/login')}
-              className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>Get Started</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+                <button
+                  onClick={() => onNavigate('/login')}
+                  className="bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Get Started</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
