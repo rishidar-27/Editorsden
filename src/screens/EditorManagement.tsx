@@ -18,6 +18,7 @@ import {
   X,
   Check,
   CheckCircle2,
+  Globe,
 } from 'lucide-react';
 import type { VerificationStatus, Editor } from '@/types';
 import { allSkills, allSoftware } from '@/data';
@@ -172,6 +173,13 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
           </p>
         </div>
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => onNavigate('/admin/map')}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 rounded-xl text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>Global Map View</span>
+          </button>
           <button
             onClick={handleExport}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-300 shadow-2xs hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"

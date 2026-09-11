@@ -19,6 +19,7 @@ import {
   AlertCircle,
   CheckCircle2,
   AlertTriangle,
+  MapPin,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useApp } from '@/context';
@@ -338,6 +339,7 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     if (user?.type === 'admin') {
       return [
         { label: 'Editor Directory', route: '/admin/editors', category: 'Directory', icon: UserIcon },
+        { label: 'Editor Global Map', route: '/admin/map', category: 'Locations', icon: MapPin },
         { label: 'Review Queue', route: '/admin/review', category: 'Approvals', icon: Clock },
         { label: 'Client Projects', route: '/admin/projects', category: 'Pipeline', icon: Briefcase },
         { label: 'Production Reports', route: '/admin/reports', category: 'Analytics', icon: FileText },

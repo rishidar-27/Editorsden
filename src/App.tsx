@@ -19,6 +19,7 @@ import { CreateProject } from '@/screens/CreateProject';
 import { AssignEditors } from '@/screens/AssignEditors';
 import { ReviewQueue } from '@/screens/ReviewQueue';
 import { Reports } from '@/screens/Reports';
+import { EditorMap } from '@/screens/EditorMap';
 
 const editorNavItems = [
   { label: 'Dashboard', route: '/editor/dashboard' },
@@ -31,6 +32,7 @@ const editorNavItems = [
 const adminNavItems = [
   { label: 'Dashboard', route: '/admin/dashboard' },
   { label: 'Editors', route: '/admin/editors' },
+  { label: 'Editor Map', route: '/admin/map' },
   { label: 'Projects', route: '/admin/projects' },
   { label: 'Review Queue', route: '/admin/review' },
   { label: 'Reports', route: '/admin/reports' },
@@ -150,6 +152,7 @@ function Router() {
     let content: React.ReactNode = null;
     if (cleanRoute === '/admin/dashboard') content = <AdminDashboard onNavigate={navigate} />;
     else if (cleanRoute === '/admin/editors') content = <EditorManagement onNavigate={navigate} />;
+    else if (cleanRoute === '/admin/map') content = <EditorMap onNavigate={navigate} />;
     else if (cleanRoute === '/admin/review') content = <ReviewQueue onNavigate={navigate} />;
     else if (cleanRoute === '/admin/reports') content = <Reports onNavigate={navigate} />;
     else if (cleanRoute === '/admin/projects') content = <ProjectsOverview onNavigate={navigate} />;
