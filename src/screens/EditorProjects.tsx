@@ -60,6 +60,15 @@ export function EditorProjects() {
     return { project, subtask };
   }, [projects, activeSubtaskId, activeProjectId]);
 
+  // Check if active selection was deleted or doesn't exist
+  const isSelectedTaskDeleted = useMemo(() => {
+    if (!activeSubtaskId || !activeProjectId) return false;
+    const project = projects.find((p) => p.id === activeProjectId);
+    if (!project) return true;
+    const subtask = project.subtasks.find((st) => st.id === activeSubtaskId);
+    return !subtask;
+  }, [projects, activeSubtaskId, activeProjectId]);
+
   // Extract all subtasks assigned to current editor
   const myAssignedItems = useMemo(() => {
     if (!editor) return [];
@@ -592,6 +601,43 @@ export function EditorProjects() {
           <a href="#" className="hover:text-gray-600 transition-colors">Contact</a>
         </div>
       </footer>
+
+      {/* Deleted / Missing Subtask Info Modal */}
+      {isSelectedTaskDeleted && (
+        <Modal
+          open={true}
+          onClose={() => {
+            setActiveProjectId(null);
+            setActiveSubtaskId(null);
+          }}
+          title="Deliverable Unavailable"
+          className="max-w-md"
+        >
+          <div className="py-4 text-center space-y-4 font-sans">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200 shadow-2xs">
+              <AlertCircle className="w-7 h-7" />
+            </div>
+            <div className="space-y-1.5 px-2">
+              <h3 className="text-base font-bold text-gray-900">This subtask doesn't exist</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                The campaign project or assigned deliverable has been deleted or removed by an administrator. This work has been removed from your active workflow queue.
+              </p>
+            </div>
+            <div className="pt-2 flex justify-center">
+              <Button
+                onClick={() => {
+                  setActiveProjectId(null);
+                  setActiveSubtaskId(null);
+                }}
+                variant="primary"
+                className="px-6 py-2.5 rounded-xl font-semibold text-xs bg-gray-900 hover:bg-black text-white"
+              >
+                Back to My Assignments
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Submit Deliverable File Upload Queue Modal */}
       {modalData && (

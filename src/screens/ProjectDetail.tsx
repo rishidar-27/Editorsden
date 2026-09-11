@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Badge, AvatarStack, Avatar, Button, EmptyState } from '@/components/ui';
+import { Card, Badge, AvatarStack, Avatar, Button, EmptyState, Modal } from '@/components/ui';
 import { useApp } from '@/context';
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import {
   Building2,
   X,
   Share2,
+  Trash2,
 } from 'lucide-react';
 import type { ProjectStatus, TaskType, Subtask, Editor } from '@/types';
 import { generateUuid } from '@/lib/supabase';
@@ -32,12 +33,14 @@ interface ProjectDetailProps {
 }
 
 export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
-  const { projects, editors, updateSubtask, addSubtaskToProject, addToast } = useApp();
+  const { projects, editors, updateSubtask, addSubtaskToProject, deleteProject, deleteSubtask, addToast } = useApp();
   const project = projects.find((p) => p.id === projectId);
 
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteProjectOpen, setIsDeleteProjectOpen] = useState(false);
+  const [subtaskToDelete, setSubtaskToDelete] = useState<Subtask | null>(null);
   const [reviewModalSubtask, setReviewModalSubtask] = useState<Subtask | null>(null);
   const [reviewFeedback, setReviewFeedback] = useState('');
 
@@ -205,6 +208,15 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setIsDeleteProjectOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-red-200 rounded-xl text-xs font-semibold text-red-600 shadow-2xs hover:bg-red-50 transition-colors"
+            title="Delete Project"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-red-600" />
+            <span>Delete Project</span>
+          </button>
+
           <button
             onClick={handleShare}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 shadow-2xs hover:bg-gray-50 transition-colors"
@@ -558,6 +570,15 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
                             <UserPlus className="w-3.5 h-3.5 mr-1" />
                             {assignedEditors.length > 0 ? 'Manage' : 'Assign'}
                           </Button>
+
+                          <button
+                            type="button"
+                            onClick={() => setSubtaskToDelete(st)}
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Delete deliverable"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -936,6 +957,79 @@ export function ProjectDetail({ projectId, onNavigate }: ProjectDetailProps) {
           </Card>
         </div>
       )}
+
+      {/* Delete Project Confirmation Modal */}
+      <Modal
+        open={isDeleteProjectOpen}
+        onClose={() => setIsDeleteProjectOpen(false)}
+        title="Delete Project"
+        className="max-w-md"
+      >
+        <div className="space-y-4 pt-1 font-sans">
+          <div className="p-3.5 bg-red-50 text-red-700 rounded-xl text-xs font-medium flex items-start gap-2.5 border border-red-100">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-600" />
+            <div className="leading-relaxed">
+              <span className="font-bold block mb-1 text-sm text-red-900">Are you sure you want to delete this project?</span>
+              This will permanently remove <strong className="text-red-950">"{project.title}"</strong> and all of its {project.subtasks.length} deliverables, queued files, and editor assignments. Assigned editors will see that this work no longer exists.
+            </div>
+          </div>
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+            <Button variant="outline" size="sm" onClick={() => setIsDeleteProjectOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                deleteProject(project.id);
+                addToast('Project deleted successfully', 'success');
+                setIsDeleteProjectOpen(false);
+                onNavigate('/admin/projects');
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete Project
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Subtask Confirmation Modal */}
+      <Modal
+        open={!!subtaskToDelete}
+        onClose={() => setSubtaskToDelete(null)}
+        title="Delete Deliverable"
+        className="max-w-md"
+      >
+        <div className="space-y-4 pt-1 font-sans">
+          <div className="p-3.5 bg-red-50 text-red-700 rounded-xl text-xs font-medium flex items-start gap-2.5 border border-red-100">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-600" />
+            <div className="leading-relaxed">
+              <span className="font-bold block mb-1 text-sm text-red-900">Delete "{subtaskToDelete?.title}"?</span>
+              This deliverable and all associated cuts will be permanently removed. If any editor is assigned, this subtask will immediately be removed from their active tasks.
+            </div>
+          </div>
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+            <Button variant="outline" size="sm" onClick={() => setSubtaskToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                if (subtaskToDelete) {
+                  deleteSubtask(project.id, subtaskToDelete.id);
+                  addToast(`Deliverable "${subtaskToDelete.title}" deleted`, 'success');
+                  setSubtaskToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete Deliverable
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

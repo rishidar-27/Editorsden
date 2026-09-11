@@ -478,6 +478,46 @@ export async function createSubtaskRecord(subtask: Subtask) {
   return null;
 }
 
+export async function deleteProjectRecord(projectId: string) {
+  // 1. Guaranteed server-side Supabase delete using Service Role Key (bypasses RLS)
+  try {
+    await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+      method: 'DELETE',
+    });
+  } catch {}
+
+  // 2. Direct browser Supabase delete
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('projects').delete().eq('id', projectId);
+    } catch (err) {
+      console.warn('Supabase deleteProjectRecord notice:', err);
+    }
+  }
+
+  notifyRealtimeChange();
+}
+
+export async function deleteSubtaskRecord(projectId: string, subtaskId: string) {
+  // 1. Guaranteed server-side Supabase delete using Service Role Key (bypasses RLS)
+  try {
+    await fetch(`http://localhost:5000/api/projects/${projectId}/subtasks/${subtaskId}`, {
+      method: 'DELETE',
+    });
+  } catch {}
+
+  // 2. Direct browser Supabase delete
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('subtasks').delete().eq('id', subtaskId);
+    } catch (err) {
+      console.warn('Supabase deleteSubtaskRecord notice:', err);
+    }
+  }
+
+  notifyRealtimeChange();
+}
+
 export async function addDeliverableSubmissionRecord(subtaskId: string, submission: DeliverableSubmission) {
   if (isSupabaseConfigured()) {
     await supabase.from('deliverable_submissions').insert({

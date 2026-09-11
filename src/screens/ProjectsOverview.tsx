@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, Badge, Button, EmptyState } from '@/components/ui';
+import { Card, Badge, Button, EmptyState, Modal } from '@/components/ui';
 import { useApp } from '@/context';
 import {
   Search,
@@ -22,16 +22,19 @@ import {
   HardDrive,
   Sparkles,
   DollarSign,
+  Trash2,
 } from 'lucide-react';
+import type { Project } from '@/types';
 
 interface ProjectsOverviewProps {
   onNavigate: (route: string) => void;
 }
 
 export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
-  const { projects, editors, addToast } = useApp();
+  const { projects, editors, deleteProject, addToast } = useApp();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const now = new Date();
 
   // Metrics computed dynamically from live context projects
@@ -383,6 +386,18 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
                       </div>
                     </div>
 
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProjectToDelete(p);
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
+                      title="Delete Campaign Project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
                     <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-900 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                   </div>
                 </div>
@@ -391,6 +406,43 @@ export function ProjectsOverview({ onNavigate }: ProjectsOverviewProps) {
           })}
         </div>
       )}
+
+      {/* Delete Project Confirmation Modal */}
+      <Modal
+        open={!!projectToDelete}
+        onClose={() => setProjectToDelete(null)}
+        title="Delete Project"
+        className="max-w-md"
+      >
+        <div className="space-y-4 pt-1 font-sans">
+          <div className="p-3.5 bg-red-50 text-red-700 rounded-xl text-xs font-medium flex items-start gap-2.5 border border-red-100">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-600" />
+            <div className="leading-relaxed">
+              <span className="font-bold block mb-1 text-sm text-red-900">Are you sure you want to delete this project?</span>
+              This will permanently remove <strong className="text-red-950">"{projectToDelete?.title}"</strong> and all of its {projectToDelete?.subtasks.length || 0} deliverables, queued files, and editor assignments.
+            </div>
+          </div>
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+            <Button variant="outline" size="sm" onClick={() => setProjectToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                if (projectToDelete) {
+                  deleteProject(projectToDelete.id);
+                  addToast(`Project "${projectToDelete.title}" deleted`, 'success');
+                  setProjectToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete Project
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

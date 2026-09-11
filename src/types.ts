@@ -149,7 +149,7 @@ export interface User {
 
 export interface ActivityEvent {
   id: string;
-  type: 'verify' | 'reject' | 'assign' | 'approve' | 'send_back' | 'create_project' | 'register' | 'submit_review' | 'deadline';
+  type: 'verify' | 'reject' | 'assign' | 'approve' | 'send_back' | 'create_project' | 'delete_project' | 'delete_subtask' | 'register' | 'submit_review' | 'deadline';
   message: string;
   timestamp: string;
 }

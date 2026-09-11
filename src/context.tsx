@@ -6,8 +6,10 @@ import {
   fetchAllProjects,
   updateEditorProfile,
   createProjectRecord,
+  deleteProjectRecord,
   updateSubtaskRecord,
   createSubtaskRecord,
+  deleteSubtaskRecord,
   deleteAssetsFromStorage,
   fetchEditorAssets,
   addDeliverableSubmissionRecord,
@@ -80,7 +82,9 @@ interface AppState {
   setVerificationStatus: (editorId: string, status: VerificationStatus, feedback?: string) => void;
   toggleEditorActive: (editorId: string) => void;
   addProject: (project: Project) => void;
+  deleteProject: (projectId: string) => void;
   updateSubtask: (projectId: string, subtaskId: string, updates: Partial<import('./types').Subtask>) => void;
+  deleteSubtask: (projectId: string, subtaskId: string) => void;
   assignEditors: (projectId: string, subtaskId: string, editorIds: string[]) => void;
   addSubtaskToProject: (projectId: string, subtask: Subtask) => void;
   deleteEditorAssets: (editorId: string, assetIds: string[]) => Promise<{ success: boolean; freedBytes: number }>;
@@ -456,6 +460,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     notifyRealtimeChange();
   }, []);
 
+  const deleteProject = useCallback((projectId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    const projectTitle = project?.title || 'Project';
+
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    deleteProjectRecord(projectId).catch(() => null);
+
+    const event: ActivityEvent = {
+      id: `a${Date.now()}`,
+      type: 'delete_project',
+      message: `Project "${projectTitle}" was deleted`,
+      timestamp: new Date().toISOString(),
+    };
+    setActivity((prev) => [event, ...prev]);
+    createActivityLogRecord({ type: 'delete_project', message: event.message, metadata: { projectId } }).catch(() => null);
+    notifyRealtimeChange();
+  }, [projects]);
+
   const updateSubtask = useCallback((projectId: string, subtaskId: string, updates: Partial<import('./types').Subtask>) => {
     setProjects((prev) => prev.map((p) => p.id === projectId ? {
       ...p,
@@ -592,6 +614,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     notifyRealtimeChange();
   }, [projects]);
 
+  const deleteSubtask = useCallback((projectId: string, subtaskId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    const subtask = project?.subtasks.find((st) => st.id === subtaskId);
+    const subtaskTitle = subtask?.title || 'Deliverable';
+
+    setProjects((prev) => prev.map((p) => p.id === projectId ? {
+      ...p,
+      subtasks: p.subtasks.filter((st) => st.id !== subtaskId),
+    } : p));
+
+    deleteSubtaskRecord(projectId, subtaskId).catch(() => null);
+
+    const event: ActivityEvent = {
+      id: `a${Date.now()}`,
+      type: 'delete_subtask',
+      message: `Deliverable "${subtaskTitle}" was deleted from "${project?.title || 'project'}"`,
+      timestamp: new Date().toISOString(),
+    };
+    setActivity((prev) => [event, ...prev]);
+    createActivityLogRecord({ type: 'delete_subtask', message: event.message, metadata: { projectId, subtaskId } }).catch(() => null);
+    notifyRealtimeChange();
+  }, [projects]);
+
   // Storage Quota Methods
   const getEditorStorageStats = useCallback((editorId: string) => {
     const editor = editors.find((e) => e.id === editorId);
@@ -700,7 +745,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       user, editors, projects, activity, assets, toasts,
       login, register, logout, getEditor, getCurrentEditor,
       updateEditor, setVerificationStatus, toggleEditorActive,
-      addProject, updateSubtask, assignEditors, addSubtaskToProject,
+      addProject, deleteProject, updateSubtask, deleteSubtask, assignEditors, addSubtaskToProject,
       getEditorStorageStats, addEditorAsset, deleteEditorAssets, upgradeStorageTier, addPayAsYouGoStorage,
       addToast, removeToast,
       darkMode, toggleDarkMode,

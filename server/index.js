@@ -835,6 +835,49 @@ app.put('/api/projects/:projectId/subtasks/:subtaskId', async (req, res) => {
   res.json({ success: true, ...updates });
 });
 
+app.delete('/api/projects/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if (supabase && isUuid(id)) {
+    try {
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) {
+        console.error('Supabase project delete error:', error);
+      } else {
+        console.log(`✓ Deleted project ${id} and cascaded subtasks in Supabase`);
+      }
+    } catch (err) {
+      console.error('Failed to delete project in Supabase:', err);
+    }
+  }
+
+  projects = projects.filter((p) => p.id !== id);
+  res.json({ success: true, deletedId: id });
+});
+
+app.delete('/api/projects/:projectId/subtasks/:subtaskId', async (req, res) => {
+  const { projectId, subtaskId } = req.params;
+
+  if (supabase && isUuid(subtaskId)) {
+    try {
+      const { error } = await supabase.from('subtasks').delete().eq('id', subtaskId);
+      if (error) {
+        console.error('Supabase subtask delete error:', error);
+      } else {
+        console.log(`✓ Deleted subtask ${subtaskId} in Supabase`);
+      }
+    } catch (err) {
+      console.error('Failed to delete subtask in Supabase:', err);
+    }
+  }
+
+  const project = projects.find((p) => p.id === projectId);
+  if (project) {
+    project.subtasks = project.subtasks.filter((st) => st.id !== subtaskId);
+  }
+  res.json({ success: true, deletedSubtaskId: subtaskId });
+});
+
 app.post('/api/projects/:projectId/subtasks', async (req, res) => {
   const { projectId } = req.params;
   const st = req.body;
