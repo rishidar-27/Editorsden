@@ -336,15 +336,6 @@ export function EditorProfile() {
                   onChange={(e) => setForm({ ...form, city: e.target.value })} 
                   icon={<MapPin className="w-3.5 h-3.5 text-gray-400" />}
                 />
-                <div className="sm:col-span-2">
-                  <Input 
-                    label="Profile Picture URL (or click your avatar above to upload image file)" 
-                    placeholder="https://images.unsplash.com/... or paste image URL" 
-                    value={avatarUrl} 
-                    onChange={(e) => setAvatarUrl(e.target.value)} 
-                    icon={<Camera className="w-3.5 h-3.5 text-gray-400" />}
-                  />
-                </div>
               </div>
             </div>
 
