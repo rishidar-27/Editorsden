@@ -274,7 +274,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
 
         <div className="flex items-center gap-2.5">
           <button 
-            onClick={() => onNavigate(`/admin/editor/${editor.id}/preview`)}
+            onClick={() => onNavigate(`/editor/${editor.id}`)}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-xs font-bold text-gray-700 dark:text-zinc-300 shadow-2xs hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5 text-gray-500" />
@@ -457,7 +457,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
             </h4>
             <div className="space-y-1 text-xs font-bold">
               <button 
-                onClick={() => onNavigate(`/admin/editor/${editor.id}/preview`)}
+                onClick={() => onNavigate(`/editor/${editor.id}`)}
                 className="w-full flex items-center justify-between p-2 rounded-xl text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">

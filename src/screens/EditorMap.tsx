@@ -114,13 +114,8 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
     // Custom Zoom Controls placed bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Default OpenStreetMap Tile Layer
-    const tileUrl =
-      mapStyle === 'dark' || (mapStyle === 'osm' && darkMode)
-        ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    const tileLayer = L.tileLayer(tileUrl, {
+    // Standard OpenStreetMap Tile Layer
+    const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
@@ -131,12 +126,26 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
     mapInstanceRef.current = map;
     markersLayerRef.current = markersGroup;
 
-    // Invalidate size on container mount
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 150);
+    // Trigger multiple invalidateSize calls to ensure map renders after layout calculations
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 100);
+    const t2 = setTimeout(() => map.invalidateSize(), 350);
+    const t3 = setTimeout(() => map.invalidateSize(), 800);
+
+    // ResizeObserver to track container resizing
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
+      observer = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      observer.observe(mapContainerRef.current);
+    }
 
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      if (observer) observer.disconnect();
       map.remove();
       mapInstanceRef.current = null;
       markersLayerRef.current = null;
@@ -335,9 +344,14 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
           padding: 8px;
         }
         .leaflet-container {
-          width: 100%;
-          height: 100%;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 600px !important;
+          background: #09090b !important;
           z-index: 10;
+        }
+        .dark .leaflet-tile-pane {
+          filter: brightness(0.65) invert(1) contrast(3) hue-rotate(200deg) saturate(0.35) brightness(0.75);
         }
       `}</style>
 
@@ -445,10 +459,14 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
       </header>
 
       {/* 2. MAP & ROSTER CONTAINER */}
-      <div className="relative flex-1 w-full h-full overflow-hidden flex">
+      <div className="relative w-full flex-1 min-h-[500px] h-[calc(100vh-128px)] overflow-hidden flex">
         
         {/* LEAFLET MAP ELEMENT */}
-        <div ref={mapContainerRef} className="w-full h-full z-10" />
+        <div 
+          ref={mapContainerRef} 
+          style={{ width: '100%', height: '100%', minHeight: '500px' }} 
+          className="w-full h-full z-10" 
+        />
 
         {/* 3. FLOATING ACTIVE EDITOR CARD / DROPDOWN */}
         {selectedEditor && (
@@ -535,7 +553,7 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => onNavigate(`/admin/editor/${selectedEditor.id}/preview`)}
+                onClick={() => onNavigate(`/editor/${selectedEditor.id}`)}
                 title="View Public Portfolio Preview"
                 className="px-3 py-2 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
