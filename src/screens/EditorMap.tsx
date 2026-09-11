@@ -45,7 +45,6 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
   const [selectedSkill, setSelectedSkill] = useState<string>('All');
   const [selectedEditor, setSelectedEditor] = useState<EditorWithGeo | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mapStyle, setMapStyle] = useState<'osm' | 'dark' | 'streets'>('osm');
 
   // Filter out admin user accounts
   const editorList = useMemo(() => {
@@ -151,30 +150,6 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
       markersLayerRef.current = null;
     };
   }, []);
-
-  // Update tile layer when theme or mapStyle changes
-  useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
-
-    // Remove existing tile layers
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) {
-        map.removeLayer(layer);
-      }
-    });
-
-    // Add updated tile layer
-    const isDarkTheme = mapStyle === 'dark' || (mapStyle === 'osm' && darkMode);
-    const tileUrl = isDarkTheme
-      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    }).addTo(map);
-  }, [mapStyle, darkMode]);
 
   // Center/Fly to an editor
   const flyToEditor = useCallback((editor: EditorWithGeo) => {
