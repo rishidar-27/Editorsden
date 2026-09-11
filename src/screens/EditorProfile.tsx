@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Input, Textarea, Select, Button, SkillTag } from '@/components/ui';
 import { useApp } from '@/context';
 import { allSkills, allSoftware } from '@/data';
@@ -85,6 +85,69 @@ export function EditorProfile() {
   const [software, setSoftware] = useState<Software[]>(editor?.editingSoftware || []);
   const [skillInput, setSkillInput] = useState('');
 
+  const isDirtyRef = useRef(false);
+  const lastEditorIdRef = useRef<string | null>(null);
+
+  // Sync state whenever editor data loads or updates from Supabase/server
+  useEffect(() => {
+    if (!editor) return;
+    if (lastEditorIdRef.current !== editor.id || !isDirtyRef.current) {
+      lastEditorIdRef.current = editor.id;
+      setForm({
+        fullName: editor.fullName || '',
+        phone: editor.phone || '',
+        email: editor.email || '',
+        city: editor.city || '',
+        linkedin: editor.linkedin || '',
+        instagram: editor.instagram || '',
+        portfolioLink: editor.portfolioLink || '',
+        experience: editor.experience || 0,
+        bio: editor.bio || '',
+        availability: editor.availability || ('Not Available' as AvailabilityStatus),
+        hoursPerWeek: editor.hoursPerWeek || 0,
+      });
+      setAvatarUrl(editor.avatarUrl || '');
+      setHardwareSpecs(parseHardware(editor.hardware));
+      setSkills(editor.skills || []);
+      setSoftware(editor.editingSoftware || []);
+    }
+  }, [
+    editor?.id,
+    editor?.fullName,
+    editor?.phone,
+    editor?.email,
+    editor?.city,
+    editor?.linkedin,
+    editor?.instagram,
+    editor?.portfolioLink,
+    editor?.experience,
+    editor?.bio,
+    editor?.availability,
+    editor?.hoursPerWeek,
+    editor?.hardware,
+    editor?.skills,
+    editor?.editingSoftware,
+    editor?.avatarUrl,
+  ]);
+
+  // Profile completion criteria (10 core items x 10%)
+  const profileCriteria = useMemo(() => [
+    { key: 'fullName', label: 'Full Name', completed: Boolean(form.fullName?.trim()) },
+    { key: 'phone', label: 'Phone Number', completed: Boolean(form.phone?.trim()) },
+    { key: 'city', label: 'City / Location', completed: Boolean(form.city?.trim()) },
+    { key: 'bio', label: 'Professional Bio', completed: Boolean(form.bio?.trim() && form.bio.trim().length >= 15) },
+    { key: 'experience', label: 'Years Experience', completed: Boolean(form.experience && form.experience > 0) },
+    { key: 'availability', label: 'Availability & Hours', completed: Boolean(form.availability && form.availability !== 'Not Available' && form.hoursPerWeek > 0) },
+    { key: 'software', label: 'Software Suite', completed: software.length > 0 },
+    { key: 'skills', label: 'Core Skills', completed: skills.length > 0 },
+    { key: 'hardware', label: 'Hardware Rig Specs', completed: Boolean(hardwareSpecs.workstation?.trim() || hardwareSpecs.displays?.trim() || hardwareSpecs.storage?.trim()) },
+    { key: 'links', label: 'Social / Portfolio Link', completed: Boolean(form.linkedin?.trim() || form.instagram?.trim() || form.portfolioLink?.trim()) },
+  ], [form, software, skills, hardwareSpecs]);
+
+  const completedCount = useMemo(() => profileCriteria.filter((c) => c.completed).length, [profileCriteria]);
+  const completionPercentage = useMemo(() => Math.round((completedCount / profileCriteria.length) * 100), [completedCount, profileCriteria.length]);
+  const missingCriteria = useMemo(() => profileCriteria.filter((c) => !c.completed), [profileCriteria]);
+
   if (!editor) return null;
 
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +177,7 @@ export function EditorProfile() {
   };
 
   const handleSave = () => {
+    isDirtyRef.current = false;
     updateEditor(editor.id, {
       ...form,
       avatarUrl: avatarUrl || editor.avatarUrl,
@@ -126,7 +190,18 @@ export function EditorProfile() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const updateFormField = (key: keyof typeof form, val: any) => {
+    isDirtyRef.current = true;
+    setForm((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const updateHardware = (field: keyof HardwareConfig, val: string) => {
+    isDirtyRef.current = true;
+    setHardwareSpecs((prev) => ({ ...prev, [field]: val }));
+  };
+
   const addSkill = (skill: string) => {
+    isDirtyRef.current = true;
     if (!skills.includes(skill as Skill) && allSkills.includes(skill)) {
       setSkills([...skills, skill as Skill]);
     }
@@ -134,10 +209,12 @@ export function EditorProfile() {
   };
 
   const removeSkill = (skill: Skill) => {
+    isDirtyRef.current = true;
     setSkills(skills.filter((s) => s !== skill));
   };
 
   const toggleSoftware = (sw: string) => {
+    isDirtyRef.current = true;
     if (software.includes(sw as Software)) {
       setSoftware(software.filter((s) => s !== sw));
     } else {
@@ -295,6 +372,86 @@ export function EditorProfile() {
           </div>
         )}
 
+        {/* Profile Completion Overview Card */}
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200/90 dark:border-zinc-800 p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center font-black text-sm shadow-xs border ${
+                completionPercentage >= 80
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                  : completionPercentage >= 50
+                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                  : 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+              }`}>
+                <span>{completionPercentage}%</span>
+                <span className="text-[8px] font-bold uppercase tracking-wider opacity-70">Score</span>
+              </div>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-base font-black text-gray-900 dark:text-white">
+                    {completionPercentage === 100
+                      ? '100% Profile Completed — Fully Configured'
+                      : `${completionPercentage}% Profile Completed`}
+                  </h3>
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    completionPercentage >= 80
+                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }`}>
+                    {completedCount} of {profileCriteria.length} details filled
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                  {completionPercentage === 100
+                    ? 'All studio and hardware specifications are verified. Your profile is ready for maximum client project matching.'
+                    : 'Provide the missing details below to ensure client clarity and unlock priority project assignments.'}
+                </p>
+              </div>
+            </div>
+
+            {missingCriteria.length > 0 ? (
+              <span className="text-xs font-bold text-gray-500 dark:text-zinc-400 sm:text-right shrink-0">
+                {missingCriteria.length} {missingCriteria.length === 1 ? 'detail' : 'details'} required for 100%
+              </span>
+            ) : (
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                Profile 100% complete
+              </span>
+            )}
+          </div>
+
+          {/* Visual Progress Bar */}
+          <div className="w-full h-2.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-gray-200/60 dark:border-zinc-700">
+            <div
+              className={`h-full transition-all duration-500 rounded-full ${
+                completionPercentage >= 80
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                  : completionPercentage >= 50
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-400'
+                  : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+              }`}
+              style={{ width: `${Math.max(4, completionPercentage)}%` }}
+            />
+          </div>
+
+          {/* Missing fields recommendation pills */}
+          {missingCriteria.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <span className="text-[11px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Unfilled fields:</span>
+              {missingCriteria.map((item) => (
+                <span
+                  key={item.key}
+                  className="px-2.5 py-0.5 bg-gray-50 dark:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 rounded-lg text-[11px] font-semibold border border-gray-200 dark:border-zinc-700/80"
+                >
+                  + {item.label}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* 2-Column Grid Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
@@ -314,26 +471,30 @@ export function EditorProfile() {
                 <Input 
                   label="Full Name" 
                   value={form.fullName} 
-                  onChange={(e) => setForm({ ...form, fullName: e.target.value })} 
+                  placeholder={form.fullName ? '' : 'Not specified (e.g. Alex Rivera)'}
+                  onChange={(e) => updateFormField('fullName', e.target.value)} 
                   icon={<User className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Phone Number" 
                   value={form.phone} 
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })} 
+                  placeholder={form.phone ? '' : 'Not specified (e.g. +1 555-0199)'}
+                  onChange={(e) => updateFormField('phone', e.target.value)} 
                   icon={<Phone className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Email Address" 
                   type="email" 
                   value={form.email} 
-                  onChange={(e) => setForm({ ...form, email: e.target.value })} 
+                  placeholder={form.email ? '' : 'Not specified (e.g. editor@gogangs.com)'}
+                  onChange={(e) => updateFormField('email', e.target.value)} 
                   icon={<Mail className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="City / Location" 
                   value={form.city} 
-                  onChange={(e) => setForm({ ...form, city: e.target.value })} 
+                  placeholder={form.city ? '' : 'Not specified (e.g. Los Angeles, CA)'}
+                  onChange={(e) => updateFormField('city', e.target.value)} 
                   icon={<MapPin className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>
@@ -352,7 +513,7 @@ export function EditorProfile() {
                   </div>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                  Editor Specified
+                  {hardwareSpecs.workstation || hardwareSpecs.displays ? 'Configured' : 'Not specified'}
                 </span>
               </div>
 
@@ -365,8 +526,8 @@ export function EditorProfile() {
                   <input
                     type="text"
                     value={hardwareSpecs.workstation}
-                    placeholder="e.g. Apple Mac Studio M2 Ultra (64GB) / PC RTX 4090, Intel i9"
-                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, workstation: e.target.value })}
+                    placeholder={hardwareSpecs.workstation ? '' : 'Not specified (e.g. Apple Mac Studio M2 Ultra / PC RTX 4090, Intel i9)'}
+                    onChange={(e) => updateHardware('workstation', e.target.value)}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
@@ -379,8 +540,8 @@ export function EditorProfile() {
                   <input
                     type="text"
                     value={hardwareSpecs.displays}
-                    placeholder="e.g. Dual 4K ASUS ProArt 32-inch HDR, Calibrated DCI-P3"
-                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, displays: e.target.value })}
+                    placeholder={hardwareSpecs.displays ? '' : 'Not specified (e.g. Dual 4K ASUS ProArt 32-inch HDR, Calibrated DCI-P3)'}
+                    onChange={(e) => updateHardware('displays', e.target.value)}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
@@ -393,8 +554,8 @@ export function EditorProfile() {
                   <input
                     type="text"
                     value={hardwareSpecs.storage}
-                    placeholder="e.g. 4TB NVMe SSD + 16TB High-Speed RAID Array"
-                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, storage: e.target.value })}
+                    placeholder={hardwareSpecs.storage ? '' : 'Not specified (e.g. 4TB NVMe SSD + 16TB High-Speed RAID Array)'}
+                    onChange={(e) => updateHardware('storage', e.target.value)}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
@@ -407,8 +568,8 @@ export function EditorProfile() {
                   <input
                     type="text"
                     value={hardwareSpecs.audioConnectivity}
-                    placeholder="e.g. 1 Gbps Symmetrical Fiber, Yamaha HS8 Monitors, Sony MDR-7506"
-                    onChange={(e) => setHardwareSpecs({ ...hardwareSpecs, audioConnectivity: e.target.value })}
+                    placeholder={hardwareSpecs.audioConnectivity ? '' : 'Not specified (e.g. 1 Gbps Symmetrical Fiber, Yamaha HS8 Monitors)'}
+                    onChange={(e) => updateHardware('audioConnectivity', e.target.value)}
                     className="w-full px-3.5 py-2 text-xs bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-500 font-medium text-gray-900 dark:text-white"
                   />
                 </div>
@@ -417,12 +578,17 @@ export function EditorProfile() {
 
             {/* Bio Card */}
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 p-5 shadow-2xs space-y-3">
-              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Creator Bio & Narrative Style</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-gray-900 dark:text-white">Creator Bio & Narrative Style</h2>
+                <span className="text-[10px] text-gray-400 font-semibold">
+                  {form.bio?.trim() ? `${form.bio.length} characters` : 'Not specified'}
+                </span>
+              </div>
               <Textarea
                 rows={3}
-                placeholder="Describe your editing philosophy, favorite niches, pacing style, and major commercial highlights..."
+                placeholder={form.bio ? '' : 'Not specified. Describe your editing philosophy, favorite niches, pacing style, and major commercial highlights...'}
                 value={form.bio}
-                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                onChange={(e) => updateFormField('bio', e.target.value)}
               />
             </div>
 
@@ -443,23 +609,23 @@ export function EditorProfile() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <Input 
                   label="LinkedIn Profile" 
-                  placeholder="linkedin.com/in/..." 
+                  placeholder={form.linkedin ? '' : 'Not specified (e.g. linkedin.com/in/username)'} 
                   value={form.linkedin} 
-                  onChange={(e) => setForm({ ...form, linkedin: e.target.value })} 
+                  onChange={(e) => updateFormField('linkedin', e.target.value)} 
                   icon={<Linkedin className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Instagram Handle" 
-                  placeholder="@username" 
+                  placeholder={form.instagram ? '' : 'Not specified (e.g. @username)'} 
                   value={form.instagram} 
-                  onChange={(e) => setForm({ ...form, instagram: e.target.value })} 
+                  onChange={(e) => updateFormField('instagram', e.target.value)} 
                   icon={<Instagram className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
                   label="Personal Portfolio Website" 
-                  placeholder="yourname.studio" 
+                  placeholder={form.portfolioLink ? '' : 'Not specified (e.g. yourname.studio)'} 
                   value={form.portfolioLink} 
-                  onChange={(e) => setForm({ ...form, portfolioLink: e.target.value })} 
+                  onChange={(e) => updateFormField('portfolioLink', e.target.value)} 
                   icon={<Globe className="w-3.5 h-3.5 text-gray-400" />}
                 />
                 <Input 
@@ -467,7 +633,7 @@ export function EditorProfile() {
                   type="number" 
                   min="0" 
                   value={form.experience} 
-                  onChange={(e) => setForm({ ...form, experience: parseInt(e.target.value) || 0 })} 
+                  onChange={(e) => updateFormField('experience', parseInt(e.target.value) || 0)} 
                   icon={<Briefcase className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>
@@ -486,7 +652,7 @@ export function EditorProfile() {
                 <Select
                   label="Status"
                   value={form.availability}
-                  onChange={(e) => setForm({ ...form, availability: e.target.value as AvailabilityStatus })}
+                  onChange={(e) => updateFormField('availability', e.target.value as AvailabilityStatus)}
                 >
                   {availabilityOptions.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
@@ -499,7 +665,7 @@ export function EditorProfile() {
                   min="0"
                   max="60"
                   value={form.hoursPerWeek}
-                  onChange={(e) => setForm({ ...form, hoursPerWeek: parseInt(e.target.value) || 0 })}
+                  onChange={(e) => updateFormField('hoursPerWeek', parseInt(e.target.value) || 0)}
                   icon={<Clock className="w-3.5 h-3.5 text-gray-400" />}
                 />
               </div>

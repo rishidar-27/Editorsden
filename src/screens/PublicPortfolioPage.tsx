@@ -62,41 +62,44 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
       return {
         ...rawEditor,
         role: rawEditor.skills?.[0] ? `${rawEditor.skills[0]} Specialist` : 'Creative Video Editor',
-        rating: rawEditor.rating || '5.0',
-        reviewsCount: rawEditor.reviewsCount || 12,
-        completedProjects: rawEditor.completedProjects || 24,
+        rating: rawEditor.rating || 5.0,
+        reviewsCount: rawEditor.reviewsCount || 0,
+        completedProjects: rawEditor.completedProjects || 0,
         turnaround: rawEditor.turnaround || '24h - 48h',
-        hardware: rawEditor.hardware,
-        avatarUrl: rawEditor.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+        hardware: rawEditor.hardware || '',
+        avatarUrl: rawEditor.avatarUrl || `https://i.pravatar.cc/150?u=${rawEditor.id}`,
+        city: rawEditor.city || '',
+        bio: rawEditor.bio || '',
+        linkedin: rawEditor.linkedin || '',
+        instagram: rawEditor.instagram || '',
+        portfolioLink: rawEditor.portfolioLink || '',
+        skills: rawEditor.skills || [],
+        editingSoftware: rawEditor.editingSoftware || [],
       };
     }
 
     return {
       id: editorId,
-      fullName: editorId === 'e1' ? 'Marcus Chen' : editorId === 'e3' ? 'David Park' : 'Elena Rodriguez',
-      role: 'Lead Commercial Reel Specialist & Colorist',
+      fullName: `Editor ${editorId.slice(0, 8)}`,
+      role: 'Creative Video Editor',
       email: `${editorId}@gogangs.com`,
-      city: editorId === 'e1' ? 'San Francisco, CA, USA' : editorId === 'e3' ? 'Los Angeles, CA, USA' : 'New York, NY, USA',
-      bio: 'Award-winning video editor and post-production director with 6+ years of mastery across high-ticket commercials, YouTube narrative pacing, ACES color science, and dynamic motion graphics. Certified Apple ProRes master deliverer.',
-      experience: 6,
-      availability: 'Full-Time (35-40 hrs/week)',
-      hourlyRate: '$70/hr',
-      rating: '4.9',
-      reviewsCount: 52,
-      completedProjects: 156,
-      turnaround: '18.4h Avg',
-      verificationStatus: 'Verified',
-      avatarUrl: editorId === 'e1' 
-        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'
-        : editorId === 'e3'
-        ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80'
-        : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-      skills: ['Commercial Ads', 'Reels Editing', 'Color Grading', 'Motion Graphics', 'Sound Design'],
-      editingSoftware: ['DaVinci Resolve Studio', 'Adobe Premiere Pro', 'After Effects', 'Blender'],
-      hardware: 'Apple Mac Studio M2 Ultra (128GB Unified) • ASUS ProArt 4K HDR 1600nits • 1Gbps Symmetrical Fiber',
-      linkedin: 'linkedin.com/in/creator',
-      instagram: '@creator.edits',
-      portfolioLink: 'creator.studio',
+      city: '',
+      bio: '',
+      experience: 0,
+      availability: 'Available',
+      hourlyRate: '$65/hr',
+      rating: 5.0,
+      reviewsCount: 0,
+      completedProjects: 0,
+      turnaround: '24h - 48h',
+      verificationStatus: 'Pending',
+      avatarUrl: `https://i.pravatar.cc/150?u=${editorId}`,
+      skills: [],
+      editingSoftware: [],
+      hardware: '',
+      linkedin: '',
+      instagram: '',
+      portfolioLink: '',
       portfolio: [],
     };
   }, [rawEditor, editorId]);
@@ -388,7 +391,7 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
                   <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1.5 font-medium">
                       <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                      {editor.city}
+                      {editor.city || 'Not specified'}
                     </span>
                     <span className="flex items-center gap-1.5 font-medium">
                       <Clock className="w-3.5 h-3.5 text-gray-400" />
@@ -396,8 +399,8 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
                     </span>
                     <span className="flex items-center gap-1 text-amber-500 font-bold">
                       <Star className="w-3.5 h-3.5 fill-amber-400" />
-                      <span>4.9</span>
-                      <span className="text-gray-400 font-normal">({editor.reviewsCount} reviews)</span>
+                      <span>{editor.rating || '5.0'}</span>
+                      <span className="text-gray-400 font-normal">({editor.reviewsCount || 0} reviews)</span>
                     </span>
                   </div>
                 </div>
@@ -406,26 +409,58 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
 
               {/* Bio Statement */}
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal max-w-3xl">
-                {editor.bio}
+                {editor.bio || 'Not specified'}
               </p>
 
               {/* Social Channels & Credentials */}
               <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-                <a 
-                  href={`mailto:${editor.email}`}
-                  className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1.5"
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>{editor.email}</span>
-                </a>
-                <span className="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 flex items-center gap-1.5">
-                  <Linkedin className="w-3.5 h-3.5 text-gray-900" />
-                  <span>linkedin.com/in/{editor.fullName.toLowerCase().replace(' ', '')}</span>
-                </span>
-                <span className="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 flex items-center gap-1.5">
-                  <Instagram className="w-3.5 h-3.5 text-gray-900" />
-                  <span>@{editor.fullName.toLowerCase().replace(' ', '')}.edits</span>
-                </span>
+                {editor.email && (
+                  <a 
+                    href={`mailto:${editor.email}`}
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1.5"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>{editor.email}</span>
+                  </a>
+                )}
+                {editor.portfolioLink ? (
+                  <a
+                    href={editor.portfolioLink.startsWith('http') ? editor.portfolioLink : `https://${editor.portfolioLink}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1.5"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-gray-900" />
+                    <span>{editor.portfolioLink}</span>
+                  </a>
+                ) : null}
+                {editor.linkedin ? (
+                  <a
+                    href={editor.linkedin.startsWith('http') ? editor.linkedin : `https://${editor.linkedin}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1.5"
+                  >
+                    <Linkedin className="w-3.5 h-3.5 text-blue-600" />
+                    <span>{editor.linkedin}</span>
+                  </a>
+                ) : null}
+                {editor.instagram ? (
+                  <a
+                    href={editor.instagram.startsWith('http') ? editor.instagram : `https://instagram.com/${editor.instagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1.5"
+                  >
+                    <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                    <span>{editor.instagram}</span>
+                  </a>
+                ) : null}
+                {!editor.portfolioLink && !editor.linkedin && !editor.instagram && (
+                  <span className="px-3 py-1.5 rounded-xl bg-gray-100 text-gray-400 italic">
+                    Social links: Not specified
+                  </span>
+                )}
               </div>
 
             </div>
@@ -489,7 +524,9 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
               </div>
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase block">NLE Software</span>
-                <span className="text-xs font-black text-gray-900">DaVinci • Premiere • AE</span>
+                <span className="text-xs font-black text-gray-900 truncate max-w-[150px] block">
+                  {editor.editingSoftware?.length ? editor.editingSoftware.slice(0, 3).join(' • ') : 'Not specified'}
+                </span>
               </div>
             </div>
 
@@ -710,19 +747,19 @@ export function PublicPortfolioPage({ editorId, onNavigate }: PublicPortfolioPag
             <div className="space-y-3 text-xs">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Primary Workstation / Rig</span>
-                <span className="font-bold text-gray-900">{parsedHardware?.workstation || 'High-Performance Workstation'}</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.workstation || 'Not specified'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Color Reference Display</span>
-                <span className="font-bold text-gray-900">{parsedHardware?.displays || 'Calibrated Color Display'}</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.displays || 'Not specified'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">High-Speed Local Storage</span>
-                <span className="font-bold text-gray-900">{parsedHardware?.storage || 'Fast NVMe Scratch Storage'}</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.storage || 'Not specified'}</span>
               </div>
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                 <span className="text-gray-500">Audio & Network Pipeline</span>
-                <span className="font-bold text-gray-900">{parsedHardware?.audioConnectivity || parsedHardware?.connectivity || 'Studio Audio & High-Speed Network'}</span>
+                <span className="font-bold text-gray-900">{parsedHardware?.audioConnectivity || parsedHardware?.connectivity || 'Not specified'}</span>
               </div>
             </div>
           </div>

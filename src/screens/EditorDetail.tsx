@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/context';
+import type { Editor } from '@/types';
 import { formatLastActive, isRecentlyActive, formatDateTime, getEditorLastActiveDate } from '@/lib/dateUtils';
 import {
   ArrowLeft,
@@ -43,14 +44,17 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
   // Retrieve live editor from Supabase-backed state
   const liveEditor = getEditor(editorId);
 
-  const editor = liveEditor || {
+  const editor: Editor = liveEditor || {
     id: editorId,
     fullName: 'Editor',
     email: '',
     phone: '',
-    city: 'Remote',
+    city: '',
+    linkedin: '',
+    instagram: '',
+    portfolioLink: '',
     avatarUrl: `https://i.pravatar.cc/150?u=${editorId}`,
-    bio: 'No bio provided yet.',
+    bio: '',
     experience: 0,
     availability: 'Part-Time' as const,
     hoursPerWeek: 20,
@@ -233,9 +237,27 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
 
   const softwareList = useMemo(() => {
     const combined = [...(editor.editingSoftware || []), ...(editor.skills || [])];
-    if (combined.length === 0) return ['Premiere Pro', 'DaVinci Resolve'];
     return Array.from(new Set(combined));
   }, [editor.editingSoftware, editor.skills]);
+
+  // Dynamic Profile Completion calculation for Admin audit
+  const profileCompletion = useMemo(() => {
+    const criteria = [
+      Boolean(editor.fullName?.trim()),
+      Boolean(editor.phone?.trim()),
+      Boolean(editor.email?.trim()),
+      Boolean(editor.city?.trim() && editor.city !== 'Remote'),
+      Boolean(editor.bio?.trim() && editor.bio.trim() !== 'No bio provided yet.' && editor.bio.trim().length >= 10),
+      Boolean(editor.experience && editor.experience > 0),
+      Boolean(editor.availability && editor.availability !== 'Not Available'),
+      Boolean(editor.editingSoftware?.length),
+      Boolean(editor.skills?.length),
+      Boolean(parsedHardware?.workstation?.trim() || parsedHardware?.displays?.trim() || parsedHardware?.storage?.trim()),
+      Boolean(editor.linkedin?.trim() || editor.instagram?.trim() || editor.portfolioLink?.trim()),
+    ];
+    const filled = criteria.filter(Boolean).length;
+    return Math.round((filled / criteria.length) * 100);
+  }, [editor, parsedHardware]);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 space-y-6">
@@ -305,6 +327,16 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                     PRO CREATOR
                   </span>
                 )}
+                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+                  profileCompletion >= 80
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                    : profileCompletion >= 50
+                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                }`}>
+                  <CheckCircle2 className="w-3 h-3" />
+                  {profileCompletion}% PROFILE COMPLETE
+                </span>
                 <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   {editor.availability || 'Available for Projects'}
@@ -559,11 +591,15 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {softwareList.map((name, i) => (
-                      <div key={i} className="px-3 py-1.5 rounded-xl text-xs font-bold border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 flex items-center gap-2">
-                        <span>{name}</span>
-                      </div>
-                    ))}
+                    {softwareList.length === 0 ? (
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 italic">Not specified</span>
+                    ) : (
+                      softwareList.map((name, i) => (
+                        <div key={i} className="px-3 py-1.5 rounded-xl text-xs font-bold border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 flex items-center gap-2">
+                          <span>{name}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -645,27 +681,84 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
                 {/* Personal Details */}
                 <div className="bg-gray-50 dark:bg-zinc-850 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800 space-y-3">
-                  <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-wider text-[11px]">Personal & Account Details</h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-wider text-[11px]">Personal & Account Details</h4>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                      {profileCompletion}% Complete
+                    </span>
+                  </div>
                   <div className="space-y-2 text-gray-700 dark:text-zinc-300">
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Full Name</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{editor.fullName}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.fullName || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Email Address</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{editor.email}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.email || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
+                      <span className="text-gray-400">Phone Number</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.phone || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Location</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{editor.city || 'Remote'}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.city || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
+                      <span className="text-gray-400">Portfolio Link</span>
+                      {editor.portfolioLink ? (
+                        <a
+                          href={editor.portfolioLink.startsWith('http') ? editor.portfolioLink : `https://${editor.portfolioLink}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 max-w-[200px] truncate"
+                        >
+                          <span className="truncate">{editor.portfolioLink}</span>
+                          <ExternalLink className="w-3 h-3 shrink-0" />
+                        </a>
+                      ) : (
+                        <span className="font-bold text-gray-400">Not specified</span>
+                      )}
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
+                      <span className="text-gray-400">LinkedIn</span>
+                      {editor.linkedin ? (
+                        <a
+                          href={editor.linkedin.startsWith('http') ? editor.linkedin : `https://${editor.linkedin}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 max-w-[200px] truncate"
+                        >
+                          <span className="truncate">{editor.linkedin}</span>
+                          <ExternalLink className="w-3 h-3 shrink-0" />
+                        </a>
+                      ) : (
+                        <span className="font-bold text-gray-400">Not specified</span>
+                      )}
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
+                      <span className="text-gray-400">Instagram</span>
+                      {editor.instagram ? (
+                        <a
+                          href={editor.instagram.startsWith('http') ? editor.instagram : `https://instagram.com/${editor.instagram.replace('@', '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1 max-w-[200px] truncate"
+                        >
+                          <span className="truncate">{editor.instagram}</span>
+                          <ExternalLink className="w-3 h-3 shrink-0" />
+                        </a>
+                      ) : (
+                        <span className="font-bold text-gray-400">Not specified</span>
+                      )}
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Availability</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{editor.availability}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.availability || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Experience</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{editor.experience ? `${editor.experience} years` : 'Entry to Mid'}</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{editor.experience ? `${editor.experience} years` : 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Last Active</span>
@@ -677,7 +770,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                     <div className="flex justify-between py-1">
                       <span className="text-gray-400">Member Since</span>
                       <span className="font-bold text-gray-900 dark:text-white">
-                        {editor.createdAt ? formatDateTime(editor.createdAt) : 'Recently'}
+                        {editor.createdAt ? formatDateTime(editor.createdAt) : 'Not specified'}
                       </span>
                     </div>
                   </div>
@@ -691,7 +784,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                       Hardware & Rig Specs
                     </h4>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-200/70 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300">
-                      {parsedHardware ? 'Editor Configured' : 'Unspecified'}
+                      {parsedHardware ? 'Editor Configured' : 'Not specified'}
                     </span>
                   </div>
 
@@ -699,25 +792,25 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Primary Workstation</span>
                       <span className="font-bold text-gray-900 dark:text-white text-right max-w-[250px] truncate">
-                        {parsedHardware?.workstation || 'Not specified yet'}
+                        {parsedHardware?.workstation || 'Not specified'}
                       </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Displays / Monitors</span>
                       <span className="font-bold text-gray-900 dark:text-white text-right max-w-[250px] truncate">
-                        {parsedHardware?.displays || 'Not specified yet'}
+                        {parsedHardware?.displays || 'Not specified'}
                       </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Local Scratch Disks</span>
                       <span className="font-bold text-gray-900 dark:text-white text-right max-w-[250px] truncate">
-                        {parsedHardware?.storage || 'Not specified yet'}
+                        {parsedHardware?.storage || 'Not specified'}
                       </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-gray-200/60 dark:border-zinc-700/60">
                       <span className="text-gray-400">Monitoring & Network</span>
                       <span className="font-bold text-gray-900 dark:text-white text-right max-w-[250px] truncate">
-                        {parsedHardware?.audioConnectivity || 'Not specified yet'}
+                        {parsedHardware?.audioConnectivity || 'Not specified'}
                       </span>
                     </div>
                     <div className="flex justify-between py-1">
@@ -732,7 +825,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
               <div className="bg-gray-50 dark:bg-zinc-850 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800 space-y-2 text-xs">
                 <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-wider text-[11px]">Professional Bio</h4>
                 <p className="text-gray-600 dark:text-zinc-400 leading-relaxed">
-                  {editor.bio || 'No bio provided yet.'}
+                  {editor.bio || 'Not specified'}
                 </p>
               </div>
 
@@ -755,7 +848,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {editor.portfolio.map((item) => (
+                  {editor.portfolio.map((item: any) => (
                     <div
                       key={item.id}
                       onClick={() => setSelectedVideoModal(item)}

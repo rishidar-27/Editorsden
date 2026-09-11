@@ -100,6 +100,9 @@ export async function fetchAllEditors(): Promise<Editor[]> {
           fullName: p.full_name,
           city: p.city || '',
           phone: p.phone || '',
+          linkedin: p.linkedin || '',
+          instagram: p.instagram || '',
+          portfolioLink: p.portfolio_link || '',
           experience: p.experience_years || 0,
           skills: p.skills || [],
           editingSoftware: p.editing_software || [],
@@ -164,6 +167,9 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
   if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
   if (updates.city !== undefined) dbUpdates.city = updates.city;
   if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
+  if (updates.linkedin !== undefined) dbUpdates.linkedin = updates.linkedin;
+  if (updates.instagram !== undefined) dbUpdates.instagram = updates.instagram;
+  if (updates.portfolioLink !== undefined) dbUpdates.portfolio_link = updates.portfolioLink;
   if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
   if (updates.experience !== undefined) dbUpdates.experience_years = updates.experience;
   if (updates.skills !== undefined) dbUpdates.skills = updates.skills;
