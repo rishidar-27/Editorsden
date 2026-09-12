@@ -330,7 +330,7 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
       tileLayerRef.current = null;
       markerMapRef.current.clear();
     };
-  }, [syncMarkers, updateTileLayer]);
+  }, []); // Run once on mount: never recreate map or zoom out on theme/editor changes
 
   // Re-run marker sync whenever editors list updates
   useEffect(() => {
