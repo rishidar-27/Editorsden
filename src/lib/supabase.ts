@@ -210,6 +210,38 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
 }
 
 /**
+ * Sends a lightweight active presence heartbeat to update last_login and mark editor online.
+ */
+export async function touchEditorPresence(id: string): Promise<boolean> {
+  if (!id) return false;
+  const nowIso = new Date().toISOString();
+  let succeeded = false;
+
+  // 1. Fast server-side update with service key
+  try {
+    const res = await fetch(`http://localhost:5000/api/editors/${id}/heartbeat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (res.ok) succeeded = true;
+  } catch {}
+
+  // 2. Direct browser Supabase update
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ last_login: nowIso, is_active: true, updated_at: nowIso })
+        .eq('id', id);
+      if (!error) succeeded = true;
+    } catch {}
+  }
+
+  notifyRealtimeChange();
+  return succeeded;
+}
+
+/**
  * ============================================================
  * 3. PROJECTS & SUBTASKS SERVICES (Supabase via Service-Role & Client)
  * ============================================================

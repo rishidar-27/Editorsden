@@ -306,7 +306,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                   className="w-full h-full rounded-xl object-cover"
                 />
               </div>
-              <span className={`w-4 h-4 rounded-full border-2 border-white dark:border-zinc-900 absolute -bottom-1 -right-1 shadow-xs ${editor.active ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
+              <span className={`w-4 h-4 rounded-full border-2 border-white dark:border-zinc-900 absolute -bottom-1 -right-1 shadow-xs ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500/70' : 'bg-gray-400'}`} />
             </div>
 
             <div className="space-y-1.5">
@@ -368,8 +368,8 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                   className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium cursor-help"
                   title={`Last active timestamp: ${formatDateTime(effectiveLastActive)}`}
                 >
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                  <span>Last active: <strong className="text-gray-900 dark:text-white font-bold">{lastActiveText}</strong></span>
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500/80' : 'bg-gray-400'}`} />
+                  <span>Status: <strong className="text-gray-900 dark:text-white font-bold">{isRecent ? 'Active now' : `Last active ${lastActiveText}`}</strong></span>
                 </span>
               </div>
             </div>
@@ -386,8 +386,8 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
             <div>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Last Active</span>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                <span className="text-sm font-black text-gray-900 dark:text-white">{lastActiveText}</span>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500/80' : 'bg-gray-400'}`} />
+                <span className="text-sm font-black text-gray-900 dark:text-white">{isRecent ? 'Active now' : lastActiveText}</span>
               </div>
               <span className="text-[10px] text-gray-400 font-medium truncate max-w-[130px] block" title={formatDateTime(effectiveLastActive)}>
                 {effectiveLastActive ? formatDateTime(effectiveLastActive) : 'Never'}
@@ -764,7 +764,7 @@ export function EditorDetail({ editorId, onNavigate }: EditorDetailProps) {
                       <span className="text-gray-400">Last Active</span>
                       <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5" title={formatDateTime(effectiveLastActive)}>
                         <span className={`w-1.5 h-1.5 rounded-full ${isRecent ? 'bg-emerald-500 animate-pulse' : editor.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                        {lastActiveText} ({effectiveLastActive ? formatDateTime(effectiveLastActive) : 'Never'})
+                        {isRecent ? 'Active now' : lastActiveText} ({effectiveLastActive ? formatDateTime(effectiveLastActive) : 'Never'})
                       </span>
                     </div>
                     <div className="flex justify-between py-1">

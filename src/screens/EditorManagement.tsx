@@ -413,7 +413,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500/80' : 'bg-gray-300 dark:bg-zinc-600'}`} />
-                            <span className="font-bold text-gray-900 dark:text-white text-xs">{text}</span>
+                            <span className={`font-bold text-xs ${isRecent ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>{isRecent ? 'Active now' : text}</span>
                           </div>
                           <span className="text-[10px] text-gray-400 dark:text-zinc-500 block font-medium mt-0.5">
                             {activeIso ? formatDateTime(activeIso) : 'Never'}

@@ -475,6 +475,31 @@ app.post('/api/editors', (req, res) => {
   res.status(201).json(newEditor);
 });
 
+// POST /api/editors/:id/heartbeat - Touch active presence timestamp and mark online
+app.post('/api/editors/:id/heartbeat', async (req, res) => {
+  const id = req.params.id;
+  const nowIso = new Date().toISOString();
+
+  if (supabase) {
+    try {
+      await supabase
+        .from('profiles')
+        .update({ last_login: nowIso, is_active: true, updated_at: nowIso })
+        .eq('id', id);
+    } catch (err) {
+      console.warn('Heartbeat Supabase update notice:', err);
+    }
+  }
+
+  const editor = editors.find((e) => e.id === id);
+  if (editor) {
+    editor.lastLogin = nowIso;
+    editor.active = true;
+  }
+
+  res.json({ success: true, timestamp: nowIso });
+});
+
 app.put('/api/editors/:id', async (req, res) => {
   const id = req.params.id;
   const updates = req.body;

@@ -34,7 +34,25 @@ export function isRecentlyActive(dateString?: string | null, minutesThreshold = 
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return false;
   const diffMs = Date.now() - date.getTime();
-  return diffMs >= -60000 && diffMs <= minutesThreshold * 60 * 1000;
+  // Allow slight clock skew discrepancies (-600,000ms = -10 minutes)
+  return diffMs >= -600000 && diffMs <= minutesThreshold * 60 * 1000;
+}
+
+/**
+ * Checks if an editor is currently online based on their account status and recent activity.
+ */
+export function isEditorOnline(editor?: {
+  active?: boolean;
+  lastLogin?: string;
+  lastProfileUpdate?: string;
+  lastPortfolioUpdate?: string;
+  updated_at?: string;
+  createdAt?: string;
+} | null, minutesThreshold = 15): boolean {
+  if (!editor) return false;
+  if (editor.active === false) return false;
+  const activeIso = getEditorLastActiveDate(editor);
+  return isRecentlyActive(activeIso, minutesThreshold);
 }
 
 /**
@@ -50,15 +68,15 @@ export function formatLastActive(dateString?: string | null): string {
   const diffMs = now.getTime() - date.getTime();
 
   // Allow small negative values for slight clock discrepancies
-  if (diffMs < 0 && diffMs > -60000) return 'Active now';
-  if (diffMs < 0) return 'Recently';
+  if (diffMs < 0 && diffMs > -600000) return 'Active now';
+  if (diffMs < 0) return 'Active now';
 
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
   const diffHours = Math.floor(diffMin / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffSec < 60) return 'Active now';
+  if (diffMin < 3) return 'Active now';
   if (diffMin < 60) return `${diffMin}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays === 1) return 'Yesterday';

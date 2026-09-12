@@ -343,7 +343,7 @@ export function Reports({ onNavigate }: ReportsProps) {
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className={`w-2 h-2 rounded-full shrink-0 ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500/80' : 'bg-gray-300'}`} />
-                            <span className="font-bold text-gray-900 text-xs">{text}</span>
+                            <span className={`font-bold text-xs ${isRecent ? 'text-emerald-600' : 'text-gray-900'}`}>{isRecent ? 'Active now' : text}</span>
                           </div>
                           <span className="text-[10px] text-gray-400 block font-normal">
                             {activeIso ? formatDateTime(activeIso) : 'Never'}

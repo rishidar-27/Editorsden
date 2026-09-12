@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import type { Editor, Project, User, ActivityEvent, VerificationStatus, EditorAsset, Subtask } from './types';
 import { editors as initialEditors, projects as initialProjects, activityFeed as initialActivity, adminCredentials } from './data';
 import {
   fetchAllEditors,
   fetchAllProjects,
   updateEditorProfile,
+  touchEditorPresence,
   createProjectRecord,
   deleteProjectRecord,
   updateSubtaskRecord,
@@ -168,6 +169,79 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [user]);
 
+  // Active presence heartbeat tracking for logged-in editors
+  const lastHeartbeatRef = useRef<number>(0);
+
+  const pingEditorPresence = useCallback((editorId: string, force = false) => {
+    if (!editorId) return;
+    const now = Date.now();
+    // Throttle to at most once every 15 seconds unless forced
+    if (!force && now - lastHeartbeatRef.current < 15000) return;
+    lastHeartbeatRef.current = now;
+
+    const nowIso = new Date().toISOString();
+
+    // Optimistically update local state so UI instantly reflects Active now
+    setEditors((prev) =>
+      prev.map((e) =>
+        e.id === editorId
+          ? { ...e, lastLogin: nowIso, lastProfileUpdate: nowIso, active: true }
+          : e
+      )
+    );
+
+    // Persist to Supabase database and backend
+    touchEditorPresence(editorId).catch(() => null);
+  }, []);
+
+  // Active heartbeat: keep online presence updated while tab is open or on user interaction
+  useEffect(() => {
+    if (user?.type !== 'editor' || !user.editorId) return;
+    const editorId = user.editorId;
+
+    // 1. Immediate heartbeat ping upon entering the app
+    pingEditorPresence(editorId, true);
+
+    // 2. Periodic heartbeat every 30 seconds while tab is active
+    const heartbeatTimer = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        pingEditorPresence(editorId);
+      }
+    }, 30000);
+
+    // 3. Tab visibility and focus listeners
+    const handleFocus = () => pingEditorPresence(editorId);
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        pingEditorPresence(editorId);
+      }
+    };
+
+    // 4. User interaction events (click, keypress)
+    const handleActivity = () => pingEditorPresence(editorId);
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleFocus);
+      window.addEventListener('pointerdown', handleActivity, { passive: true });
+      window.addEventListener('keydown', handleActivity, { passive: true });
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
+    return () => {
+      clearInterval(heartbeatTimer);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleFocus);
+        window.removeEventListener('pointerdown', handleActivity);
+        window.removeEventListener('keydown', handleActivity);
+      }
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
+    };
+  }, [user?.type, user?.editorId, pingEditorPresence]);
+
   // Listen for Supabase session and email confirmation redirects
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -185,6 +259,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
             editorId: session.user.id,
           };
         });
+        if (!isUserAdmin) {
+          pingEditorPresence(session.user.id, true);
+        }
       }
     }).catch(() => null);
 
@@ -201,6 +278,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
             editorId: session.user.id,
           };
         });
+        if (!isUserAdmin) {
+          pingEditorPresence(session.user.id, true);
+        }
       } else if (event === 'SIGNED_OUT') {
         setUser((currentUser) => (currentUser?.type === 'admin' ? currentUser : null));
       }
@@ -209,7 +289,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [pingEditorPresence]);
 
   // Fetch real data from Supabase / Backend with Realtime Sync
   useEffect(() => {
@@ -338,10 +418,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       try {
         const authRes = await signInWithEmail(email, password);
         if (authRes?.user) {
-          const nowIso = new Date().toISOString();
           setUser({ type: 'editor', editorId: authRes.user.id });
-          updateEditorProfile(authRes.user.id, { lastLogin: nowIso }).catch(() => null);
-          setEditors((prev) => prev.map((e) => e.id === authRes.user.id ? { ...e, lastLogin: nowIso } : e));
+          pingEditorPresence(authRes.user.id, true);
           return { success: true, userType: 'editor' };
         }
       } catch (authErr: any) {
@@ -359,12 +437,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     if (editor) {
       setUser({ type: 'editor', editorId: editor.id });
-      setEditors((prev) => prev.map((e) => e.id === editor.id ? { ...e, lastLogin: new Date().toISOString() } : e));
+      pingEditorPresence(editor.id, true);
       return { success: true, userType: 'editor' };
     }
 
     return { success: false, error: 'Invalid email or password' };
-  }, [editors]);
+  }, [editors, pingEditorPresence]);
 
   const register = useCallback(async (emailInput: string, passwordInput: string, fullNameInput?: string, specialtyInput?: string): Promise<{ success: boolean; error?: string }> => {
     const email = emailInput.trim().toLowerCase();

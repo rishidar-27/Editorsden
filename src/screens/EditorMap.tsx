@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useApp } from '@/context';
 import { getEditorCoordinates, GeoLocation } from '@/lib/geoUtils';
+import { isEditorOnline, formatLastActive, getEditorLastActiveDate } from '@/lib/dateUtils';
 import type { Editor } from '@/types';
 import {
   MapPin,
@@ -129,6 +130,8 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
 
       const isVerified = editor.verificationStatus === 'Verified';
       const isPending = editor.verificationStatus === 'Pending';
+      const effectiveLastActive = getEditorLastActiveDate(editor);
+      const isOnline = isEditorOnline(editor, 15);
       const isActive = editor.active;
 
       const ringColorClass = !isActive
@@ -145,9 +148,9 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
       const iconHtml = `
         <div class="editor-map-marker-wrapper group cursor-pointer" id="marker-${editor.id}">
           <div class="relative flex items-center justify-center">
-            <!-- Pulsing Beacon for Active Editors -->
+            <!-- Pulsing Beacon for Online Editors -->
             ${
-              isActive && isVerified
+              isOnline && isVerified
                 ? `<span class="absolute -inset-1.5 rounded-full bg-emerald-500/30 animate-ping"></span>`
                 : ''
             }
@@ -224,7 +227,7 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
           <div class="popup-badges">
             <span class="popup-pill skill-pill">${editor.skills?.[0] || 'Video Editor'}</span>
             <span class="popup-pill exp-pill">${editor.experience || 1} yr${(editor.experience || 1) > 1 ? 's' : ''} exp</span>
-            <span class="popup-pill ${isActive ? 'online-pill' : 'offline-pill'}">${isActive ? 'Active' : 'Offline'}</span>
+            <span class="popup-pill ${isOnline ? 'online-pill' : 'offline-pill'}">${isOnline ? 'Active now' : (isActive ? formatLastActive(effectiveLastActive) : 'Inactive')}</span>
           </div>
 
           <button id="popup-btn-${editor.id}" class="popup-view-btn">
@@ -724,6 +727,8 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
           ) : (
             editorsWithGeo.map((editor) => {
               const isVerified = editor.verificationStatus === 'Verified';
+              const effectiveLastActive = getEditorLastActiveDate(editor);
+              const isOnline = isEditorOnline(editor, 15);
 
               return (
                 <div
@@ -740,18 +745,31 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
                       />
                       <span
                         className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-zinc-900 ${
-                          isVerified ? 'bg-emerald-500' : 'bg-amber-500'
+                          isOnline
+                            ? 'bg-emerald-500 animate-pulse'
+                            : isVerified
+                            ? 'bg-emerald-500/60'
+                            : 'bg-amber-500'
                         }`}
                       />
                     </div>
 
                     <div className="min-w-0">
-                      <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                        {editor.fullName}
+                      <div className="text-xs font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+                        <span>{editor.fullName}</span>
+                        {isOnline && (
+                          <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded-md">
+                            Online
+                          </span>
+                        )}
                       </div>
                       <div className="text-[11px] text-gray-500 dark:text-zinc-400 truncate flex items-center gap-1">
                         <MapPin className="w-2.5 h-2.5 text-red-500 shrink-0" />
                         <span>{editor.city || editor.geo.cityName}</span>
+                        <span className="text-gray-300 dark:text-zinc-600">•</span>
+                        <span className={isOnline ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}>
+                          {isOnline ? 'Active now' : formatLastActive(effectiveLastActive)}
+                        </span>
                       </div>
                     </div>
                   </div>

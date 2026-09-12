@@ -368,7 +368,9 @@ export function AssignEditors({ projectId, subtaskId, onNavigate }: AssignEditor
                                   title={`Last active timestamp: ${formatDateTime(activeIso)}`}
                                 >
                                   <span className={`w-1.5 h-1.5 rounded-full ${isRecent ? 'bg-emerald-500 animate-pulse' : e.active ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                                  Active {text}
+                                  <span className={isRecent ? 'text-emerald-600 font-bold' : ''}>
+                                    {isRecent ? 'Active now' : `Active ${text}`}
+                                  </span>
                                 </span>
                               );
                             })()}
