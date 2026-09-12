@@ -24,6 +24,7 @@ import {
 import { Logo } from './Logo';
 import { useApp } from '@/context';
 import { Avatar } from './ui';
+import { fetchUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/supabase';
 
 interface NavItem {
   label: string;
@@ -80,7 +81,8 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     }
   }, [searchOpen]);
 
-  const storageKey = `gogangs_read_notifs_${user?.type === 'admin' ? 'admin' : (user?.editorId || 'guest')}`;
+  const currentUserId = user?.type === 'admin' ? 'admin' : (user?.editorId || 'guest');
+  const storageKey = `gogangs_read_notifs_${currentUserId}`;
   const [readIds, setReadIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -89,6 +91,31 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
       return [];
     }
   });
+
+  // Sync read notification state with Supabase
+  useEffect(() => {
+    let mounted = true;
+    if (currentUserId && currentUserId !== 'guest') {
+      fetchUserNotifications(currentUserId)
+        .then((notifs) => {
+          if (!mounted || !notifs) return;
+          const readFromDb = notifs.filter((n) => n.isRead).map((n) => n.id);
+          if (readFromDb.length > 0) {
+            setReadIds((prev) => {
+              const merged = Array.from(new Set([...prev, ...readFromDb]));
+              try {
+                localStorage.setItem(storageKey, JSON.stringify(merged));
+              } catch {}
+              return merged;
+            });
+          }
+        })
+        .catch((err) => console.warn('Supabase notifications sync info:', err));
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [currentUserId, storageKey]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -316,6 +343,11 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
     } catch {}
+    if (currentUserId && currentUserId !== 'guest') {
+      markAllNotificationsAsRead(currentUserId, allIds).catch((err) =>
+        console.warn('Failed to sync mark all notifications in Supabase:', err)
+      );
+    }
   };
 
   const markAsRead = (id: string, route?: string) => {
@@ -324,6 +356,11 @@ export function TopNav({ items, currentRoute, onNavigate, showSearch = false, sh
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
     } catch {}
+    if (currentUserId && currentUserId !== 'guest') {
+      markNotificationAsRead(currentUserId, id).catch((err) =>
+        console.warn('Failed to sync notification read in Supabase:', err)
+      );
+    }
     if (route) {
       setNotificationsOpen(false);
       onNavigate(route);

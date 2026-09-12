@@ -49,12 +49,23 @@ export function EditorMap({ onNavigate }: EditorMapProps) {
     );
   }, [editors]);
 
-  // Enrich each editor with geocoded coordinates
+  // Enrich each editor with database coordinates (lat/lng) or geocoded coordinates
   const editorsWithGeo: EditorWithGeo[] = useMemo(() => {
-    return editorList.map((e) => ({
-      ...e,
-      geo: getEditorCoordinates(e.city, e.id),
-    }));
+    return editorList.map((e) => {
+      const fallbackGeo = getEditorCoordinates(e.city, e.id);
+      const hasCustomCoords = typeof e.lat === 'number' && typeof e.lng === 'number' && !isNaN(e.lat) && !isNaN(e.lng);
+      return {
+        ...e,
+        geo: hasCustomCoords
+          ? {
+              lat: e.lat!,
+              lng: e.lng!,
+              cityName: fallbackGeo.cityName || e.city || 'Custom Location',
+              country: fallbackGeo.country || 'Global',
+            }
+          : fallbackGeo,
+      };
+    });
   }, [editorList]);
 
   // Unique countries and cities stats

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Editor, Project, Subtask, EditorAsset, ActivityEvent, DeliverableSubmission } from '@/types';
+import type { Editor, Project, Subtask, EditorAsset, ActivityEvent, DeliverableSubmission, UserNotification } from '@/types';
+import { allSkills, allSoftware, allTaskTypes } from '@/data';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://gogangs.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'public-anon-key';
@@ -140,6 +141,9 @@ export async function fetchAllEditors(): Promise<Editor[]> {
           completedProjects: p.completed_projects || 0,
           hardware: p.hardware,
           turnaround: p.turnaround || '24h - 48h',
+          lat: p.lat != null ? Number(p.lat) : undefined,
+          lng: p.lng != null ? Number(p.lng) : undefined,
+          themePreference: p.theme_preference || undefined,
         }));
       }
     } catch (err) {
@@ -184,6 +188,9 @@ export async function updateEditorProfile(id: string, updates: Partial<Editor>) 
   if (updates.storageLimitBytes !== undefined) dbUpdates.storage_limit_bytes = updates.storageLimitBytes;
   if (updates.hardware !== undefined) dbUpdates.hardware = updates.hardware;
   if (updates.lastLogin !== undefined) dbUpdates.last_login = updates.lastLogin;
+  if (updates.lat !== undefined) dbUpdates.lat = updates.lat;
+  if (updates.lng !== undefined) dbUpdates.lng = updates.lng;
+  if (updates.themePreference !== undefined) dbUpdates.theme_preference = updates.themePreference;
 
   // 1. Guaranteed server-side Supabase write using Service Role Key (bypasses RLS)
   try {
@@ -706,6 +713,9 @@ export function subscribeToDatabaseChanges(onPayload: (table?: string, eventType
     .on('postgres_changes', { event: '*', schema: 'public', table: 'deliverable_submissions' }, (p) => onPayload('deliverable_submissions', p.eventType, p))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'editor_assets' }, (p) => onPayload('editor_assets', p.eventType, p))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, (p) => onPayload('activity_logs', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, (p) => onPayload('notifications', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'skills' }, (p) => onPayload('skills', p.eventType, p))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'software_tools' }, (p) => onPayload('software_tools', p.eventType, p))
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') {
         console.log('[Supabase Realtime] Connected to live database stream');
@@ -739,5 +749,157 @@ export function subscribeToDatabaseChanges(onPayload: (table?: string, eventType
       window.removeEventListener('gogangs-local-sync', handleLocalSync);
     }
   };
+}
+
+/**
+ * ============================================================
+ * 7. USER NOTIFICATIONS (Persistent Read/Unread Sync)
+ * ============================================================
+ */
+export async function fetchUserNotifications(userId: string): Promise<UserNotification[]> {
+  if (!isSupabaseConfigured() || !userId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (!error && Array.isArray(data)) {
+      return data.map((n: any) => ({
+        id: n.id,
+        userId: n.user_id,
+        title: n.title,
+        message: n.message,
+        type: n.type,
+        route: n.route,
+        isRead: Boolean(n.is_read),
+        readAt: n.read_at,
+        createdAt: n.created_at,
+      }));
+    }
+  } catch (err) {
+    console.warn('Supabase fetchUserNotifications notice:', err);
+  }
+  return [];
+}
+
+export async function markNotificationAsRead(userId: string, notificationId: string): Promise<boolean> {
+  if (!isSupabaseConfigured() || !userId || !notificationId) return false;
+  try {
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from('notifications')
+      .upsert({
+        id: notificationId,
+        user_id: userId,
+        title: 'Notification',
+        message: 'Viewed notification',
+        is_read: true,
+        read_at: nowIso,
+        updated_at: nowIso,
+      }, { onConflict: 'id' });
+
+    notifyRealtimeChange();
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export async function markAllNotificationsAsRead(userId: string, notificationIds: string[]): Promise<boolean> {
+  if (!isSupabaseConfigured() || !userId || notificationIds.length === 0) return false;
+  try {
+    const nowIso = new Date().toISOString();
+    const rows = notificationIds.map((id) => ({
+      id,
+      user_id: userId,
+      title: 'Notification',
+      message: 'Viewed notification',
+      is_read: true,
+      read_at: nowIso,
+      updated_at: nowIso,
+    }));
+    const { error } = await supabase.from('notifications').upsert(rows, { onConflict: 'id' });
+    notifyRealtimeChange();
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * ============================================================
+ * 8. TAXONOMY & LOOKUP SERVICES (Skills, Software, Task Types)
+ * ============================================================
+ */
+export async function fetchSkills(): Promise<string[]> {
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from('skills')
+        .select('name')
+        .order('name', { ascending: true });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((d: any) => d.name);
+      }
+    } catch {}
+  }
+  return allSkills;
+}
+
+export async function fetchSoftwareTools(): Promise<string[]> {
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from('software_tools')
+        .select('name')
+        .order('name', { ascending: true });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((d: any) => d.name);
+      }
+    } catch {}
+  }
+  return allSoftware;
+}
+
+export async function fetchTaskTypes(): Promise<string[]> {
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await supabase
+        .from('task_types')
+        .select('name')
+        .order('name', { ascending: true });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data.map((d: any) => d.name);
+      }
+    } catch {}
+  }
+  return allTaskTypes;
+}
+
+export async function addCustomSkill(name: string): Promise<boolean> {
+  const trimmed = name.trim();
+  if (!trimmed || !isSupabaseConfigured()) return false;
+  try {
+    const { error } = await supabase.from('skills').insert({ name: trimmed });
+    if (!error) notifyRealtimeChange();
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export async function addCustomSoftwareTool(name: string): Promise<boolean> {
+  const trimmed = name.trim();
+  if (!trimmed || !isSupabaseConfigured()) return false;
+  try {
+    const { error } = await supabase.from('software_tools').insert({ name: trimmed });
+    if (!error) notifyRealtimeChange();
+    return !error;
+  } catch {
+    return false;
+  }
 }
 

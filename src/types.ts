@@ -89,6 +89,9 @@ export interface Editor {
   turnaround?: string;
   createdAt?: string;
   role?: string;
+  lat?: number;
+  lng?: number;
+  themePreference?: 'dark' | 'light';
 }
 
 export interface EditorAsset {
@@ -164,5 +167,32 @@ export interface AppNotification {
   type: 'feedback' | 'assign' | 'approve' | 'deadline' | 'verify' | 'storage' | 'system';
   userId?: string;
   createdAt?: string;
+}
+
+export interface SkillItem {
+  id: string;
+  name: string;
+}
+
+export interface SoftwareToolItem {
+  id: string;
+  name: string;
+}
+
+export interface TaskTypeItem {
+  id: string;
+  name: string;
+}
+
+export interface UserNotification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type?: string;
+  route?: string;
+  isRead: boolean;
+  readAt?: string;
+  createdAt: string;
 }
 

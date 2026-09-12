@@ -360,6 +360,9 @@ app.get('/api/editors', async (req, res) => {
             completedProjects: p.completed_projects || 0,
             hardware: p.hardware,
             turnaround: p.turnaround || '24h - 48h',
+            lat: p.lat != null ? Number(p.lat) : undefined,
+            lng: p.lng != null ? Number(p.lng) : undefined,
+            themePreference: p.theme_preference || undefined,
           }));
 
         if (search) {
@@ -445,6 +448,9 @@ app.get('/api/editors/:id', async (req, res) => {
           completedProjects: p.completed_projects || 0,
           hardware: p.hardware,
           turnaround: p.turnaround || '24h - 48h',
+          lat: p.lat != null ? Number(p.lat) : undefined,
+          lng: p.lng != null ? Number(p.lng) : undefined,
+          themePreference: p.theme_preference || undefined,
         });
       }
     } catch (err) {
@@ -527,6 +533,9 @@ app.put('/api/editors/:id', async (req, res) => {
     if (updates.storageLimitBytes !== undefined) dbUpdates.storage_limit_bytes = updates.storageLimitBytes;
     if (updates.hardware !== undefined) dbUpdates.hardware = updates.hardware;
     if (updates.lastLogin !== undefined) dbUpdates.last_login = updates.lastLogin;
+    if (updates.lat !== undefined) dbUpdates.lat = updates.lat;
+    if (updates.lng !== undefined) dbUpdates.lng = updates.lng;
+    if (updates.themePreference !== undefined) dbUpdates.theme_preference = updates.themePreference;
 
     try {
       const { data, error } = await supabase.from('profiles').update(dbUpdates).eq('id', id).select().single();

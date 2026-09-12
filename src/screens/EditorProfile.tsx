@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Input, Textarea, Select, Button, SkillTag } from '@/components/ui';
 import { useApp } from '@/context';
 import { allSkills, allSoftware } from '@/data';
+import { fetchSkills, fetchSoftwareTools } from '@/lib/supabase';
 import {
   Check,
   Plus,
@@ -84,6 +85,22 @@ export function EditorProfile() {
   const [skills, setSkills] = useState<Skill[]>(editor?.skills || []);
   const [software, setSoftware] = useState<Software[]>(editor?.editingSoftware || []);
   const [skillInput, setSkillInput] = useState('');
+  const [availableSkills, setAvailableSkills] = useState<string[]>(allSkills);
+  const [availableSoftware, setAvailableSoftware] = useState<string[]>(allSoftware);
+
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([fetchSkills(), fetchSoftwareTools()])
+      .then(([sks, sws]) => {
+        if (!mounted) return;
+        if (sks && sks.length > 0) setAvailableSkills(sks);
+        if (sws && sws.length > 0) setAvailableSoftware(sws);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const isDirtyRef = useRef(false);
   const lastEditorIdRef = useRef<string | null>(null);
@@ -202,8 +219,9 @@ export function EditorProfile() {
 
   const addSkill = (skill: string) => {
     isDirtyRef.current = true;
-    if (!skills.includes(skill as Skill) && allSkills.includes(skill)) {
-      setSkills([...skills, skill as Skill]);
+    const trimmed = skill.trim();
+    if (trimmed && !skills.includes(trimmed as Skill)) {
+      setSkills([...skills, trimmed as Skill]);
     }
     setSkillInput('');
   };
@@ -222,7 +240,7 @@ export function EditorProfile() {
     }
   };
 
-  const filteredSkills = allSkills.filter(
+  const filteredSkills = availableSkills.filter(
     (s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s as Skill)
   );
 
@@ -712,7 +730,7 @@ export function EditorProfile() {
               <h2 className="text-sm font-bold text-gray-900 dark:text-white">Creative Software Suite</h2>
               
               <div className="flex flex-wrap gap-1.5">
-                {allSoftware.map((sw) => {
+                {availableSoftware.map((sw) => {
                   const selected = software.includes(sw as Software);
                   return (
                     <button

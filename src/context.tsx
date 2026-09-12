@@ -156,8 +156,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [darkMode]);
 
   const toggleDarkMode = useCallback(() => {
-    setDarkMode((prev) => !prev);
-  }, []);
+    setDarkMode((prev) => {
+      const next = !prev;
+      const nextTheme = next ? 'dark' : 'light';
+      if (user?.type === 'editor' && user.editorId) {
+        updateEditorProfile(user.editorId, { themePreference: nextTheme }).catch((err) => {
+          console.warn('Failed to sync theme preference to Supabase:', err);
+        });
+      }
+      return next;
+    });
+  }, [user]);
+
+  // Sync theme preference from loaded editor profile in Supabase
+  useEffect(() => {
+    if (user?.type === 'editor' && user.editorId && editors.length > 0) {
+      const currentEd = editors.find((e) => e.id === user.editorId);
+      if (currentEd?.themePreference) {
+        setDarkMode(currentEd.themePreference === 'dark');
+      }
+    }
+  }, [user?.editorId, editors]);
 
   useEffect(() => {
     try {
