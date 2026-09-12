@@ -224,13 +224,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ]);
         if (!isMounted) return;
         if (isSupabaseConfigured()) {
-          setEditors(liveEditors || []);
-          setProjects(liveProjects || []);
-          setActivity(liveActivity || []);
+          setEditors((prev) => {
+            const next = liveEditors || [];
+            return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+          });
+          setProjects((prev) => {
+            const next = liveProjects || [];
+            return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+          });
+          setActivity((prev) => {
+            const next = liveActivity || [];
+            return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+          });
         } else {
-          if (liveEditors && liveEditors.length > 0) setEditors(liveEditors);
-          if (liveProjects && liveProjects.length > 0) setProjects(liveProjects);
-          if (liveActivity && liveActivity.length > 0) setActivity(liveActivity);
+          if (liveEditors && liveEditors.length > 0) {
+            setEditors((prev) => JSON.stringify(prev) === JSON.stringify(liveEditors) ? prev : liveEditors);
+          }
+          if (liveProjects && liveProjects.length > 0) {
+            setProjects((prev) => JSON.stringify(prev) === JSON.stringify(liveProjects) ? prev : liveProjects);
+          }
+          if (liveActivity && liveActivity.length > 0) {
+            setActivity((prev) => JSON.stringify(prev) === JSON.stringify(liveActivity) ? prev : liveActivity);
+          }
         }
       } catch (err) {
         console.warn('Real data load notice:', err);

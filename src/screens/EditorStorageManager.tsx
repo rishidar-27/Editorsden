@@ -60,16 +60,17 @@ export function EditorStorageManager() {
   const isNearLimit = percentageUsed >= 80;
   const isOverLimit = percentageUsed >= 100;
 
-  const [extraGBInput, setExtraGBInput] = useState<number>(10);
+  const [extraGBInput, setExtraGBInput] = useState<number | ''>(10);
+  const parsedGB = typeof extraGBInput === 'number' && extraGBInput > 0 ? extraGBInput : 1;
   const pricePerGB = 0.50;
-  const calculatedTotalCost = (Math.max(1, Number(extraGBInput) || 1) * pricePerGB).toFixed(2);
+  const calculatedTotalCost = (parsedGB * pricePerGB).toFixed(2);
   const currentLimitGBNum = storageLimitBytes / (1024 * 1024 * 1024);
-  const newTotalGB = (currentLimitGBNum + Math.max(1, Number(extraGBInput) || 1)).toFixed(1).replace(/\.0$/, '');
+  const newTotalGB = (currentLimitGBNum + parsedGB).toFixed(1).replace(/\.0$/, '');
 
   const handleAddExtraStorage = async (additionalGB: number) => {
     await addPayAsYouGoStorage(editorId, additionalGB);
     setIsUpgradeModalOpen(false);
-    addToast(`Successfully added +${additionalGB} GB extra storage! You are now a PRO Creator.`, 'success');
+    addToast(`Successfully added +${additionalGB} GB extra storage!`, 'success');
   };
 
   const draftAssets = useMemo(() => {
@@ -224,7 +225,7 @@ export function EditorStorageManager() {
             }`}
           >
             <Plus className="w-3.5 h-3.5 mr-1" />
-            Add Extra Storage (Pay As You Go)
+            Add Extra Storage
           </Button>
         </div>
       </div>
@@ -708,122 +709,60 @@ export function EditorStorageManager() {
         </Modal>
       )}
 
-      {/* Pay-As-You-Go Extra Storage Modal */}
+      {/* Extra Storage Modal */}
       {isUpgradeModalOpen && (
         <Modal
           open={isUpgradeModalOpen}
           onClose={() => setIsUpgradeModalOpen(false)}
-          title="Add Extra Video Storage (Pay As You Go)"
+          title="Add Extra Storage"
+          className="max-w-md"
         >
-          <div className="space-y-5 pt-1">
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 text-xs text-amber-900 dark:text-amber-300 flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold">1 GB is permanently Free for every editor.</p>
-                <p className="text-[11px] opacity-90 mt-0.5">
-                  Set how much extra storage you need below. Pay only for what you add with zero recurring fees. Any top-up permanently qualifies your account as a <span className="font-bold">PRO Creator</span>.
-                </p>
-              </div>
-            </div>
-
-            {/* Set GB Stepper & Direct Input */}
-            <div className="space-y-2.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 block">
-                How many extra GBs do you want?
+          <div className="space-y-4 pt-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">
+                Extra storage needed (GB)
               </label>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setExtraGBInput((prev) => Math.max(1, prev - 5))}
-                  className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white font-black text-2xl flex items-center justify-center transition-colors cursor-pointer"
-                  title="Decrease 5 GB"
-                >
-                  -
-                </button>
-                <div className="relative flex-1">
-                  <input
-                    type="number"
-                    min={1}
-                    max={500}
-                    value={extraGBInput}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value);
-                      setExtraGBInput(isNaN(val) ? 1 : Math.max(1, Math.min(500, val)));
-                    }}
-                    className="w-full text-center text-3xl font-black py-2.5 px-4 rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:border-amber-500"
-                  />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400 dark:text-zinc-500 uppercase">
-                    GB
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setExtraGBInput((prev) => Math.min(500, prev + 5))}
-                  className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white font-black text-2xl flex items-center justify-center transition-colors cursor-pointer"
-                  title="Increase 5 GB"
-                >
-                  +
-                </button>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={extraGBInput}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    setExtraGBInput(isNaN(val) ? '' : Math.max(1, Math.min(500, val)));
+                  }}
+                  placeholder="10"
+                  className="w-full px-3 py-2 text-sm bg-surface-0 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-lg focus-ring pr-10"
+                  autoFocus
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 dark:text-zinc-500 pointer-events-none">
+                  GB
+                </span>
               </div>
-
-              {/* Quick Select Presets */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="text-[11px] font-semibold text-gray-400">Quick select:</span>
-                {[5, 10, 25, 50, 100].map((gb) => (
-                  <button
-                    key={gb}
-                    type="button"
-                    onClick={() => setExtraGBInput(gb)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      extraGBInput === gb
-                        ? 'bg-amber-500 text-white shadow-xs'
-                        : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
-                    }`}
-                  >
-                    +{gb} GB
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Live Pricing Breakdown Card */}
-            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-zinc-850 border border-gray-200 dark:border-zinc-800 space-y-2.5">
-              <div className="flex justify-between text-xs text-gray-600 dark:text-zinc-400">
-                <span>Pay-As-You-Go Rate</span>
-                <span className="font-semibold text-gray-900 dark:text-white">$0.50 / GB</span>
-              </div>
-              <div className="flex justify-between text-xs text-gray-600 dark:text-zinc-400">
-                <span>Extra Storage Added</span>
-                <span className="font-semibold text-gray-900 dark:text-white">+{extraGBInput} GB</span>
-              </div>
-              <div className="flex justify-between text-xs text-gray-600 dark:text-zinc-400">
-                <span>New Total Bucket Size</span>
-                <span className="font-bold text-amber-600 dark:text-amber-400">{newTotalGB} GB</span>
-              </div>
-              <div className="pt-2.5 border-t border-gray-200 dark:border-zinc-750 flex items-baseline justify-between">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 block">Total Amount Due</span>
-                  <span className="text-[10px] text-gray-400">One-time payment • Never expires</span>
-                </div>
-                <div className="text-3xl font-black text-gray-900 dark:text-white">
-                  ${calculatedTotalCost}
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Action */}
-            <div className="space-y-2 pt-1">
-              <Button
-                size="lg"
-                variant="primary"
-                onClick={() => handleAddExtraStorage(extraGBInput)}
-                className="w-full font-bold bg-amber-500 hover:bg-amber-600 text-white border-0 py-3 text-sm cursor-pointer shadow-xs"
-              >
-                Pay ${calculatedTotalCost} & Add +{extraGBInput} GB Storage
-              </Button>
-              <p className="text-[10.5px] text-center text-gray-400">
-                Instant Cloudflare R2 bucket expansion • Permanent PRO Creator badge
+              <p className="mt-2 text-xs text-gray-500 dark:text-zinc-400">
+                Rate: $0.50 / GB &bull; Cost: <span className="font-semibold text-gray-900 dark:text-white">${calculatedTotalCost}</span> &bull; New capacity: <span className="font-semibold text-gray-900 dark:text-white">{newTotalGB} GB</span>
               </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800">
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => setIsUpgradeModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                type="button"
+                onClick={() => handleAddExtraStorage(parsedGB)}
+                className="bg-amber-500 hover:bg-amber-600 text-white border-0"
+              >
+                Add +{parsedGB} GB
+              </Button>
             </div>
           </div>
         </Modal>
