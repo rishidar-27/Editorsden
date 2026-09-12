@@ -30,6 +30,8 @@ interface EditorManagementProps {
 
 export function EditorManagement({ onNavigate }: EditorManagementProps) {
   const { editors, setVerificationStatus, toggleEditorActive, addToast } = useApp();
+  type CardFilterKey = 'all' | 'verified' | 'pending' | 'active' | 'inactive';
+  const [cardFilter, setCardFilter] = useState<CardFilterKey>('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
   const [activeStatusFilter, setActiveStatusFilter] = useState('All');
@@ -57,8 +59,18 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
   const activeEditors = editorList.filter((e) => e.active).length;
   const inactiveEditors = editorList.filter((e) => !e.active).length;
 
-  const metrics = [
+  const metrics: Array<{
+    key: CardFilterKey;
+    label: string;
+    value: string;
+    trend: string;
+    trendUp: boolean;
+    subtext: string;
+    icon: React.ReactNode;
+    bg: string;
+  }> = [
     {
+      key: 'all',
       label: 'Total Editors',
       value: String(totalEditors),
       trend: '↑ 12%',
@@ -68,6 +80,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       bg: 'bg-gray-100',
     },
     {
+      key: 'verified',
       label: 'Verified',
       value: String(verifiedEditors),
       trend: '↑ 18%',
@@ -77,6 +90,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       bg: 'bg-emerald-100/70',
     },
     {
+      key: 'pending',
       label: 'Pending Verification',
       value: String(pendingEditors),
       trend: '↓ 7%',
@@ -86,6 +100,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       bg: 'bg-amber-100/70',
     },
     {
+      key: 'active',
       label: 'Active',
       value: String(activeEditors),
       trend: '↑ 16%',
@@ -95,6 +110,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       bg: 'bg-gray-100',
     },
     {
+      key: 'inactive',
       label: 'Inactive',
       value: String(inactiveEditors),
       trend: '↓ 50%',
@@ -104,6 +120,38 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       bg: 'bg-red-100/70',
     },
   ];
+
+  const handleCardClick = (key: CardFilterKey) => {
+    setCurrentPage(1);
+    if (key === 'all') {
+      setCardFilter('all');
+      setActiveStatusFilter('All');
+      return;
+    }
+    if (cardFilter === key) {
+      setCardFilter('all');
+      setActiveStatusFilter('All');
+    } else {
+      setCardFilter(key);
+      if (key === 'verified') setActiveStatusFilter('Verified');
+      else if (key === 'pending') setActiveStatusFilter('Pending');
+      else setActiveStatusFilter('All');
+    }
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setActiveStatusFilter(status);
+    setCurrentPage(1);
+    if (status === 'Verified') setCardFilter('verified');
+    else if (status === 'Pending') setCardFilter('pending');
+    else if (status === 'All') {
+      if (cardFilter === 'verified' || cardFilter === 'pending') {
+        setCardFilter('all');
+      }
+    } else {
+      setCardFilter('all');
+    }
+  };
 
   // Dynamic filter logic
   const filtered = useMemo(() => {
@@ -116,13 +164,24 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
       ) {
         return false;
       }
-      if (activeStatusFilter !== 'All' && e.verificationStatus !== activeStatusFilter) return false;
+
+      // Quick card filter
+      if (cardFilter === 'verified' && e.verificationStatus !== 'Verified') return false;
+      if (cardFilter === 'pending' && e.verificationStatus !== 'Pending') return false;
+      if (cardFilter === 'active' && !e.active) return false;
+      if (cardFilter === 'inactive' && e.active) return false;
+
+      // Dropdown status filter (when not already filtering via verified/pending cards)
+      if (cardFilter === 'all' && activeStatusFilter !== 'All' && e.verificationStatus !== activeStatusFilter) {
+        return false;
+      }
+
       if (activeAvailabilityFilter !== 'All' && e.availability !== activeAvailabilityFilter) return false;
       if (activeSkillFilter !== 'All' && !e.skills.includes(activeSkillFilter as never)) return false;
       if (activeSoftwareFilter !== 'All' && !e.editingSoftware.includes(activeSoftwareFilter as never)) return false;
       return true;
     });
-  }, [editorList, search, activeStatusFilter, activeAvailabilityFilter, activeSkillFilter, activeSoftwareFilter]);
+  }, [editorList, search, cardFilter, activeStatusFilter, activeAvailabilityFilter, activeSkillFilter, activeSoftwareFilter]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
@@ -140,10 +199,12 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
 
   const clearAllFilters = () => {
     setSearch('');
+    setCardFilter('all');
     setActiveStatusFilter('All');
     setActiveAvailabilityFilter('All');
     setActiveSkillFilter('All');
     setActiveSoftwareFilter('All');
+    setCurrentPage(1);
   };
 
   const handleExport = () => {
@@ -192,8 +253,14 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
 
       {/* 5 Top Stat Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        {metrics.map((m, idx) => (
-          <Card key={idx} className="p-4 relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs">
+        {metrics.map((m) => (
+          <Card
+            key={m.key}
+            onClick={() => handleCardClick(m.key)}
+            className={`p-4 relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xs cursor-pointer transition-all hover:border-gray-300 dark:hover:border-zinc-700 ${
+              cardFilter === m.key ? 'ring-2 ring-blue-500/80 dark:ring-blue-400/80' : ''
+            }`}
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-gray-500 dark:text-zinc-400 truncate pr-2">{m.label}</span>
               <div className={`w-8 h-8 rounded-xl ${m.bg} flex items-center justify-center shrink-0`}>
@@ -234,7 +301,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
           <div className="flex flex-wrap items-center gap-2">
             <select
               value={activeStatusFilter}
-              onChange={(e) => setActiveStatusFilter(e.target.value)}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
               className="px-3 py-2 text-xs font-semibold text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:border-gray-400 dark:focus:border-zinc-600 shadow-2xs cursor-pointer"
             >
               <option value="All">Status: All</option>
@@ -267,7 +334,7 @@ export function EditorManagement({ onNavigate }: EditorManagementProps) {
               ))}
             </select>
 
-            {(search || activeStatusFilter !== 'All' || activeAvailabilityFilter !== 'All' || activeSkillFilter !== 'All') && (
+            {(search || cardFilter !== 'all' || activeStatusFilter !== 'All' || activeAvailabilityFilter !== 'All' || activeSkillFilter !== 'All' || activeSoftwareFilter !== 'All') && (
               <button
                 onClick={clearAllFilters}
                 className="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold text-gray-900 dark:text-zinc-200 hover:underline transition-colors cursor-pointer"
